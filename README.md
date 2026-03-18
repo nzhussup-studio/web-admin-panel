@@ -147,6 +147,7 @@ kubectl apply -f letsencrypt_clusterissuer.yml
 
 ### GitHub Actions Configuration:
 
-- Configuration files are located in the `.github/workflows` directory.
+- Frontend workflows for the admin panel are located in the `.github/workflows` directory of this repository.
+- Backend service workflows now live in the `backend-services` repository under its `.github/workflows` directory.
 
 ---

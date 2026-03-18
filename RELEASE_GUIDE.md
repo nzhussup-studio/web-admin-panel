@@ -122,5 +122,5 @@ module.exports = {
   extends: ['@commitlint/config-conventional'],
 };
 
-# copy release cicd if needed
+# copy frontend release ci/cd if needed
 ```
