@@ -1,22 +1,15 @@
-import React, { useEffect, useState } from "react";
-import Header from "@/components/layout/Header";
-import EditableCard from "@/components/shared/EditableCard";
-import AddButton from "@/components/shared/AddButton";
-import PopUp from "@/components/shared/Popup";
+import React from "react";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import CrudPageLayout from "@/components/pages/CrudPageLayout";
+import Popup from "@/components/shared/Popup";
 import FormInput from "@/components/shared/FormInput";
-import PageSubHeader from "@/components/shared/PageSubHeader";
 import {
   EducationControllerService,
   type base_service_Education,
 } from "@/lib/api/client";
-import { normalizeApiError } from "@/lib/api/errors";
-import { usePopup } from "@/hooks/shared/usePopup";
-import { useRenderPage } from "@/hooks/shared/useRenderPage";
+import { useCrudPage } from "@/hooks/crud/useCrudPage";
 import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
-import PageWrapper from "@/motion/PageTransition";
-import LoadingElement from "@/components/states/LoadingState";
-import ErrorElement from "@/components/states/ErrorState";
-import NoInfoFoundElement from "@/components/states/EmptyState";
 
 const formatDateForInput = (dateString) => {
   if (!dateString) return "";
@@ -25,86 +18,46 @@ const formatDateForInput = (dateString) => {
 };
 
 const EducationPage = () => {
-  const [education, setEducation] = useState<base_service_Education[]>([]);
-  const [isAscending, setIsAscending] = useState(false);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
-  const [showLoading, setShowLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
-
   const {
+    items: education,
+    loading,
+    error,
+    toggleSort,
     showPopup,
     formData,
+    setFormData,
     isEditMode,
     openPopup,
     closePopup,
-    setFormData,
-  } = usePopup<base_service_Education>();
-
-  const fetchEducation = async () => {
-    setShowLoading(true);
-    setError(null);
-    try {
-      const fetchedEducation = await EducationControllerService.listEducation();
-      const sortedEducation = [...fetchedEducation].sort((a, b) =>
+    saveItem,
+    isDeleteModalOpen,
+    confirmDelete,
+    closeDeleteModal,
+    handleDelete,
+  } = useCrudPage<base_service_Education, base_service_Education, number>({
+    loadItems: () => EducationControllerService.listEducation(),
+    createItem: (payload) => EducationControllerService.createEducation(payload),
+    updateItem: (payload) => EducationControllerService.updateEducation(payload),
+    deleteItem: (id) => EducationControllerService.deleteEducation({ id }),
+    getItemId: (item) => item.id ?? null,
+    sortItems: (items, isAscending) =>
+      items.sort((a, b) =>
         isAscending
           ? Number(a.displayOrder) - Number(b.displayOrder)
           : Number(b.displayOrder) - Number(a.displayOrder)
-      );
-      setEducation(sortedEducation as base_service_Education[]);
-    } catch (fetchError) {
-      setError(normalizeApiError(fetchError));
-    } finally {
-      setShowLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchEducation();
-  }, [isAscending]);
-
-  const saveEducation = async () => {
-    const payload = {
-      ...formData,
-      displayOrder: Number(formData.displayOrder),
-    } as base_service_Education;
-    if (isEditMode) {
-      await EducationControllerService.updateEducation(payload);
-    } else {
-      await EducationControllerService.createEducation(payload);
-    }
-    await fetchEducation();
-    closePopup();
-  };
-
-  const confirmDelete = (itemId?: number) => {
-    setSelectedItemId(itemId ?? null);
-    setDeleteModalOpen(true);
-  };
-
-  const handleDelete = async () => {
-    if (selectedItemId == null) return;
-    try {
-      await EducationControllerService.deleteEducation({ id: selectedItemId });
-      setDeleteModalOpen(false);
-      setSelectedItemId(null);
-      await fetchEducation();
-    } catch (deleteError) {
-      setError(normalizeApiError(deleteError));
-    }
-  };
-
-  const toggleSort = () => {
-    setIsAscending((prev) => !prev);
-  };
-
-  const { renderPage } = useRenderPage(education, showLoading, error);
+      ),
+    toPayload: (data) =>
+      ({
+        ...data,
+        displayOrder: Number(data.displayOrder),
+      }) as base_service_Education,
+  });
 
   const eduForm = (
-    <PopUp
+    <Popup
       closePopup={closePopup}
       title={isEditMode ? "Edit Education" : "Add Education"}
-      onSubmit={saveEducation}
+      onSubmit={saveItem}
     >
       <FormInput
         label='Institution'
@@ -158,56 +111,91 @@ const EducationPage = () => {
         type='number'
         value={formData.displayOrder}
         onChange={(e) =>
-          setFormData({ ...formData, displayOrder: e.target.value })
+          setFormData({
+            ...formData,
+            displayOrder: Number(e.target.value),
+          })
         }
         required={true}
       />
-    </PopUp>
+    </Popup>
   );
 
   const eduPage = (
-    <PageWrapper>
-      <div className='mt-4'>
-        {education.map((edu) => (
-          <EditableCard
-            key={edu.id}
-            title={edu.degree}
-            onEdit={() => openPopup(edu)}
-            onDelete={() => confirmDelete(edu.id)}
-          >
-            <p>{edu.institution}</p>
-            <p>{edu.location}</p>
-            <p>
-              {new Date(edu.startDate).toLocaleDateString()} -{" "}
-              {edu.endDate
-                ? new Date(edu.endDate).toLocaleDateString()
-                : "Present"}
-            </p>
-            {edu.thesis && <p>Thesis: {edu.thesis}</p>}
-            {edu.description && <p>Description: {edu.description}</p>}
-            <p>Order: {edu.displayOrder}</p>
-          </EditableCard>
-        ))}
-      </div>
-    </PageWrapper>
+    <div className='d-grid gap-3'>
+      {education.map((edu) => (
+        <Card
+          key={edu.id}
+          className='rounded-4 app-interactive-card app-resource-card'
+          onClick={() => openPopup(edu)}
+        >
+          <Card.Body className='p-4 app-card-body'>
+            <div className='d-flex justify-content-between align-items-start gap-3'>
+              <div>
+                <Card.Title className='fw-semibold mb-3 app-card-title'>{edu.degree}</Card.Title>
+                <div className='d-flex flex-column gap-2 text-secondary'>
+                  <div>{edu.institution}</div>
+                  <div>{edu.location}</div>
+                  <div>
+                    {new Date(edu.startDate).toLocaleDateString()} -{" "}
+                    {edu.endDate
+                      ? new Date(edu.endDate).toLocaleDateString()
+                      : "Present"}
+                  </div>
+                  {edu.thesis ? <div>Thesis: {edu.thesis}</div> : null}
+                  {edu.description ? <div>{edu.description}</div> : null}
+                  <div>Order: {edu.displayOrder}</div>
+                </div>
+              </div>
+              <div className='app-card-actions'>
+                <Button
+                  variant='outline-primary'
+                  size='sm'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openPopup(edu);
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant='outline-danger'
+                  size='sm'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    confirmDelete(edu.id ?? null);
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          </Card.Body>
+        </Card>
+      ))}
+    </div>
   );
 
   return (
-    <>
-      <Header text={"Education"} />
-      <div className='container my-5'>
-        <PageSubHeader toggleSort={toggleSort} />
-        {renderPage(ErrorElement, LoadingElement, NoInfoFoundElement, eduPage)}
-      </div>
-      <DeleteConfirmation
+    <CrudPageLayout
+      title='Education'
+      toggleSort={toggleSort}
+      loading={loading}
+      error={error}
+      isEmpty={education.length === 0}
+      showAddButton={!error && !showPopup}
+      onAdd={() => openPopup()}
+      modal={showPopup ? eduForm : null}
+      deleteDialog={
+        <DeleteConfirmation
         isOpen={isDeleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
+        onClose={closeDeleteModal}
         onConfirm={handleDelete}
       />
-
-      {showPopup && eduForm}
-      {!error && !showPopup && <AddButton openPopup={openPopup} />}
-    </>
+      }
+    >
+      {eduPage}
+    </CrudPageLayout>
   );
 };
 

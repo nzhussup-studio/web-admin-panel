@@ -1,100 +1,55 @@
-import React, { useEffect, useState } from "react";
-import Header from "@/components/layout/Header";
-import EditableCard from "@/components/shared/EditableCard";
+import React from "react";
+import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import CrudPageLayout from "@/components/pages/CrudPageLayout";
 import { ProjectControllerService, type base_service_Project } from "@/lib/api/client";
-import { normalizeApiError } from "@/lib/api/errors";
-import { usePopup } from "@/hooks/shared/usePopup";
-import { useRenderPage } from "@/hooks/shared/useRenderPage";
-import AddButton from "@/components/shared/AddButton";
-import PopUp from "@/components/shared/Popup";
+import { useCrudPage } from "@/hooks/crud/useCrudPage";
+import Popup from "@/components/shared/Popup";
 import FormInput from "@/components/shared/FormInput";
-import PageSubHeader from "@/components/shared/PageSubHeader";
 import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
-import PageWrapper from "@/motion/PageTransition";
-import LoadingElement from "@/components/states/LoadingState";
-import ErrorElement from "@/components/states/ErrorState";
-import NoInfoFoundElement from "@/components/states/EmptyState";
 
 const ProjectsPage = () => {
-  const [projects, setProjects] = useState<base_service_Project[]>([]);
-  const [isAscending, setIsAscending] = useState(false);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
-  const [showLoading, setShowLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
   const {
+    items: projects,
+    loading,
+    error,
+    toggleSort,
     showPopup,
     formData,
+    setFormData,
     isEditMode,
     openPopup,
     closePopup,
-    setFormData,
-  } = usePopup<base_service_Project>();
-
-  const fetchProjects = async () => {
-    setShowLoading(true);
-    setError(null);
-    try {
-      const fetchedProjects = await ProjectControllerService.listProject();
-      const sortedProjects = [...fetchedProjects].sort((a, b) =>
+    saveItem,
+    isDeleteModalOpen,
+    confirmDelete,
+    closeDeleteModal,
+    handleDelete,
+  } = useCrudPage<base_service_Project, base_service_Project, number>({
+    loadItems: () => ProjectControllerService.listProject(),
+    createItem: (payload) => ProjectControllerService.createProject(payload),
+    updateItem: (payload) => ProjectControllerService.updateProject(payload),
+    deleteItem: (id) => ProjectControllerService.deleteProject({ id }),
+    getItemId: (item) => item.id ?? null,
+    sortItems: (items, isAscending) =>
+      items.sort((a, b) =>
         isAscending
           ? Number(a.displayOrder) - Number(b.displayOrder)
           : Number(b.displayOrder) - Number(a.displayOrder)
-      );
-      setProjects(sortedProjects as base_service_Project[]);
-    } catch (fetchError) {
-      setError(normalizeApiError(fetchError));
-    } finally {
-      setShowLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProjects();
-  }, [isAscending]);
-
-  const { renderPage } = useRenderPage(projects, showLoading, error);
-
-  const saveProject = async () => {
-    const payload = {
-      ...formData,
-      displayOrder: Number(formData.displayOrder),
-    } as base_service_Project;
-    if (isEditMode) {
-      await ProjectControllerService.updateProject(payload);
-    } else {
-      await ProjectControllerService.createProject(payload);
-    }
-    await fetchProjects();
-    closePopup();
-  };
-
-  const confirmDelete = (itemId?: number) => {
-    setSelectedItemId(itemId ?? null);
-    setDeleteModalOpen(true);
-  };
-
-  const handleDelete = async () => {
-    if (selectedItemId == null) return;
-    try {
-      await ProjectControllerService.deleteProject({ id: selectedItemId });
-      setDeleteModalOpen(false);
-      setSelectedItemId(null);
-      await fetchProjects();
-    } catch (deleteError) {
-      setError(normalizeApiError(deleteError));
-    }
-  };
-
-  const toggleSort = () => {
-    setIsAscending((prev) => !prev);
-  };
+      ),
+    toPayload: (data) =>
+      ({
+        ...data,
+        displayOrder: Number(data.displayOrder),
+      }) as base_service_Project,
+  });
 
   const projectForm = (
-    <PopUp
+    <Popup
       closePopup={closePopup}
       title={isEditMode ? "Edit Project" : "Add Project"}
-      onSubmit={saveProject}
+      onSubmit={saveItem}
     >
       <FormInput
         label='Project Name'
@@ -122,73 +77,103 @@ const ProjectsPage = () => {
         type='number'
         value={formData.displayOrder}
         onChange={(e) =>
-          setFormData({ ...formData, displayOrder: e.target.value })
+          setFormData({
+            ...formData,
+            displayOrder: Number(e.target.value),
+          })
         }
         required={true}
       />
-    </PopUp>
+    </Popup>
   );
 
   const projectPage = (
-    <PageWrapper>
-      <div className='mt-4'>
-        {projects.map((project) => (
-          <EditableCard
-            key={project.id}
-            title={project.name}
-            onEdit={() => openPopup(project)}
-            onDelete={() => confirmDelete(project.id)}
-          >
-            <div className='mt-4'>
+    <div className='d-grid gap-3'>
+      {projects.map((project) => (
+        <Card
+          key={project.id}
+          className='rounded-4 app-interactive-card app-resource-card'
+          onClick={() => openPopup(project)}
+        >
+          <Card.Body className='p-4 app-card-body'>
+            <div className='d-flex justify-content-between align-items-start gap-3'>
               <div>
-                {project.techStack &&
-                  project.techStack.split(",").map((tech, index) => (
-                    <span key={index} className='badge bg-primary me-2'>
-                      {tech.trim()}{" "}
-                    </span>
-                  ))}
+                <Card.Title className='fw-semibold mb-3 app-card-title'>
+                  {project.name}
+                </Card.Title>
+                <div className='d-flex flex-wrap gap-2 mb-3'>
+                  {project.techStack &&
+                    project.techStack.split(",").map((tech, index) => (
+                      <Badge key={index} bg='primary-subtle' text='primary'>
+                        {tech.trim()}
+                      </Badge>
+                    ))}
+                </div>
               </div>
+              <div className='app-card-actions'>
+                <Button
+                  variant='outline-primary'
+                  size='sm'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openPopup(project);
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant='outline-danger'
+                  size='sm'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    confirmDelete(project.id ?? null);
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+            <div className='d-flex flex-wrap align-items-center gap-3'>
               {project.url && (
-                <a
+                <Button
+                  variant='link'
+                  className='p-0'
                   href={project.url}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='btn btn-link'
                   onClick={(e) => e.stopPropagation()}
                 >
                   View Project
-                </a>
+                </Button>
               )}
-              <p>Order: {project.displayOrder}</p>
+              <span className='text-secondary'>Order: {project.displayOrder}</span>
             </div>
-          </EditableCard>
-        ))}
-      </div>
-    </PageWrapper>
+          </Card.Body>
+        </Card>
+      ))}
+    </div>
   );
 
   return (
-    <>
-      <Header text={"Project Management"} />
-      <div className='container my-5'>
-        <PageSubHeader toggleSort={toggleSort} />
-        {renderPage(
-          ErrorElement,
-          LoadingElement,
-          NoInfoFoundElement,
-          projectPage
-        )}
-      </div>
-
-      <DeleteConfirmation
+    <CrudPageLayout
+      title='Project Management'
+      toggleSort={toggleSort}
+      loading={loading}
+      error={error}
+      isEmpty={projects.length === 0}
+      showAddButton={!error && !showPopup}
+      onAdd={() => openPopup()}
+      modal={showPopup ? projectForm : null}
+      deleteDialog={
+        <DeleteConfirmation
         isOpen={isDeleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
+        onClose={closeDeleteModal}
         onConfirm={handleDelete}
       />
-
-      {showPopup && projectForm}
-      {!error && !showPopup && <AddButton openPopup={openPopup} />}
-    </>
+      }
+    >
+      {projectPage}
+    </CrudPageLayout>
   );
 };
 

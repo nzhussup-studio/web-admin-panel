@@ -1,25 +1,21 @@
-import type { FormEvent, MouseEvent, ReactNode } from "react";
-import { useRef, useState } from "react";
+import type { FormEvent, ReactNode } from "react";
+import { useState } from "react";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Modal from "react-bootstrap/Modal";
+import Spinner from "react-bootstrap/Spinner";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
 
-interface PopUpProps {
+interface PopupProps {
   closePopup: () => void;
   title: ReactNode;
   children?: ReactNode;
   onSubmit: () => Promise<void> | void;
 }
 
-const Popup = ({ closePopup, title, children, onSubmit }: PopUpProps) => {
+const Popup = ({ closePopup, title, children, onSubmit }: PopupProps) => {
   const { isDarkMode } = useDarkMode();
   const [isLoading, setIsLoading] = useState(false);
-
-  const contentRef = useRef<HTMLDivElement | null>(null);
-
-  const handleOverlayClick = (e: MouseEvent<HTMLDivElement>) => {
-    if (contentRef.current && !contentRef.current.contains(e.target as Node)) {
-      closePopup();
-    }
-  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,85 +31,45 @@ const Popup = ({ closePopup, title, children, onSubmit }: PopUpProps) => {
   };
 
   return (
-    <div
-      className='popup-overlay'
-      onClick={handleOverlayClick}
+    <Modal
+      show
+      onHide={closePopup}
+      centered
+      scrollable
+      animation={false}
+      backdropClassName='popup-backdrop'
+      contentClassName={`app-modal-content${isDarkMode ? " text-light" : ""}`}
       data-testid='popup-overlay'
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 1000,
-        padding: "10px",
-        boxSizing: "border-box",
-      }}
     >
-      <div
-        ref={contentRef}
-        className='popup-content'
-        data-testid='popup-content'
-        style={{
-          background: isDarkMode ? "#2a2a2a" : "white",
-          color: isDarkMode ? "#e0e0e0" : "#000",
-          padding: "20px",
-          borderRadius: "8px",
-          width: "100%",
-          maxWidth: "900px",
-          position: "relative",
-          overflowY: "auto",
-          maxHeight: "90vh",
-          border: isDarkMode ? "1px solid #444" : "1px solid #ccc",
-        }}
-      >
-        <h5>{title}</h5>
-        <form onSubmit={handleSubmit}>
+      <Modal.Header closeButton>
+        <Modal.Title>{title}</Modal.Title>
+      </Modal.Header>
+      <Form onSubmit={handleSubmit}>
+        <Modal.Body data-testid='popup-content'>
           {children}
-
-          <div className='d-flex justify-content-between mt-3'>
-            <button
-              className='btn btn-primary'
-              type='submit'
-              disabled={isLoading}
-              style={{
-                backgroundColor: isDarkMode ? "#3a3a3a" : "#007bff",
-                color: isDarkMode ? "#e0e0e0" : "#fff",
-              }}
-            >
-              {isLoading ? "Saving..." : "Save"}
-            </button>
-            <button
-              className='btn btn-secondary'
-              type='button'
-              onClick={closePopup}
-              disabled={isLoading}
-              style={{
-                backgroundColor: isDarkMode ? "#505050" : "#f8f9fa",
-                color: isDarkMode ? "#e0e0e0" : "#000",
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-        {isLoading && (
-          <div className='text-center my-3'>
-            <div
-              data-testid='loading-spinner'
-              className='spinner-border text-primary'
-              role='status'
-            >
-              <span className='visually-hidden'>Loading...</span>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+        </Modal.Body>
+        <Modal.Footer className='justify-content-between'>
+          <Button type='submit' variant='primary' disabled={isLoading}>
+            {isLoading ? "Saving..." : "Save"}
+          </Button>
+          <Button type='button' variant='secondary' onClick={closePopup} disabled={isLoading}>
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Form>
+      {isLoading && (
+        <div className='text-center my-3'>
+          <Spinner
+            animation='border'
+            variant='primary'
+            role='status'
+            data-testid='loading-spinner'
+          >
+            <span className='visually-hidden'>Loading...</span>
+          </Spinner>
+        </div>
+      )}
+    </Modal>
   );
 };
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import PopUp from "@/components/shared/Popup";
+import Popup from "@/components/shared/Popup";
 import { ThemeProvider } from "@/providers/theme/ThemeProvider";
 
 // Mock timer functions
@@ -10,7 +10,7 @@ const renderWithDarkMode = (component) => {
   return render(<ThemeProvider>{component}</ThemeProvider>);
 };
 
-describe("PopUp Component", () => {
+describe("Popup Component", () => {
   const mockClosePopup = jest.fn();
   const mockOnSubmit = jest.fn();
   const defaultProps = {
@@ -27,30 +27,29 @@ describe("PopUp Component", () => {
 
   test("renders popup with title", () => {
     renderWithDarkMode(
-      <PopUp {...defaultProps}>
+      <Popup {...defaultProps}>
         <div>Popup content</div>
-      </PopUp>
+      </Popup>
     );
     expect(screen.getByText("Test Popup")).toBeInTheDocument();
     expect(screen.getByText("Popup content")).toBeInTheDocument();
   });
 
-  test("closes on overlay click", () => {
+  test("closes from the modal close button", () => {
     renderWithDarkMode(
-      <PopUp {...defaultProps}>
+      <Popup {...defaultProps}>
         <div>Popup content</div>
-      </PopUp>
+      </Popup>
     );
-    const overlay = screen.getByTestId("popup-overlay");
-    fireEvent.click(overlay);
+    fireEvent.click(screen.getByLabelText(/close/i));
     expect(mockClosePopup).toHaveBeenCalled();
   });
 
   test("does not close when clicking popup content", () => {
     renderWithDarkMode(
-      <PopUp {...defaultProps}>
+      <Popup {...defaultProps}>
         <div>Popup content</div>
-      </PopUp>
+      </Popup>
     );
     const content = screen.getByTestId("popup-content");
     fireEvent.click(content);
@@ -60,14 +59,12 @@ describe("PopUp Component", () => {
   test("handles form submission", async () => {
     mockOnSubmit.mockResolvedValueOnce();
     renderWithDarkMode(
-      <PopUp {...defaultProps}>
-        <form>
-          <button type='submit'>Submit</button>
-        </form>
-      </PopUp>
+      <Popup {...defaultProps}>
+        <div>Popup content</div>
+      </Popup>
     );
 
-    const submitButton = screen.getByText("Submit");
+    const submitButton = screen.getByRole("button", { name: /save/i });
     await act(async () => {
       fireEvent.click(submitButton);
       jest.advanceTimersByTime(200);
@@ -82,14 +79,12 @@ describe("PopUp Component", () => {
     );
 
     renderWithDarkMode(
-      <PopUp {...defaultProps}>
-        <form>
-          <button type='submit'>Submit</button>
-        </form>
-      </PopUp>
+      <Popup {...defaultProps}>
+        <div>Popup content</div>
+      </Popup>
     );
 
-    const submitButton = screen.getByText("Submit");
+    const submitButton = screen.getByRole("button", { name: /save/i });
     await act(async () => {
       fireEvent.click(submitButton);
       jest.advanceTimersByTime(200);

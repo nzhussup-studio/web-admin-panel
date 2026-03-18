@@ -1,9 +1,11 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
+import { Routes, Route, useLocation } from "react-router-dom";
 import routes from "@/router/routes";
 import ProtectedRoute from "@/router/ProtectedRoute";
 import GlobalAlert from "@/components/layout/GlobalAlert";
 import FloatingEmojis from "@/components/layout/FloatingEmojis";
+import PageTransition from "@/motion/PageTransition";
 import "@/app/App.css";
 
 function App() {
@@ -17,28 +19,44 @@ function App() {
 }
 
 function MainApp() {
-  return (
-    <Routes>
-      {routes.map((route) => {
-        const Component = route.component;
+  const location = useLocation();
 
-        if (route.isProtected) {
+  return (
+    <AnimatePresence mode='wait'>
+      <Routes location={location} key={location.pathname}>
+        {routes.map((route) => {
+          const Component = route.component;
+
+          if (route.isProtected) {
+            return (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={
+                  <ProtectedRoute>
+                    <PageTransition>
+                      <Component />
+                    </PageTransition>
+                  </ProtectedRoute>
+                }
+              />
+            );
+          }
+
           return (
             <Route
               key={route.path}
               path={route.path}
               element={
-                <ProtectedRoute>
+                <PageTransition>
                   <Component />
-                </ProtectedRoute>
+                </PageTransition>
               }
             />
           );
-        }
-
-        return <Route key={route.path} path={route.path} element={<Component />} />;
-      })}
-    </Routes>
+        })}
+      </Routes>
+    </AnimatePresence>
   );
 }
 

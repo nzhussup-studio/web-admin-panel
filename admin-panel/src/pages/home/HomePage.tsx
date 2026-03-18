@@ -1,106 +1,88 @@
 import Header from "@/components/layout/Header";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
 import { useNavigate } from "react-router-dom";
-import Card from "@/components/shared/Card";
-import PageWrapper from "@/motion/PageTransition";
+
+const dashboardSections = [
+  {
+    title: "Projects",
+    description:
+      "Manage your projects, update details, and keep public data in sync.",
+    buttonLabel: "Manage Projects",
+    path: "/projects",
+  },
+  {
+    title: "CV",
+    description:
+      "Maintain your experience, education, skills, and certificates in one place.",
+    buttonLabel: "Manage CV",
+    path: "/cv",
+  },
+  {
+    title: "Users",
+    description:
+      "Review accounts, adjust roles, and manage admin access safely.",
+    buttonLabel: "Manage Users",
+    path: "/users",
+  },
+  {
+    title: "Albums",
+    description:
+      "Organize albums, update metadata, and curate image collections.",
+    buttonLabel: "Manage Albums",
+    path: "/albums",
+  },
+  {
+    title: "CV Generator",
+    description:
+      "Select structured profile data and export a tailored CV package.",
+    buttonLabel: "Generate CV",
+    path: "/cv-generator",
+  },
+  {
+    title: "LLM Config",
+    description:
+      "Tune AI-related configuration without touching backend settings directly.",
+    buttonLabel: "Configure LLM",
+    path: "/llm",
+  },
+];
 
 const HomePage = () => {
   const navigate = useNavigate();
 
-  const handleNavigateProjects = () => {
-    console.log("Navigating to projects");
-    navigate("/projects");
-  };
-
-  const handleNavigateCV = () => {
-    console.log("Navigating to CV");
-    navigate("/cv");
-  };
-
-  const handleNavigateUsers = () => {
-    console.log("Navigating to users");
-    navigate("/users");
-  };
-
-  const handleNavigateAlbums = () => {
-    console.log("Navigating to photos");
-    navigate("/albums");
-  };
-
-  const handleNavigateCVGenerator = () => {
-    console.log("Navigating to CV Generator");
-    navigate("/cv-generator");
-  };
-
-  const handleNavigateLLMConfig = () => {
-    console.log("Navigating to LLM Config");
-    navigate("/llm");
-  };
-
   return (
     <>
       <Header text={"Welcome to the Admin Panel"} />
-      <PageWrapper>
-        <div className='container my-5'>
-          <div className='row row-cols-1 row-cols-md-2 g-4'>
-            {/* Projects Card */}
-            <div className='col'>
+      <Container className='my-5'>
+        <Row xs={1} md={2} className='g-4'>
+          {dashboardSections.map((section) => (
+            <Col key={section.path}>
               <Card
-                title='Projects'
-                desc='Here you can manage you projects, add new projects, update and delete them.'
-                buttontxt='Manage Projects'
-                handleFunc={handleNavigateProjects}
-              />
-            </div>
-
-            {/* CV Card */}
-            <div className='col'>
-              <Card
-                title='CV'
-                desc='Here you can manage your CV, add new experiences, update and delete them.'
-                buttontxt='Manage CV'
-                handleFunc={handleNavigateCV}
-              />
-            </div>
-          </div>
-          <div className='row row-cols-1 row-cols-md-2 mt-1 g-4'>
-            <div className='col'>
-              <Card
-                title='Users'
-                desc='Here you can manage the users, add new users, update and delete them.'
-                buttontxt='Manage Users'
-                handleFunc={handleNavigateUsers}
-              />
-            </div>
-
-            <div className='col'>
-              <Card
-                title='Albums'
-                desc='Here you can manage your albums, add new albums and images, update and delete them.'
-                buttontxt='Manage Albums'
-                handleFunc={handleNavigateAlbums}
-              />
-            </div>
-
-            <div className='col'>
-              <Card
-                title='CV Generator'
-                desc='Here you can generate your CV using the CV Generator'
-                buttontxt='Generate CV'
-                handleFunc={handleNavigateCVGenerator}
-              />
-            </div>
-
-            <div className='col'>
-              <Card
-                title='LLM Config'
-                desc='Here you can tune LLM specific configurations'
-                buttontxt='Configure LLM'
-                handleFunc={handleNavigateLLMConfig}
-              />
-            </div>
-          </div>
-        </div>
-      </PageWrapper>
+                className='h-100 rounded-4 app-interactive-card app-navigation-card'
+                onClick={() => navigate(section.path)}
+              >
+                <Card.Body className='d-flex flex-column p-4 app-card-body'>
+                  <Card.Title className='fw-semibold fs-4 app-card-title'>
+                    {section.title}
+                  </Card.Title>
+                  <Card.Text className='text-secondary flex-grow-1'>
+                    {section.description}
+                  </Card.Text>
+                  <div className='app-card-actions'>
+                    <Button onClick={() => navigate(section.path)}>
+                      {section.buttonLabel}
+                    </Button>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Container>
     </>
   );
 };

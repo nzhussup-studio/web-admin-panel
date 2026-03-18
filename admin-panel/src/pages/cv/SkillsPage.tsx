@@ -1,101 +1,55 @@
-import React, { useEffect, useState } from "react";
-import Header from "@/components/layout/Header";
-import EditableCard from "@/components/shared/EditableCard";
-import AddButton from "@/components/shared/AddButton";
-import PopUp from "@/components/shared/Popup";
+import React from "react";
+import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import CrudPageLayout from "@/components/pages/CrudPageLayout";
+import Popup from "@/components/shared/Popup";
 import FormInput from "@/components/shared/FormInput";
 import { SkillControllerService, type base_service_Skill } from "@/lib/api/client";
-import { normalizeApiError } from "@/lib/api/errors";
-import { usePopup } from "@/hooks/shared/usePopup";
-import { useRenderPage } from "@/hooks/shared/useRenderPage";
-import PageSubHeader from "@/components/shared/PageSubHeader";
+import { useCrudPage } from "@/hooks/crud/useCrudPage";
 import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
-import PageWrapper from "@/motion/PageTransition";
-import LoadingElement from "@/components/states/LoadingState";
-import ErrorElement from "@/components/states/ErrorState";
-import NoInfoFoundElement from "@/components/states/EmptyState";
 
 const SkillsPage = () => {
-  const [skills, setSkills] = useState<base_service_Skill[]>([]);
-  const [isAscending, setIsAscending] = useState(false);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
-  const [showLoading, setShowLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
-
   const {
+    items: skills,
+    loading,
+    error,
+    toggleSort,
     showPopup,
     formData,
+    setFormData,
     isEditMode,
     openPopup,
     closePopup,
-    setFormData,
-  } = usePopup<base_service_Skill>();
-
-  const fetchSkills = async () => {
-    setShowLoading(true);
-    setError(null);
-    try {
-      const fetchedSkills = await SkillControllerService.listSkill();
-      const sortedSkills = [...fetchedSkills].sort((a, b) =>
+    saveItem,
+    isDeleteModalOpen,
+    confirmDelete,
+    closeDeleteModal,
+    handleDelete,
+  } = useCrudPage<base_service_Skill, base_service_Skill, number>({
+    loadItems: () => SkillControllerService.listSkill(),
+    createItem: (payload) => SkillControllerService.createSkill(payload),
+    updateItem: (payload) => SkillControllerService.updateSkill(payload),
+    deleteItem: (id) => SkillControllerService.deleteSkill({ id }),
+    getItemId: (item) => item.id ?? null,
+    sortItems: (items, isAscending) =>
+      items.sort((a, b) =>
         isAscending
           ? Number(a.displayOrder) - Number(b.displayOrder)
           : Number(b.displayOrder) - Number(a.displayOrder)
-      );
-      setSkills(sortedSkills as base_service_Skill[]);
-    } catch (fetchError) {
-      setError(normalizeApiError(fetchError));
-    } finally {
-      setShowLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSkills();
-  }, [isAscending]);
-
-  const { renderPage } = useRenderPage(skills, showLoading, error);
-
-  const saveSkill = async () => {
-    const payload = {
-      ...formData,
-      displayOrder: Number(formData.displayOrder),
-    } as base_service_Skill;
-    if (isEditMode) {
-      await SkillControllerService.updateSkill(payload);
-    } else {
-      await SkillControllerService.createSkill(payload);
-    }
-    await fetchSkills();
-    closePopup();
-  };
-
-  const confirmDelete = (itemId?: number) => {
-    setSelectedItemId(itemId ?? null);
-    setDeleteModalOpen(true);
-  };
-
-  const handleDelete = async () => {
-    if (selectedItemId == null) return;
-    try {
-      await SkillControllerService.deleteSkill({ id: selectedItemId });
-      setDeleteModalOpen(false);
-      setSelectedItemId(null);
-      await fetchSkills();
-    } catch (deleteError) {
-      setError(normalizeApiError(deleteError));
-    }
-  };
-
-  const toggleSort = () => {
-    setIsAscending((prev) => !prev);
-  };
+      ),
+    toPayload: (data) =>
+      ({
+        ...data,
+        displayOrder: Number(data.displayOrder),
+      }) as base_service_Skill,
+  });
 
   const skillForm = (
-    <PopUp
+    <Popup
       closePopup={closePopup}
       title={isEditMode ? "Edit Skill" : "Add Skill"}
-      onSubmit={saveSkill}
+      onSubmit={saveItem}
     >
       <FormInput
         label='Category'
@@ -116,63 +70,88 @@ const SkillsPage = () => {
         type='number'
         value={formData.displayOrder}
         onChange={(e) =>
-          setFormData({ ...formData, displayOrder: e.target.value })
+          setFormData({
+            ...formData,
+            displayOrder: Number(e.target.value),
+          })
         }
         required={true}
       />
-    </PopUp>
+    </Popup>
   );
 
   const skillPage = (
-    <PageWrapper>
-      <div className='mt-4'>
-        {skills.map((skill) => (
-          <EditableCard
-            key={skill.id}
-            title={skill.category}
-            onEdit={() => openPopup(skill)}
-            onDelete={() => confirmDelete(skill.id)}
-          >
-            <div className='mt-4'>
-              {skill.skillNames.split(", ").map((skillName, index) => (
-                <span
-                  key={index}
-                  className='badge bg-primary me-2 mb-2'
-                  style={{ fontSize: "14px" }}
+    <div className='d-grid gap-3'>
+      {skills.map((skill) => (
+        <Card
+          key={skill.id}
+          className='rounded-4 app-interactive-card app-resource-card'
+          onClick={() => openPopup(skill)}
+        >
+          <Card.Body className='p-4 app-card-body'>
+            <div className='d-flex justify-content-between align-items-start gap-3'>
+              <div>
+                <Card.Title className='fw-semibold mb-3 app-card-title'>
+                  {skill.category}
+                </Card.Title>
+                <div className='d-flex flex-wrap gap-2 mb-3'>
+                  {skill.skillNames.split(", ").map((skillName, index) => (
+                    <Badge key={index} bg='primary-subtle' text='primary'>
+                      {skillName}
+                    </Badge>
+                  ))}
+                </div>
+                <div className='text-secondary'>Order: {skill.displayOrder}</div>
+              </div>
+              <div className='app-card-actions'>
+                <Button
+                  variant='outline-primary'
+                  size='sm'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openPopup(skill);
+                  }}
                 >
-                  {skillName}
-                </span>
-              ))}
-              <p>Order: {skill.displayOrder}</p>
+                  Edit
+                </Button>
+                <Button
+                  variant='outline-danger'
+                  size='sm'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    confirmDelete(skill.id ?? null);
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
             </div>
-          </EditableCard>
-        ))}
-      </div>
-    </PageWrapper>
+          </Card.Body>
+        </Card>
+      ))}
+    </div>
   );
 
   return (
-    <>
-      <Header text={"Skills"} />
-      <div className='container my-5'>
-        <PageSubHeader toggleSort={toggleSort} />
-        {renderPage(
-          ErrorElement,
-          LoadingElement,
-          NoInfoFoundElement,
-          skillPage
-        )}
-      </div>
-
-      <DeleteConfirmation
+    <CrudPageLayout
+      title='Skills'
+      toggleSort={toggleSort}
+      loading={loading}
+      error={error}
+      isEmpty={skills.length === 0}
+      showAddButton={!error && !showPopup}
+      onAdd={() => openPopup()}
+      modal={showPopup ? skillForm : null}
+      deleteDialog={
+        <DeleteConfirmation
         isOpen={isDeleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
+        onClose={closeDeleteModal}
         onConfirm={handleDelete}
       />
-
-      {showPopup && skillForm}
-      {!error && !showPopup && <AddButton openPopup={openPopup} />}
-    </>
+      }
+    >
+      {skillPage}
+    </CrudPageLayout>
   );
 };
 

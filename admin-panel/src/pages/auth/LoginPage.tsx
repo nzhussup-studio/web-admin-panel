@@ -1,11 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { AuthControllerService } from "@/lib/api/client";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
-import DarkModeToggle from "@/components/shared/DarkModeToggle";
 import Loading from "@/components/states/LoadingState";
-import PageWrapper from "@/motion/PageTransition";
+import { BrightnessHighIcon, MoonStarsIcon } from "@/assets/icons";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -14,7 +19,7 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
-  const { isDarkMode } = useDarkMode();
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,100 +57,86 @@ const LoginPage = () => {
   };
 
   const loginForm = (
-    <PageWrapper>
-      <div className='form-floating mb-3'>
-        <input
+    <>
+      <Form.Floating className='mb-3'>
+        <Form.Control
           type='text'
-          className={`form-control ${isDarkMode ? "bg-dark text-light" : ""}`}
           id='floatingInput'
           placeholder='Username'
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
-          style={{
-            backgroundColor: isDarkMode ? "#2a2a2a" : "#fff",
-            color: isDarkMode ? "#e0e0e0" : "#000",
-          }}
         />
         <label htmlFor='floatingInput'>Username</label>
-      </div>
+      </Form.Floating>
 
-      <div className='form-floating mb-3'>
-        <input
+      <Form.Floating className='mb-3'>
+        <Form.Control
           type='password'
-          className={`form-control ${isDarkMode ? "bg-dark text-light" : ""}`}
           id='floatingPassword'
           placeholder='Password'
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          style={{
-            backgroundColor: isDarkMode ? "#2a2a2a" : "#fff",
-            color: isDarkMode ? "#e0e0e0" : "#000",
-          }}
         />
         <label htmlFor='floatingPassword'>Password</label>
-      </div>
+      </Form.Floating>
 
-      <button
-        className={`btn w-100 py-2 ${
-          isDarkMode ? "btn-secondary" : "btn-primary"
-        }`}
+      <Button
+        className='w-100 py-2'
+        variant={isDarkMode ? "secondary" : "primary"}
         type='submit'
-        style={{
-          backgroundColor: isDarkMode ? "#505050" : "#007bff",
-          color: isDarkMode ? "#e0e0e0" : "#fff",
-        }}
       >
         Sign in
-      </button>
-    </PageWrapper>
+      </Button>
+    </>
   );
 
   return (
-    <div
-      className={`d-flex align-items-center py-4 vh-100 ${
-        isDarkMode ? "dark-mode" : ""
-      }`}
-      style={{
-        backgroundColor: isDarkMode
-          ? "#121212 !important"
-          : "#f8f9fa !important",
-      }}
-    >
-      <div className='container'>
-        <div className='row justify-content-center'>
-          <div className='col-md-4'>
-            <main className='form-signin w-100 m-auto'>
-              <form onSubmit={handleSubmit}>
+    <div className={`d-flex align-items-center py-4 app-login-page ${isDarkMode ? "dark-mode" : ""}`}>
+      <Container>
+        <Row className='justify-content-center'>
+          <Col md={5} lg={4}>
+            <Card className='app-login-card border-0'>
+              <Card.Body className='p-4 p-lg-5'>
+                <main className='form-signin w-100 m-auto'>
+                  <form onSubmit={handleSubmit}>
                 <div className='d-flex justify-content-between align-items-center mb-4'>
                   <h1
-                    className='h3 mb-3 fw-normal'
-                    style={{
-                      color: isDarkMode ? "#e0e0e0" : "#000",
-                    }}
+                    className='h3 mb-3 fw-semibold app-login-title'
                   >
                     Please sign in
                   </h1>
-                  <DarkModeToggle />
+                  <Form.Check
+                    type='switch'
+                    id='login-dark-mode-switch'
+                    className='mb-0'
+                    label={
+                      isDarkMode ? (
+                        <MoonStarsIcon width={16} height={16} color='black' />
+                      ) : (
+                        <BrightnessHighIcon width={16} height={16} />
+                      )
+                    }
+                    checked={isDarkMode}
+                    onChange={toggleDarkMode}
+                    aria-label='Toggle dark mode'
+                  />
                 </div>
 
                 {error && <div className='alert alert-danger'>{error}</div>}
 
                 {loading ? <Loading /> : loginForm}
-                <p
-                  className='mt-5 mb-3'
-                  style={{
-                    color: isDarkMode ? "#b0b0b0" : "#666",
-                  }}
-                >
+                <p className='mt-5 mb-0 text-secondary'>
                   © by nzhussup. All rights reserved!
                 </p>
-              </form>
-            </main>
-          </div>
-        </div>
-      </div>
+                  </form>
+                </main>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
     </div>
   );
 };

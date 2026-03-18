@@ -17,6 +17,11 @@ export const ThemeProvider = ({ children }: ProviderProps) => {
   };
 
   useEffect(() => {
+    document.documentElement.setAttribute(
+      "data-bs-theme",
+      isDarkMode ? "dark" : "light"
+    );
+
     if (isDarkMode) {
       document.body.classList.add("dark-mode");
     } else {

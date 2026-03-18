@@ -1,5 +1,7 @@
 import type { ChangeEvent } from "react";
 import { useState } from "react";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 
 interface PreviewImage {
   file: Blob;
@@ -52,7 +54,7 @@ const ImageFormInput = ({
 
   return (
     <div className='mb-4'>
-      {label && <label className='form-label'>{label}</label>}
+      {label && <Form.Label>{label}</Form.Label>}
 
       <input
         type='file'
@@ -64,9 +66,9 @@ const ImageFormInput = ({
         required={required}
         aria-label='Choose files'
       />
-      <label htmlFor='image-upload-input' className='btn btn-primary btn-sm'>
+      <Button as='label' htmlFor='image-upload-input' size='sm'>
         Select Image{multiple && "s"}
-      </label>
+      </Button>
 
       {previewImages.length > 0 && (
         <div className='d-flex flex-wrap gap-2 mt-3'>
@@ -90,26 +92,25 @@ const ImageFormInput = ({
                   border: "1px solid #ccc",
                 }}
               />
-              <button
+              <Button
                 type='button'
                 onClick={() => removeImagePreview(index)}
                 aria-label='Remove image'
+                variant='danger'
+                size='sm'
                 style={{
                   position: "absolute",
                   top: "-6px",
                   right: "-6px",
-                  background: "red",
-                  color: "white",
-                  border: "none",
                   borderRadius: "50%",
                   width: "20px",
                   height: "20px",
                   fontSize: "12px",
-                  cursor: "pointer",
+                  padding: 0,
                 }}
               >
                 ×
-              </button>
+              </Button>
             </div>
           ))}
         </div>

@@ -1,9 +1,20 @@
 import type { MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
+import Navbar from "react-bootstrap/Navbar";
+import Row from "react-bootstrap/Row";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
-import ClearCacheButton from "@/components/shared/ClearCacheButton";
+import { CacheService } from "@/lib/api/client";
 import { useGlobalAlert } from "@/hooks/alerts/useGlobalAlert";
+import {
+  BrightnessHighIcon,
+  CodeSlashIcon,
+  MoonStarsIcon,
+} from "@/assets/icons";
 
 const Header = ({ text }: { text: string }) => {
   const { logout } = useAuth();
@@ -29,90 +40,69 @@ const Header = ({ text }: { text: string }) => {
     }
   };
 
+  const onClearCache = async () => {
+    try {
+      await CacheService.deleteV1AlbumCache();
+      handleClearCache(null);
+    } catch (error) {
+      handleClearCache(error);
+    }
+  };
+
   return (
-    <div className='container'>
-      <header className='py-3 mb-4 border-bottom'>
-        <div className='row align-items-center'>
-          {/* Logo on the left */}
-          <div className='col-12 col-md-4 text-center text-md-start mb-2 mb-md-0'>
-            <a
+    <Navbar bg='body' expand='md' className='py-3 mb-4 app-header-shell'>
+      <Container>
+        <Row className='w-100 align-items-center gy-3'>
+          <Col xs={12} md={4} className='d-flex justify-content-center justify-content-md-start'>
+            <Navbar.Brand
               href='/'
-              className='d-inline-flex link-body-emphasis text-decoration-none'
+              className='d-inline-flex align-items-center mb-0'
               onClick={handleLogoClick}
             >
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                width='40'
-                height='40'
-                fill='currentColor'
-                className='bi bi-code-slash'
-                viewBox='0 0 16 16'
-              >
-                <path d='M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0m6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0' />
-              </svg>
-            </a>
-          </div>
+              <span className='visually-hidden'>Home</span>
+              <CodeSlashIcon width={40} height={40} />
+            </Navbar.Brand>
+          </Col>
 
-          {/* Title in the middle */}
-          <div className='col-12 col-md-4 text-center mb-2 mb-md-0'>
-            <h1 className='h4'>{text}</h1>
-          </div>
+          <Col xs={12} md={4} className='text-center'>
+            <Navbar.Text className='fw-semibold fs-4 text-body m-0 d-block'>
+              {text}
+            </Navbar.Text>
+          </Col>
 
-          {/* Buttons on the right */}
-          <div className='col-12 col-md-4 d-flex justify-content-center justify-content-md-end align-items-center'>
-            {/* On mobile, stack components vertically; on md+ align to the right */}
-            <div className='d-flex flex-column flex-md-row align-items-center justify-content-center justify-content-md-end'>
-              {/* Dark Mode Toggle & Clear Cache Button */}
-              <div className='d-flex justify-content-center align-items-center mb-3 mb-md-0 me-md-3'>
-                <label className='form-check form-switch me-2'>
-                  <input
-                    className='form-check-input'
-                    type='checkbox'
-                    checked={isDarkMode}
-                    onChange={toggleDarkMode}
-                    aria-label='Toggle dark mode'
-                  />
-                  <span className='form-check-label'>
-                    {isDarkMode ? (
-                      <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        width='16'
-                        height='16'
-                        fill='black'
-                        className='bi bi-moon-stars'
-                        viewBox='0 0 16 16'
-                      >
-                        <path d='...' />
-                      </svg>
-                    ) : (
-                      <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        width='16'
-                        height='16'
-                        fill='currentColor'
-                        className='bi bi-brightness-high'
-                        viewBox='0 0 16 16'
-                      >
-                        <path d='...' />
-                      </svg>
-                    )}
-                  </span>
-                </label>
-                <ClearCacheButton triggerAlertHandler={handleClearCache} />
-              </div>
-
-              <button
+          <Col xs={12} md={4}>
+            <div className='d-flex flex-wrap align-items-center justify-content-center justify-content-md-end gap-2'>
+              <Form.Check
+                type='switch'
+                id='header-dark-mode-switch'
+                className='mb-0'
+                label={
+                  isDarkMode ? (
+                    <MoonStarsIcon width={16} height={16} color='black' />
+                  ) : (
+                    <BrightnessHighIcon width={16} height={16} />
+                  )
+                }
+                checked={isDarkMode}
+                onChange={toggleDarkMode}
+                aria-label='Toggle dark mode'
+              />
+              <Button
                 type='button'
-                className='btn btn-outline-primary'
-                onClick={handleLogout}
+                variant='outline-danger'
+                onClick={onClearCache}
+                data-testid='clear-cache-button'
               >
+                Clear Cache
+              </Button>
+              <Button type='button' variant='outline-primary' onClick={handleLogout}>
                 Logout
-              </button>
+              </Button>
             </div>
-          </div>
-        </div>
-      </header>
-    </div>
+          </Col>
+        </Row>
+      </Container>
+    </Navbar>
   );
 };
 

@@ -1,0 +1,93 @@
+.app-interactive-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--app-border) !important;
+  background: linear-gradient(180deg, var(--app-surface-strong), var(--app-surface));
+  box-shadow: var(--app-shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.app-interactive-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, rgba(13, 110, 253, 0.14), transparent 30%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 45%);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.app-interactive-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.app-interactive-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--app-shadow-hover);
+  border-color: rgba(13, 110, 253, 0.18) !important;
+}
+
+.app-interactive-card:hover .app-card-cover,
+.app-interactive-card:hover .app-image-frame-img {
+  transform: scale(1.04);
+}
+
+.app-navigation-card,
+.app-resource-card,
+.app-album-card,
+.app-image-frame {
+  cursor: pointer;
+}
+
+.app-card-title {
+  letter-spacing: -0.02em;
+}
+
+.app-card-body {
+  gap: 0.75rem;
+}
+
+.app-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.app-image-frame {
+  border: 1px solid var(--app-border);
+  background: linear-gradient(180deg, var(--app-surface-strong), var(--app-surface));
+  box-shadow: var(--app-shadow);
+}
+
+.app-image-frame:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--app-shadow-hover);
+}
+
+.app-login-page {
+  min-height: 100vh;
+}
+
+.app-login-card {
+  border: 1px solid var(--app-border);
+  border-radius: 1.5rem;
+  background: linear-gradient(160deg, var(--app-surface-strong), var(--app-surface));
+  box-shadow: var(--app-shadow-hover);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.app-login-title {
+  letter-spacing: -0.03em;
+}
+
+@media (max-width: 768px) {
+  .app-header-shell {
+    margin: 8px;
+  }
+}

@@ -1,109 +1,61 @@
-import React, { useEffect, useState } from "react";
-import Header from "@/components/layout/Header";
-import EditableCard from "@/components/shared/EditableCard";
-import AddButton from "@/components/shared/AddButton";
-import PopUp from "@/components/shared/Popup";
+import React from "react";
+import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import CrudPageLayout from "@/components/pages/CrudPageLayout";
+import Popup from "@/components/shared/Popup";
 import FormInput from "@/components/shared/FormInput";
 import {
   WorkExperienceControllerService,
   type base_service_WorkExperience,
 } from "@/lib/api/client";
-import { normalizeApiError } from "@/lib/api/errors";
-import { usePopup } from "@/hooks/shared/usePopup";
-import { useRenderPage } from "@/hooks/shared/useRenderPage";
-import PageSubHeader from "@/components/shared/PageSubHeader";
+import { useCrudPage } from "@/hooks/crud/useCrudPage";
 import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
-import PageWrapper from "@/motion/PageTransition";
-import LoadingElement from "@/components/states/LoadingState";
-import ErrorElement from "@/components/states/ErrorState";
-import NoInfoFoundElement from "@/components/states/EmptyState";
 
 const WorkExperiencePage = () => {
-  const [workExperience, setWorkExperience] = useState<
-    base_service_WorkExperience[]
-  >([]);
-  const [isAscending, setIsAscending] = useState(false);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
-  const [showLoading, setShowLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
-
   const {
+    items: workExperience,
+    loading,
+    error,
+    toggleSort,
     showPopup,
     formData,
+    setFormData,
     isEditMode,
     openPopup,
     closePopup,
-    setFormData,
-  } = usePopup<base_service_WorkExperience>();
-
-  const fetchWorkExperience = async () => {
-    setShowLoading(true);
-    setError(null);
-    try {
-      const fetchedWorkExperience =
-        await WorkExperienceControllerService.listWorkExperience();
-      const sortedWorkExperience = [...fetchedWorkExperience].sort((a, b) =>
+    saveItem,
+    isDeleteModalOpen,
+    confirmDelete,
+    closeDeleteModal,
+    handleDelete,
+  } = useCrudPage<base_service_WorkExperience, base_service_WorkExperience, number>({
+    loadItems: () => WorkExperienceControllerService.listWorkExperience(),
+    createItem: (payload) =>
+      WorkExperienceControllerService.createWorkExperience(payload),
+    updateItem: (payload) =>
+      WorkExperienceControllerService.updateWorkExperience(payload),
+    deleteItem: (id) =>
+      WorkExperienceControllerService.deleteWorkExperience({ id }),
+    getItemId: (item) => item.id ?? null,
+    sortItems: (items, isAscending) =>
+      items.sort((a, b) =>
         isAscending
           ? Number(a.displayOrder) - Number(b.displayOrder)
           : Number(b.displayOrder) - Number(a.displayOrder)
-      );
-      setWorkExperience(sortedWorkExperience as base_service_WorkExperience[]);
-    } catch (fetchError) {
-      setError(normalizeApiError(fetchError));
-    } finally {
-      setShowLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchWorkExperience();
-  }, [isAscending]);
-
-  const { renderPage } = useRenderPage(workExperience, showLoading, error);
-
-  const saveWorkExperience = async () => {
-    const payload = {
-      ...formData,
-      displayOrder: Number(formData.displayOrder),
-    } as base_service_WorkExperience;
-    if (isEditMode) {
-      await WorkExperienceControllerService.updateWorkExperience(payload);
-    } else {
-      await WorkExperienceControllerService.createWorkExperience(payload);
-    }
-    await fetchWorkExperience();
-    closePopup();
-  };
-
-  const confirmDelete = (itemId?: number) => {
-    setSelectedItemId(itemId ?? null);
-    setDeleteModalOpen(true);
-  };
-
-  const handleDelete = async () => {
-    if (selectedItemId == null) return;
-    try {
-      await WorkExperienceControllerService.deleteWorkExperience({
-        id: selectedItemId,
-      });
-      setDeleteModalOpen(false);
-      setSelectedItemId(null);
-      await fetchWorkExperience();
-    } catch (deleteError) {
-      setError(normalizeApiError(deleteError));
-    }
-  };
-
-  const toggleSort = () => {
-    setIsAscending((prev) => !prev);
-  };
+      ),
+    toPayload: (data) =>
+      ({
+        ...data,
+        displayOrder: Number(data.displayOrder),
+      }) as base_service_WorkExperience,
+  });
 
   const wexForm = (
-    <PopUp
+    <Popup
       closePopup={closePopup}
       title={isEditMode ? "Edit Work Experience" : "Add Work Experience"}
-      onSubmit={saveWorkExperience}
+      onSubmit={saveItem}
     >
       <FormInput
         label='Job Title'
@@ -160,74 +112,102 @@ const WorkExperiencePage = () => {
         type='number'
         value={formData.displayOrder}
         onChange={(e) =>
-          setFormData({ ...formData, displayOrder: e.target.value })
+          setFormData({
+            ...formData,
+            displayOrder: Number(e.target.value),
+          })
         }
         required={true}
       />
-    </PopUp>
+    </Popup>
   );
 
   const wexPage = (
-    <PageWrapper>
-      <div className='mt-4'>
-        {workExperience.map((experience) => (
-          <EditableCard
-            key={experience.id}
-            title={experience.position}
-            onEdit={() => openPopup(experience)}
-            onDelete={() => confirmDelete(experience.id)}
-          >
-            <div className='mb-3'>
-              <h5>Company: {experience.company}</h5>
-              <p>Location: {experience.location}</p>
-              <p>
-                {experience.startDate} -{" "}
-                {experience.endDate ? experience.endDate : "Present"}
-              </p>
-              <p>
-                Description:
-                <br />
-                <span style={{ whiteSpace: "pre-line" }}>
-                  {experience.description}
-                </span>
-              </p>
-
-              <p>
-                Tech Stack:{" "}
-                {
+    <div className='d-grid gap-3'>
+      {workExperience.map((experience) => (
+        <Card
+          key={experience.id}
+          className='rounded-4 app-interactive-card app-resource-card'
+          onClick={() => openPopup(experience)}
+        >
+          <Card.Body className='p-4 app-card-body'>
+            <div className='d-flex justify-content-between align-items-start gap-3'>
+              <div>
+                <Card.Title className='fw-semibold mb-1 app-card-title'>
+                  {experience.position}
+                </Card.Title>
+                <Card.Subtitle className='mb-3 text-secondary'>
+                  {experience.company}
+                </Card.Subtitle>
+                <div className='d-flex flex-column gap-2 text-secondary'>
+                  <div>{experience.location}</div>
                   <div>
+                    {experience.startDate} -{" "}
+                    {experience.endDate ? experience.endDate : "Present"}
+                  </div>
+                  <div style={{ whiteSpace: "pre-line" }}>
+                    {experience.description}
+                  </div>
+                  <div className='d-flex flex-wrap gap-2'>
                     {experience.techStack &&
                       experience.techStack.split(",").map((tech, index) => (
-                        <span key={index} className='badge bg-primary me-2'>
-                          {tech.trim()}{" "}
-                        </span>
+                        <Badge key={index} bg='primary-subtle' text='primary'>
+                          {tech.trim()}
+                        </Badge>
                       ))}
                   </div>
-                }
-              </p>
-              <p>Order: {experience.displayOrder}</p>
+                  <div>Order: {experience.displayOrder}</div>
+                </div>
+              </div>
+              <div className='app-card-actions'>
+                <Button
+                  variant='outline-primary'
+                  size='sm'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openPopup(experience);
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant='outline-danger'
+                  size='sm'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    confirmDelete(experience.id ?? null);
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
             </div>
-          </EditableCard>
-        ))}
-      </div>
-    </PageWrapper>
+          </Card.Body>
+        </Card>
+      ))}
+    </div>
   );
 
   return (
-    <>
-      <Header text={"Work Experience"} />
-      <div className='container my-5'>
-        <PageSubHeader toggleSort={toggleSort} />
-        {renderPage(ErrorElement, LoadingElement, NoInfoFoundElement, wexPage)}
-      </div>
-      <DeleteConfirmation
+    <CrudPageLayout
+      title='Work Experience'
+      toggleSort={toggleSort}
+      loading={loading}
+      error={error}
+      isEmpty={workExperience.length === 0}
+      showAddButton={!error && !showPopup}
+      onAdd={() => openPopup()}
+      modal={showPopup ? wexForm : null}
+      deleteDialog={
+        <DeleteConfirmation
         isOpen={isDeleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
+        onClose={closeDeleteModal}
         onConfirm={handleDelete}
       />
-      {showPopup && wexForm}
-      {!error && !showPopup && <AddButton openPopup={openPopup} />}
-    </>
+      }
+    >
+      {wexPage}
+    </CrudPageLayout>
   );
 };
 

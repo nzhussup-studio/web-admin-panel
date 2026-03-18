@@ -1,107 +1,57 @@
-import React, { useEffect, useState } from "react";
-import Header from "@/components/layout/Header";
-import EditableCard from "@/components/shared/EditableCard";
-import AddButton from "@/components/shared/AddButton";
-import PopUp from "@/components/shared/Popup";
+import React from "react";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import CrudPageLayout from "@/components/pages/CrudPageLayout";
+import Popup from "@/components/shared/Popup";
 import FormInput from "@/components/shared/FormInput";
-import PageSubHeader from "@/components/shared/PageSubHeader";
 import {
   CertificateControllerService,
   type base_service_Certificate,
 } from "@/lib/api/client";
-import { normalizeApiError } from "@/lib/api/errors";
-import { usePopup } from "@/hooks/shared/usePopup";
-import { useRenderPage } from "@/hooks/shared/useRenderPage";
+import { useCrudPage } from "@/hooks/crud/useCrudPage";
 import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
-import PageWrapper from "@/motion/PageTransition";
-import LoadingElement from "@/components/states/LoadingState";
-import ErrorElement from "@/components/states/ErrorState";
-import NoInfoFoundElement from "@/components/states/EmptyState";
 
 const CertificationsPage = () => {
-  const [certificates, setCertificates] = useState<base_service_Certificate[]>(
-    []
-  );
-  const [isAscending, setIsAscending] = useState(false);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
-  const [showLoading, setShowLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
-
   const {
+    items: certificates,
+    loading,
+    error,
+    toggleSort,
     showPopup,
     formData,
+    setFormData,
     isEditMode,
     openPopup,
     closePopup,
-    setFormData,
-  } = usePopup<base_service_Certificate>();
-
-  const fetchCertificates = async () => {
-    setShowLoading(true);
-    setError(null);
-    try {
-      const fetchedCertificates =
-        await CertificateControllerService.listCertificate();
-      const sortedCertificates = [...fetchedCertificates].sort((a, b) =>
+    saveItem,
+    isDeleteModalOpen,
+    confirmDelete,
+    closeDeleteModal,
+    handleDelete,
+  } = useCrudPage<base_service_Certificate, base_service_Certificate, number>({
+    loadItems: () => CertificateControllerService.listCertificate(),
+    createItem: (payload) => CertificateControllerService.createCertificate(payload),
+    updateItem: (payload) => CertificateControllerService.updateCertificate(payload),
+    deleteItem: (id) => CertificateControllerService.deleteCertificate({ id }),
+    getItemId: (item) => item.id ?? null,
+    sortItems: (items, isAscending) =>
+      items.sort((a, b) =>
         isAscending
           ? Number(a.displayOrder) - Number(b.displayOrder)
           : Number(b.displayOrder) - Number(a.displayOrder)
-      );
-      setCertificates(sortedCertificates as base_service_Certificate[]);
-    } catch (fetchError) {
-      setError(normalizeApiError(fetchError));
-    } finally {
-      setShowLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCertificates();
-  }, [isAscending]);
-
-  const saveCertificate = async () => {
-    const payload = {
-      ...formData,
-      displayOrder: Number(formData.displayOrder),
-    } as base_service_Certificate;
-    if (isEditMode) {
-      await CertificateControllerService.updateCertificate(payload);
-    } else {
-      await CertificateControllerService.createCertificate(payload);
-    }
-    await fetchCertificates();
-    closePopup();
-  };
-
-  const confirmDelete = (itemId?: number) => {
-    setSelectedItemId(itemId ?? null);
-    setDeleteModalOpen(true);
-  };
-
-  const handleDelete = async () => {
-    if (selectedItemId == null) return;
-    try {
-      await CertificateControllerService.deleteCertificate({ id: selectedItemId });
-      setDeleteModalOpen(false);
-      setSelectedItemId(null);
-      await fetchCertificates();
-    } catch (deleteError) {
-      setError(normalizeApiError(deleteError));
-    }
-  };
-
-  const toggleSort = () => {
-    setIsAscending((prev) => !prev);
-  };
-
-  const { renderPage } = useRenderPage(certificates, showLoading, error);
+      ),
+    toPayload: (data) =>
+      ({
+        ...data,
+        displayOrder: Number(data.displayOrder),
+      }) as base_service_Certificate,
+  });
 
   const certForm = (
-    <PopUp
+    <Popup
       closePopup={closePopup}
       title={isEditMode ? "Edit Certificate" : "Add Certificate"}
-      onSubmit={saveCertificate}
+      onSubmit={saveItem}
     >
       <FormInput
         label='Certificate Name'
@@ -120,60 +70,97 @@ const CertificationsPage = () => {
         type='number'
         value={formData.displayOrder}
         onChange={(e) =>
-          setFormData({ ...formData, displayOrder: e.target.value })
+          setFormData({
+            ...formData,
+            displayOrder: Number(e.target.value),
+          })
         }
         required={true}
       />
-    </PopUp>
+    </Popup>
   );
 
   const certPage = (
-    <PageWrapper>
-      <div className='mt-4'>
-        {certificates.map((certificate) => (
-          <EditableCard
-            key={certificate.id}
-            title={certificate.name}
-            onEdit={() => openPopup(certificate)}
-            onDelete={() => confirmDelete(certificate.id)}
-          >
-            <div className='mb-3'>
-              {certificate.url && (
-                <a
-                  href={certificate.url}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='btn btn-link'
-                  onClick={(e) => e.stopPropagation()}
+    <div className='d-grid gap-3'>
+      {certificates.map((certificate) => (
+        <Card
+          key={certificate.id}
+          className='rounded-4 app-interactive-card app-resource-card'
+          onClick={() => openPopup(certificate)}
+        >
+          <Card.Body className='p-4 app-card-body'>
+            <div className='d-flex justify-content-between align-items-start gap-3'>
+              <div>
+                <Card.Title className='fw-semibold mb-3 app-card-title'>
+                  {certificate.name}
+                </Card.Title>
+                <div className='d-flex flex-wrap align-items-center gap-3'>
+                  {certificate.url && (
+                    <Button
+                      variant='link'
+                      className='p-0'
+                      href={certificate.url}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      View Certificate
+                    </Button>
+                  )}
+                  <span className='text-secondary'>
+                    Order: {certificate.displayOrder}
+                  </span>
+                </div>
+              </div>
+              <div className='app-card-actions'>
+                <Button
+                  variant='outline-primary'
+                  size='sm'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openPopup(certificate);
+                  }}
                 >
-                  View Certificate
-                </a>
-              )}
-              <p>Order: {certificate.displayOrder}</p>
+                  Edit
+                </Button>
+                <Button
+                  variant='outline-danger'
+                  size='sm'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    confirmDelete(certificate.id ?? null);
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
             </div>
-          </EditableCard>
-        ))}
-      </div>
-    </PageWrapper>
+          </Card.Body>
+        </Card>
+      ))}
+    </div>
   );
 
   return (
-    <>
-      <Header text={"Certifications"} />
-      <div className='container my-5'>
-        <PageSubHeader toggleSort={toggleSort} />
-        {renderPage(ErrorElement, LoadingElement, NoInfoFoundElement, certPage)}
-      </div>
-
-      <DeleteConfirmation
+    <CrudPageLayout
+      title='Certifications'
+      toggleSort={toggleSort}
+      loading={loading}
+      error={error}
+      isEmpty={certificates.length === 0}
+      showAddButton={!error && !showPopup}
+      onAdd={() => openPopup()}
+      modal={showPopup ? certForm : null}
+      deleteDialog={
+        <DeleteConfirmation
         isOpen={isDeleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
+        onClose={closeDeleteModal}
         onConfirm={handleDelete}
       />
-
-      {showPopup && certForm}
-      {!error && !showPopup && <AddButton openPopup={openPopup} />}
-    </>
+      }
+    >
+      {certPage}
+    </CrudPageLayout>
   );
 };
 

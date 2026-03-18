@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Header from "@/components/layout/Header";
-import PageWrapper from "@/motion/PageTransition";
 
 const LlmConfigPage = () => {
   const [modelName, setModelName] = useState("");
@@ -16,72 +15,70 @@ const LlmConfigPage = () => {
     <>
       <Header text={"LLM Configuration"} />
 
-      <PageWrapper>
-        <div className='container my-5'>
-          <form
-            className='p-4 rounded shadow-sm border'
-            onSubmit={handleSubmit}
-            style={{
-              backgroundColor: document.body.classList.contains("dark-mode")
-                ? "#000"
-                : "#fff",
-              color: document.body.classList.contains("dark-mode")
-                ? "#fff"
-                : "#000",
-            }}
-          >
-            <div className='mb-3'>
-              <label htmlFor='modelName' className='form-label'>
-                Model Name
-              </label>
-              <input
-                type='text'
-                id='modelName'
-                className='form-control'
-                value={modelName}
-                onChange={(e) => setModelName(e.target.value)}
-                placeholder='Enter model name'
-                style={{
-                  backgroundColor: document.body.classList.contains("dark-mode")
-                    ? "#000"
-                    : "#fff",
-                  color: document.body.classList.contains("dark-mode")
-                    ? "#fff"
-                    : "#000",
-                  borderColor: document.body.classList.contains("dark-mode")
-                    ? "#444"
-                    : "#ccc",
-                }}
-              />
-            </div>
+      <div className='container my-5'>
+        <form
+          className='p-4 rounded shadow-sm border'
+          onSubmit={handleSubmit}
+          style={{
+            backgroundColor: document.body.classList.contains("dark-mode")
+              ? "#000"
+              : "#fff",
+            color: document.body.classList.contains("dark-mode")
+              ? "#fff"
+              : "#000",
+          }}
+        >
+          <div className='mb-3'>
+            <label htmlFor='modelName' className='form-label'>
+              Model Name
+            </label>
+            <input
+              type='text'
+              id='modelName'
+              className='form-control'
+              value={modelName}
+              onChange={(e) => setModelName(e.target.value)}
+              placeholder='Enter model name'
+              style={{
+                backgroundColor: document.body.classList.contains("dark-mode")
+                  ? "#000"
+                  : "#fff",
+                color: document.body.classList.contains("dark-mode")
+                  ? "#fff"
+                  : "#000",
+                borderColor: document.body.classList.contains("dark-mode")
+                  ? "#444"
+                  : "#ccc",
+              }}
+            />
+          </div>
 
-            <div className='form-check mb-3'>
-              <input
-                type='checkbox'
-                id='enableBackgroundGen'
-                className='form-check-input'
-                checked={enableBackgroundGen}
-                onChange={(e) => setEnableBackgroundGen(e.target.checked)}
-              />
-              <label
-                htmlFor='enableBackgroundGen'
-                className='form-check-label'
-                style={{
-                  color: document.body.classList.contains("dark-mode")
-                    ? "#fff"
-                    : "#000",
-                }}
-              >
-                Enable Background Generation
-              </label>
-            </div>
+          <div className='form-check mb-3'>
+            <input
+              type='checkbox'
+              id='enableBackgroundGen'
+              className='form-check-input'
+              checked={enableBackgroundGen}
+              onChange={(e) => setEnableBackgroundGen(e.target.checked)}
+            />
+            <label
+              htmlFor='enableBackgroundGen'
+              className='form-check-label'
+              style={{
+                color: document.body.classList.contains("dark-mode")
+                  ? "#fff"
+                  : "#000",
+              }}
+            >
+              Enable Background Generation
+            </label>
+          </div>
 
-            <button type='submit' className='btn btn-primary'>
-              Save Configuration
-            </button>
-          </form>
-        </div>
-      </PageWrapper>
+          <button type='submit' className='btn btn-primary'>
+            Save Configuration
+          </button>
+        </form>
+      </div>
     </>
   );
 };

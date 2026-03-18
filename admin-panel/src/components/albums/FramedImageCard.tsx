@@ -1,4 +1,6 @@
 import { X } from "lucide-react";
+import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
 import { useGlobalAlert } from "@/hooks/alerts/useGlobalAlert";
 
@@ -44,7 +46,7 @@ const FramedImageCard = ({
     <>
       <div
         data-testid='image-frame'
-        className={`position-relative rounded-3 overflow-hidden image-frame ${
+        className={`position-relative rounded-3 overflow-hidden image-frame app-image-frame ${
           isDarkMode ? "dark-mode" : ""
         }`}
         onClick={handleCopyUrl}
@@ -64,7 +66,7 @@ const FramedImageCard = ({
           <img
             src={imageUrl}
             alt={alt || "Framed image"}
-            className='w-100 h-100 object-fit-cover image-frame-img'
+            className='w-100 h-100 object-fit-cover image-frame-img app-image-frame-img'
             loading='lazy'
             style={{
               transition: "transform 0.3s ease, filter 0.3s ease",
@@ -72,12 +74,13 @@ const FramedImageCard = ({
           />
 
           {/* Delete Button - Top Right */}
-          <button
+          <Button
             onClick={(e) => {
               e.stopPropagation();
               onDelete?.();
             }}
             aria-label='Delete image'
+            variant='danger'
             style={{
               position: "absolute",
               top: "8px",
@@ -85,27 +88,27 @@ const FramedImageCard = ({
               width: "36px",
               height: "36px",
               borderRadius: "50%",
-              backgroundColor: "#dc3545",
-              color: "white",
-              border: "none",
               zIndex: 10,
               boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              padding: 0,
             }}
           >
             <X size={18} />
-          </button>
+          </Button>
 
           {/* Edit Button - Top Left */}
-          <button
+          <Button
             onClick={(e) => {
               e.stopPropagation();
               onEdit?.();
             }}
             aria-label='Edit image'
+            variant='success'
+            size='sm'
             style={{
               position: "absolute",
               top: "8px",
@@ -113,58 +116,35 @@ const FramedImageCard = ({
               width: "36px",
               height: "36px",
               borderRadius: "50%",
-              backgroundColor: "#28a745",
-              color: "white",
-              border: "none",
               zIndex: 10,
               boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              padding: 0,
             }}
           >
             Edit
-          </button>
+          </Button>
 
           {imageId && (
-            <div
+            <Badge
+              bg='dark'
               style={{
                 position: "absolute",
                 bottom: "8px",
                 left: "50%",
                 transform: "translateX(-50%)",
-                backgroundColor: "rgba(0,0,0,0.6)",
-                color: "white",
-                padding: "2px 8px",
                 borderRadius: "12px",
                 fontSize: "12px",
                 zIndex: 5,
+                opacity: 0.85,
               }}
             >
               {imageId}
-            </div>
+            </Badge>
           )}
-
-          <style>{`
-        .image-frame:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-        }
-
-        .image-frame:hover .image-frame-img {
-          transform: scale(1.05);
-          filter: brightness(1.08);
-        }
-
-        .dark-mode .image-frame:hover .image-frame-img {
-          filter: brightness(1.12);
-        }
-
-        .dark-mode .image-frame {
-          background-color: #1f1f1f;
-        }
-      `}</style>
         </div>
       </div>
     </>

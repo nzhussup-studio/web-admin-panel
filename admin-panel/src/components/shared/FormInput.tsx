@@ -4,6 +4,8 @@ import type {
   SelectHTMLAttributes,
   TextareaHTMLAttributes,
 } from "react";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 
 type FormInputChangeEvent =
   | ChangeEvent<HTMLInputElement>
@@ -32,23 +34,28 @@ const FormInput = ({
 }: FormInputProps) => {
   const isDate = type === "date";
   const isClearableText = type === "clearable_text"; // Check if it's clearable_text
+  const normalizedValue: string | number | string[] | undefined =
+    typeof value === "string" || typeof value === "number"
+      ? value
+      : value
+        ? Array.from(value)
+        : undefined;
 
   return (
     <div className='mb-3 position-relative'>
-      <label className='form-label'>{label}</label>
+      <Form.Label>{label}</Form.Label>
 
       {type === "textarea" ? (
-        <textarea
-          className='form-control'
-          value={value}
+        <Form.Control
+          as='textarea'
+          value={normalizedValue}
           onChange={onChange as TextareaHTMLAttributes<HTMLTextAreaElement>["onChange"]}
           required={required}
           rows={rows}
         />
       ) : type === "select" ? (
-        <select
-          className='form-control'
-          value={value}
+        <Form.Select
+          value={normalizedValue}
           onChange={onChange as SelectHTMLAttributes<HTMLSelectElement>["onChange"]}
           required={required}
         >
@@ -60,37 +67,41 @@ const FormInput = ({
               {option}
             </option>
           ))}
-        </select>
+        </Form.Select>
       ) : (
         <>
-          <input
+          <Form.Control
             type={type}
-            className='form-control pe-5'
-            value={value}
+            className='pe-5'
+            value={normalizedValue}
             onChange={onChange}
             required={required}
           />
           {/* Show clear button only for clearable_text inputs with a value */}
           {isClearableText && value && (
-            <button
+            <Button
               type='button'
               onClick={() => onChange({ target: { value: "" } })}
-              className='btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2'
+              variant='outline-secondary'
+              size='sm'
+              className='position-absolute top-50 end-0 translate-middle-y me-2'
               style={{ zIndex: 10 }}
             >
               &times;
-            </button>
+            </Button>
           )}
           {/* Show clear button for date inputs */}
           {isDate && value && (
-            <button
+            <Button
               type='button'
               onClick={() => onChange({ target: { value: "" } })}
-              className='btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2'
+              variant='outline-secondary'
+              size='sm'
+              className='position-absolute top-50 end-0 translate-middle-y me-2'
               style={{ zIndex: 10 }}
             >
               &times;
-            </button>
+            </Button>
           )}
         </>
       )}

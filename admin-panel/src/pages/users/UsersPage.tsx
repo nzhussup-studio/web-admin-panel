@@ -1,78 +1,61 @@
-import React, { useState, useEffect } from "react";
-import Header from "@/components/layout/Header";
-import EditableCard from "@/components/shared/EditableCard";
+import React, { useEffect, useState } from "react";
+import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import CrudPageLayout from "@/components/pages/CrudPageLayout";
 import {
   AdminUserControllerService,
   type user_service_AdminUserRegistryRequest,
   type user_service_User,
 } from "@/lib/api/client";
 import { normalizeApiError } from "@/lib/api/errors";
-import { usePopup } from "@/hooks/shared/usePopup";
-import { useRenderPage } from "@/hooks/shared/useRenderPage";
-import AddButton from "@/components/shared/AddButton";
-import PopUp from "@/components/shared/Popup";
+import { useCrudPage } from "@/hooks/crud/useCrudPage";
+import Popup from "@/components/shared/Popup";
 import FormInput from "@/components/shared/FormInput";
-import PageSubHeader from "@/components/shared/PageSubHeader";
 import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
-import PageWrapper from "@/motion/PageTransition";
-import LoadingElement from "@/components/states/LoadingState";
-import ErrorElement from "@/components/states/ErrorState";
-import NoInfoFoundElement from "@/components/states/EmptyState";
 import GlobalAlert from "@/components/layout/GlobalAlert";
 
 const UsersPage = () => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const [users, setUsers] = useState<user_service_User[]>([]);
-  const [isAscending, setIsAscending] = useState(false);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
-  const [showLoading, setShowLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
   const [response, setResponse] = useState<{ status: number } | null>(null);
 
   const {
+    items: users,
+    loading,
+    error,
+    setError,
+    toggleSort,
     showPopup,
     formData,
+    setFormData,
     isEditMode,
     openPopup,
     closePopup,
-    setFormData,
-  } = usePopup<user_service_User & user_service_AdminUserRegistryRequest>();
-
-  const fetchUsers = async () => {
-    setShowLoading(true);
-    setError(null);
-    try {
-      const fetchedUsers = await AdminUserControllerService.findAll();
-      const sortedUsers = [...fetchedUsers].sort((a, b) =>
+    saveItem,
+    isDeleteModalOpen,
+    confirmDelete,
+    closeDeleteModal,
+    handleDelete: handleDeleteBase,
+  } = useCrudPage<
+    user_service_User,
+    user_service_User & user_service_AdminUserRegistryRequest,
+    number
+  >({
+    loadItems: () => AdminUserControllerService.findAll(),
+    createItem: (payload) =>
+      AdminUserControllerService.registerUser1(
+        payload as user_service_AdminUserRegistryRequest
+      ),
+    updateItem: (payload) =>
+      AdminUserControllerService.updateUser1(payload as user_service_User),
+    deleteItem: (id) => AdminUserControllerService.deleteUser1({ id }),
+    getItemId: (item) => item.id ?? null,
+    sortItems: (items, isAscending) =>
+      items.sort((a, b) =>
         isAscending ? Number(a.id) - Number(b.id) : Number(b.id) - Number(a.id)
-      );
-      setUsers(sortedUsers);
-    } catch (fetchError) {
-      setError(normalizeApiError(fetchError));
-    } finally {
-      setShowLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, [isAscending]);
-
-  const { renderPage } = useRenderPage(users, showLoading, error);
-
-  const saveUser = async () => {
-    if (isEditMode) {
-      await AdminUserControllerService.updateUser1(formData as user_service_User);
-    } else {
-      await AdminUserControllerService.registerUser1(
-        formData as user_service_AdminUserRegistryRequest
-      );
-    }
-    await fetchUsers();
-    closePopup();
-  };
+      ),
+  });
 
   useEffect(() => {
     if (response) {
@@ -87,19 +70,10 @@ const UsersPage = () => {
     }
   }, [response, setResponse]);
 
-  const confirmDelete = (itemId?: number) => {
-    setSelectedItemId(itemId ?? null);
-    setDeleteModalOpen(true);
-  };
-
   const handleDelete = async () => {
-    if (selectedItemId == null) return;
     try {
-      await AdminUserControllerService.deleteUser1({ id: selectedItemId });
+      await handleDeleteBase();
       setResponse({ status: 200 });
-      setDeleteModalOpen(false);
-      setSelectedItemId(null);
-      await fetchUsers();
     } catch (deleteError) {
       const normalizedError = normalizeApiError(deleteError);
       setResponse(
@@ -109,15 +83,11 @@ const UsersPage = () => {
     }
   };
 
-  const toggleSort = () => {
-    setIsAscending((prev) => !prev);
-  };
-
   const userForm = (
-    <PopUp
+    <Popup
       closePopup={closePopup}
       title={isEditMode ? "Edit User" : "Add User"}
-      onSubmit={saveUser}
+      onSubmit={saveItem}
     >
       <FormInput
         label='Username'
@@ -139,54 +109,87 @@ const UsersPage = () => {
         onChange={(e) => setFormData({ ...formData, role: e.target.value })}
         required={true}
       />
-    </PopUp>
+    </Popup>
   );
 
   const userPage = (
-    <PageWrapper>
-      <div className='mt-4'>
-        {users.map((user) => (
-          <EditableCard
-            key={user.id}
-            title={user.username}
-            onEdit={() => openPopup(user)}
-            onDelete={() => confirmDelete(user.id)}
-          >
-            <div className='mt-4'>
-              <p>Password: {user.password}</p>
-              <p>
-                <strong>Role:</strong> {user.role}
-              </p>
+    <div className='d-grid gap-3'>
+      {users.map((user) => (
+        <Card
+          key={user.id}
+          className='rounded-4 app-interactive-card app-resource-card'
+          onClick={() => openPopup(user)}
+        >
+          <Card.Body className='p-4 app-card-body'>
+            <div className='d-flex justify-content-between align-items-start gap-3'>
+              <div>
+                <Card.Title className='fw-semibold mb-3 app-card-title'>
+                  {user.username}
+                </Card.Title>
+                <div className='d-flex flex-column gap-2'>
+                  <div className='text-secondary'>Password: {user.password}</div>
+                  <Badge bg={user.role === "ROLE_ADMIN" ? "danger" : "secondary"} className='align-self-start'>
+                    {user.role}
+                  </Badge>
+                </div>
+              </div>
+              <div className='app-card-actions'>
+                <Button
+                  variant='outline-primary'
+                  size='sm'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openPopup(user);
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant='outline-danger'
+                  size='sm'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    confirmDelete(user.id ?? null);
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
             </div>
-          </EditableCard>
-        ))}
-      </div>
-    </PageWrapper>
+          </Card.Body>
+        </Card>
+      ))}
+    </div>
   );
 
   return (
-    <>
-      <Header text={"User Management"} />
-      <GlobalAlert
-        message={alertMessage}
-        show={alertVisible}
-        onClose={() => setAlertVisible(false)}
-        type='alert-danger'
-      />
-      <div className='container my-5'>
-        <PageSubHeader toggleSort={toggleSort} />
-        {renderPage(ErrorElement, LoadingElement, NoInfoFoundElement, userPage)}
-      </div>
-
-      <DeleteConfirmation
-        isOpen={isDeleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={handleDelete}
-      />
-
-      {showPopup && userForm}
-      {!error && !showPopup && <AddButton openPopup={openPopup} />}
-    </>
+    <CrudPageLayout
+      title='User Management'
+      toggleSort={toggleSort}
+      loading={loading}
+      error={error}
+      isEmpty={users.length === 0}
+      showAddButton={!error && !showPopup}
+      onAdd={() => openPopup()}
+      afterHeader={
+        <GlobalAlert
+          message={alertMessage}
+          show={alertVisible}
+          onClose={() => setAlertVisible(false)}
+          type='alert-danger'
+        />
+      }
+      modal={showPopup ? userForm : null}
+      deleteDialog={
+        <DeleteConfirmation
+          isOpen={isDeleteModalOpen}
+          onClose={closeDeleteModal}
+          onConfirm={handleDelete}
+        />
+      }
+    >
+      {userPage}
+    </CrudPageLayout>
   );
 };
 

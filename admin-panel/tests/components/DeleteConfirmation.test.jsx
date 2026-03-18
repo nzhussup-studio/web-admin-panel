@@ -69,15 +69,14 @@ describe("DeleteConfirmation Component", () => {
     expect(mockOnClose).not.toHaveBeenCalled();
   });
 
-  test("closes when clicking overlay", () => {
+  test("closes from the modal close button", () => {
     renderWithProvider({
       isOpen: true,
       onClose: mockOnClose,
       onConfirm: mockOnConfirm,
     });
 
-    const overlay = screen.getByRole("dialog");
-    fireEvent.click(overlay);
+    fireEvent.click(screen.getByLabelText(/close/i));
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
@@ -88,9 +87,8 @@ describe("DeleteConfirmation Component", () => {
       onConfirm: mockOnConfirm,
     });
 
-    const dialogContent = screen
-      .getByRole("dialog")
-      .querySelector(".popup-content");
+    const dialogContent = screen.getByText(/are you sure/i).closest(".modal-content");
+    expect(dialogContent).not.toBeNull();
     fireEvent.click(dialogContent);
     expect(mockOnClose).not.toHaveBeenCalled();
   });

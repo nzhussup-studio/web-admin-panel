@@ -1,6 +1,11 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import Button from "react-bootstrap/Button";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Container from "react-bootstrap/Container";
+import Stack from "react-bootstrap/Stack";
 import Header from "@/components/layout/Header";
+import PageState from "@/components/pages/PageState";
 import {
   AlbumService,
   ImageService,
@@ -9,26 +14,20 @@ import {
 } from "@/lib/api/client";
 import { normalizeApiError } from "@/lib/api/errors";
 import { usePopup } from "@/hooks/shared/usePopup";
-import { useRenderPage } from "@/hooks/shared/useRenderPage";
-import AddButton from "@/components/shared/AddButton";
-import PopUp from "@/components/shared/Popup";
-
-import PageSubHeader from "@/components/shared/PageSubHeader";
+import Popup from "@/components/shared/Popup";
 import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
-import PageWrapper from "@/motion/PageTransition";
-import LoadingElement from "@/components/states/LoadingState";
-import ErrorElement from "@/components/states/ErrorState";
-import NoInfoFoundElement from "@/components/states/EmptyState";
 import FramedImageCard from "@/components/albums/FramedImageCard";
 import ImageFormInput from "@/components/shared/ImageFormInput";
 import FormInput from "@/components/shared/FormInput";
 import config from "@/config/app-config";
 import { useGlobalAlert } from "@/hooks/alerts/useGlobalAlert";
+import { BackCircleIcon, FunnelIcon } from "@/assets/icons";
 
 type ImagePreview = { file: Blob; preview: string };
 
 const AlbumPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { triggerAlert } = useGlobalAlert();
   const [album, setAlbum] = useState<image_service_model_Album | null>(null);
   const [isAscending, setIsAscending] = useState(false);
@@ -82,7 +81,7 @@ const AlbumPage = () => {
   };
 
   const albumForm = (
-    <PopUp
+    <Popup
       closePopup={closePopup}
       title={isEditMode ? "Edit Image" : "Add Image"}
       onSubmit={saveImage}
@@ -92,11 +91,11 @@ const AlbumPage = () => {
         onChange={(files) => setFormData({ ...formData, file: files })}
         required={true}
       />
-    </PopUp>
+    </Popup>
   );
 
   const imageForm = (
-    <PopUp
+    <Popup
       closePopup={closePopup}
       title={isEditMode ? "Edit Image" : "Add Image"}
       onSubmit={async () => {
@@ -129,7 +128,7 @@ const AlbumPage = () => {
         onChange={(e) => setFormData({ ...formData, newId: e.target.value })}
         required={true}
       />
-    </PopUp>
+    </Popup>
   );
 
   const renderForm = () => {
@@ -163,40 +162,64 @@ const AlbumPage = () => {
   };
 
   const albumImagesSection = (
-    <PageWrapper>
-      <div className='row row-cols-2 row-cols-sm-2 row-cols-md-3 g-4'>
-        {album?.images?.map((image) => (
-          <div key={image.id} className='col'>
-            <FramedImageCard
-              imageUrl={`${config.apiBase}${image?.url || ""}`}
-              alt={image?.id}
-              onDelete={() => confirmDelete(image.id)}
-              onEdit={() => {
-                openPopup(image);
-              }}
-            />
-          </div>
-        ))}
-      </div>
-    </PageWrapper>
+    <div className='row row-cols-2 row-cols-sm-2 row-cols-md-3 g-4'>
+      {album?.images?.map((image) => (
+        <div key={image.id} className='col'>
+          <FramedImageCard
+            imageUrl={`${config.apiBase}${image?.url || ""}`}
+            alt={image?.id}
+            onDelete={() => confirmDelete(image.id)}
+            onEdit={() => {
+              openPopup(image);
+            }}
+          />
+        </div>
+      ))}
+    </div>
   );
-  const { renderPage } = useRenderPage(album?.images || [], showLoading, error);
 
   return (
     <>
       <Header text={album ? "Album " + album.title : "Album"} />
 
-      <div className='container my-5'>
-        <PageSubHeader toggleSort={toggleSort} />
-        <br />
-
-        {renderPage(
-          ErrorElement,
-          LoadingElement,
-          NoInfoFoundElement,
-          albumImagesSection
-        )}
-      </div>
+      <Container className='my-5'>
+        <Stack
+          direction='horizontal'
+          gap={3}
+          className='align-items-center justify-content-between flex-wrap mb-4'
+        >
+          <Button
+            variant='outline-secondary'
+            className='d-inline-flex align-items-center gap-2'
+            onClick={() => navigate(-1)}
+          >
+            <BackCircleIcon width={16} height={16} />
+            Back
+          </Button>
+          <ButtonGroup className='ms-auto'>
+            <Button
+              variant='outline-primary'
+              className='d-inline-flex align-items-center gap-2'
+              onClick={toggleSort}
+            >
+              <FunnelIcon width={16} height={16} />
+              Sort
+            </Button>
+            {!error && !showPopup ? (
+              <Button variant='primary' onClick={() => openPopup()}>
+                Add Image
+              </Button>
+            ) : null}
+          </ButtonGroup>
+        </Stack>
+        <PageState
+          isEmpty={(album?.images || []).length === 0}
+          loading={showLoading}
+          error={error}
+        >
+          {albumImagesSection}
+        </PageState>
+      </Container>
 
       <DeleteConfirmation
         isOpen={isDeleteModalOpen}
@@ -205,7 +228,6 @@ const AlbumPage = () => {
       />
 
       {renderForm()}
-      {!error && !showPopup && <AddButton openPopup={openPopup} />}
     </>
   );
 };

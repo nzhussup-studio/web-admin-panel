@@ -1,11 +1,15 @@
 import Header from "@/components/layout/Header";
+import PageState from "@/components/pages/PageState";
 import GlobalAlert from "@/components/layout/GlobalAlert";
-import PageSubHeader from "@/components/shared/PageSubHeader";
-import ExportButton from "@/components/shared/ExportButton";
-import ErrorElement from "@/components/states/ErrorState";
-import LoadingElement from "@/components/states/LoadingState";
-import NoInfoFoundElement from "@/components/states/EmptyState";
 import { useEffect, useState } from "react";
+import Button from "react-bootstrap/Button";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Card from "react-bootstrap/Card";
+import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
+import Stack from "react-bootstrap/Stack";
 import {
   CertificateControllerService,
   EducationControllerService,
@@ -14,15 +18,16 @@ import {
   WorkExperienceControllerService,
 } from "@/lib/api/client";
 import { normalizeApiError } from "@/lib/api/errors";
-import { useRenderPage } from "@/hooks/shared/useRenderPage";
-import Card from "@/components/shared/Card";
 import config from "@/config/app-config";
 import { generateCV } from "@/lib/cv/generateCv";
+import { BackCircleIcon, DownloadIcon, FunnelIcon } from "@/assets/icons";
+import { useNavigate } from "react-router-dom";
 
 type BasicInfo = Record<string, string>;
 type SelectedItems = Record<string, Set<string | number>>;
 
 const CvGeneratorPage = () => {
+  const navigate = useNavigate();
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
@@ -109,8 +114,6 @@ const CvGeneratorPage = () => {
     fetchData();
   }, [isAscending]);
 
-  const { renderPage } = useRenderPage(data, showLoading, error);
-
   const [selectedItems, setSelectedItems] = useState<SelectedItems>(() => {
     try {
       const saved = localStorage.getItem(config.cvGeneratorLocalStorageKey);
@@ -185,47 +188,47 @@ const CvGeneratorPage = () => {
   };
   const generatorPage = (
     <div>
-      <Card
-        key={"basic-info"}
-        title={"Basic Information"}
-        style={{ marginTop: "20px", padding: "16px" }}
-      >
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          style={{ display: "flex", flexDirection: "column", gap: "12px" }}
-        >
-          {Object.entries(basicInfo).map(([key, value]) => (
-            <div key={key} style={{ display: "flex", flexDirection: "column" }}>
-              <label
-                htmlFor={`basic-info-${key}`}
-                style={{ fontWeight: "600", marginBottom: "4px" }}
-              >
-                {key.charAt(0).toUpperCase() + key.slice(1)}
-              </label>
-              {key === "about" ? (
-                <textarea
-                  id={`basic-info-${key}`}
-                  value={String(value ?? "")}
-                  onChange={(e) =>
-                    setBasicInfo((prev) => ({ ...prev, [key]: e.target.value }))
-                  }
-                  rows={3}
-                  style={{ resize: "vertical", padding: "8px" }}
-                />
-              ) : (
-                <input
-                  id={`basic-info-${key}`}
-                  type='text'
-                  value={String(value ?? "")}
-                  onChange={(e) =>
-                    setBasicInfo((prev) => ({ ...prev, [key]: e.target.value }))
-                  }
-                  style={{ padding: "8px" }}
-                />
-              )}
-            </div>
-          ))}
-        </form>
+      <Card className='rounded-4 app-interactive-card mt-4'>
+        <Card.Body className='p-4 app-card-body'>
+          <Card.Title className='fw-semibold mb-4 app-card-title'>Basic Information</Card.Title>
+          <Form onSubmit={(e) => e.preventDefault()}>
+            <Row className='g-3'>
+              {Object.entries(basicInfo).map(([key, value]) => (
+                <Col key={key} md={key === "about" ? 12 : 6}>
+                  <Form.Group controlId={`basic-info-${key}`}>
+                    <Form.Label className='text-capitalize fw-semibold'>
+                      {key.replace(/_/g, " ")}
+                    </Form.Label>
+                    {key === "about" ? (
+                      <Form.Control
+                        as='textarea'
+                        rows={4}
+                        value={String(value ?? "")}
+                        onChange={(e) =>
+                          setBasicInfo((prev) => ({
+                            ...prev,
+                            [key]: e.target.value,
+                          }))
+                        }
+                      />
+                    ) : (
+                      <Form.Control
+                        type='text'
+                        value={String(value ?? "")}
+                        onChange={(e) =>
+                          setBasicInfo((prev) => ({
+                            ...prev,
+                            [key]: e.target.value,
+                          }))
+                        }
+                      />
+                    )}
+                  </Form.Group>
+                </Col>
+              ))}
+            </Row>
+          </Form>
+        </Card.Body>
       </Card>
 
       {data.map((sectionObj, index) => {
@@ -249,35 +252,21 @@ const CvGeneratorPage = () => {
         };
 
         return (
-          <Card
-            key={index}
-            style={{ marginTop: "20px", padding: "16px" }}
-            title={
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <span>{sectionName.replace(/_/g, " ")}</span>
-                <button
+          <Card key={index} className='rounded-4 app-interactive-card mt-4'>
+            <Card.Body className='p-4 app-card-body'>
+              <div className='d-flex justify-content-between align-items-center gap-3 mb-3'>
+                <Card.Title className='mb-0 text-capitalize fw-semibold app-card-title'>
+                  {sectionName.replace(/_/g, " ")}
+                </Card.Title>
+                <Button
                   onClick={handleToggleAll}
-                  style={{
-                    fontSize: "0.8rem",
-                    padding: "4px 8px",
-                    cursor: "pointer",
-                    border: "1px solid #ccc",
-                    backgroundColor: "#f1f1f1",
-                    borderRadius: "4px",
-                  }}
                   type='button'
+                  variant='outline-secondary'
+                  size='sm'
                 >
                   {allSelected ? "Deselect All" : "Select All"}
-                </button>
+                </Button>
               </div>
-            }
-          >
             {Array.isArray(items) && items.length > 0 ? (
               items.map((item) => {
                 const itemId = item.id;
@@ -285,40 +274,24 @@ const CvGeneratorPage = () => {
                   selectedItems[sectionName]?.has(itemId) || false;
 
                 return (
-                  <label
+                  <Form.Check
                     key={itemId}
-                    style={{
-                      display: "block",
-                      userSelect: "none",
-                      cursor: "pointer",
-                      padding: "8px",
-                      backgroundColor: isChecked ? "#d0ebff" : "#f9f9f9",
-                      borderRadius: "4px",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    <input
-                      type='checkbox'
-                      checked={isChecked}
-                      onChange={() => toggleSelect(sectionName, itemId)}
-                      style={{ marginRight: "8px" }}
-                    />
-                    <pre
-                      style={{
-                        display: "inline",
-                        userSelect: "text",
-                        cursor: "text",
-                        margin: 0,
-                      }}
-                    >
-                      {JSON.stringify(item, null, 2)}
-                    </pre>
-                  </label>
+                    type='checkbox'
+                    className={`rounded-3 border p-3 mb-2 ${isChecked ? "bg-primary-subtle" : "bg-body-tertiary"}`}
+                    checked={isChecked}
+                    onChange={() => toggleSelect(sectionName, itemId)}
+                    label={
+                      <pre className='mb-0 text-wrap' style={{ whiteSpace: "pre-wrap" }}>
+                        {JSON.stringify(item, null, 2)}
+                      </pre>
+                    }
+                  />
                 );
               })
             ) : (
-              <p>No items</p>
+              <div className='text-secondary'>No items</div>
             )}
+            </Card.Body>
           </Card>
         );
       })}
@@ -334,25 +307,54 @@ const CvGeneratorPage = () => {
         onClose={() => setAlertVisible(false)}
         type='alert-danger'
       />
-      <div className='container my-5'>
-        <PageSubHeader toggleSort={toggleSort}>
-          <ExportButton
-            text={"Export to PDF"}
-            onClick={() => handleGenerateCV("pdf")}
-          />
-          <ExportButton
-            text={"Export to Word"}
-            onClick={() => handleGenerateCV("word")}
-          />
-        </PageSubHeader>
+      <Container className='my-5'>
+        <Stack
+          direction='horizontal'
+          gap={3}
+          className='align-items-center justify-content-between flex-wrap mb-4'
+        >
+          <Button
+            variant='outline-secondary'
+            className='d-inline-flex align-items-center gap-2'
+            onClick={() => navigate(-1)}
+          >
+            <BackCircleIcon width={16} height={16} />
+            Back
+          </Button>
+          <div className='d-flex align-items-center gap-2 flex-wrap ms-auto'>
+            <Button
+              variant='outline-primary'
+              className='d-inline-flex align-items-center gap-2'
+              onClick={toggleSort}
+            >
+              <FunnelIcon width={16} height={16} />
+              Sort
+            </Button>
+            <ButtonGroup>
+              <Button
+                variant='outline-primary'
+                className='d-inline-flex align-items-center gap-2'
+                onClick={() => handleGenerateCV("pdf")}
+              >
+                <DownloadIcon width={16} height={16} />
+                Export to PDF
+              </Button>
+              <Button
+                variant='primary'
+                className='d-inline-flex align-items-center gap-2'
+                onClick={() => handleGenerateCV("word")}
+              >
+                <DownloadIcon width={16} height={16} />
+                Export to Word
+              </Button>
+            </ButtonGroup>
+          </div>
+        </Stack>
 
-        {renderPage(
-          ErrorElement,
-          LoadingElement,
-          NoInfoFoundElement,
-          generatorPage
-        )}
-      </div>
+        <PageState isEmpty={data.length === 0} loading={showLoading} error={error}>
+          {generatorPage}
+        </PageState>
+      </Container>
     </>
   );
 };
