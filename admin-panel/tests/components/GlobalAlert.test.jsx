@@ -1,10 +1,10 @@
 import React from "react";
 import { render, screen, act } from "@testing-library/react";
-import GlobalAlert from "../../src/components/GlobalAlert";
-import { useGlobalAlert } from "../../src/context/GlobalAlertContext";
+import GlobalAlert from "@/components/layout/GlobalAlert";
+import { useGlobalAlert } from "@/hooks/alerts/useGlobalAlert";
 
 // Mock the useGlobalAlert hook
-jest.mock("../../src/context/GlobalAlertContext", () => ({
+jest.mock("@/hooks/alerts/useGlobalAlert", () => ({
   useGlobalAlert: jest.fn(),
 }));
 

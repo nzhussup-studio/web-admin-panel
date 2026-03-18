@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Card from "../../src/components/Card";
+import Card from "@/components/shared/Card";
 
 describe("Card Component", () => {
   const mockHandleFunc = jest.fn();

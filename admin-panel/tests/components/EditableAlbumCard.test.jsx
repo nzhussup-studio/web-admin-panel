@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import EditableAlbumCard from "../../src/components/EditableAlbumCard";
-import { DarkModeProvider } from "../../src/context/DarkModeContext";
+import EditableAlbumCard from "@/components/albums/EditableAlbumCard";
+import { ThemeProvider } from "@/providers/theme/ThemeProvider";
 
 // Mock useNavigate
 const mockNavigate = jest.fn();
@@ -14,7 +14,7 @@ jest.mock("react-router-dom", () => ({
 const renderWithProviders = (component) => {
   return render(
     <BrowserRouter>
-      <DarkModeProvider>{component}</DarkModeProvider>
+      <ThemeProvider>{component}</ThemeProvider>
     </BrowserRouter>
   );
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import DeleteConfirmation from "../../src/components/DeleteConfirmation";
-import { DarkModeProvider } from "../../src/context/DarkModeContext";
+import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
+import { ThemeProvider } from "@/providers/theme/ThemeProvider";
 
 describe("DeleteConfirmation Component", () => {
   const mockOnClose = jest.fn();
@@ -14,9 +14,9 @@ describe("DeleteConfirmation Component", () => {
 
   const renderWithProvider = (props) => {
     return render(
-      <DarkModeProvider>
+      <ThemeProvider>
         <DeleteConfirmation {...props} />
-      </DarkModeProvider>
+      </ThemeProvider>
     );
   };
 

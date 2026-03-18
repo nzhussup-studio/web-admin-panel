@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import { DarkModeProvider } from "../../src/context/DarkModeContext";
-import { GlobalAlertProvider } from "../../src/context/GlobalAlertContext";
+import { ThemeProvider } from "@/providers/theme/ThemeProvider";
+import { GlobalAlertProvider } from "@/providers/alerts/GlobalAlertProvider";
 
 // Mock context providers
 export const mockDarkModeContext = {
@@ -25,8 +25,8 @@ export const mockClipboard = {
 // Helper function for rendering with providers
 export const renderWithProviders = (component) => {
   return render(
-    <DarkModeProvider>
+    <ThemeProvider>
       <GlobalAlertProvider>{component}</GlobalAlertProvider>
-    </DarkModeProvider>
+    </ThemeProvider>
   );
 };

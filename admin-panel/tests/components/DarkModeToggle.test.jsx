@@ -1,14 +1,14 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import DarkModeToggle from "../../src/components/DarkModeToggle";
-import { DarkModeProvider } from "../../src/context/DarkModeContext";
+import DarkModeToggle from "@/components/shared/DarkModeToggle";
+import { ThemeProvider } from "@/providers/theme/ThemeProvider";
 
 describe("DarkModeToggle Component", () => {
   const renderWithProvider = () => {
     return render(
-      <DarkModeProvider>
+      <ThemeProvider>
         <DarkModeToggle />
-      </DarkModeProvider>
+      </ThemeProvider>
     );
   };
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import ImageFormInput from "../../src/components/ImageFormInput";
+import ImageFormInput from "@/components/shared/ImageFormInput";
 
 describe("ImageFormInput Component", () => {
   const mockOnChange = jest.fn();

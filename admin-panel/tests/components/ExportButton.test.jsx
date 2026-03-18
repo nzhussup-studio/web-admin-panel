@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import ExportButton from "../../src/components/ExportButton";
+import ExportButton from "@/components/shared/ExportButton";
 
 describe("ExportButton Component", () => {
   const mockOnClick = jest.fn();

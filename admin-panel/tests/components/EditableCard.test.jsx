@@ -1,10 +1,10 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import EditableCard from "../../src/components/EditableCard";
-import { DarkModeProvider } from "../../src/context/DarkModeContext";
+import EditableCard from "@/components/shared/EditableCard";
+import { ThemeProvider } from "@/providers/theme/ThemeProvider";
 
 const renderWithDarkMode = (component) => {
-  return render(<DarkModeProvider>{component}</DarkModeProvider>);
+  return render(<ThemeProvider>{component}</ThemeProvider>);
 };
 
 describe("EditableCard Component", () => {

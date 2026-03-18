@@ -1,10 +1,10 @@
 import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import Header from "../../src/components/Header";
-import { AuthProvider } from "../../src/context/AuthContext";
-import { DarkModeProvider } from "../../src/context/DarkModeContext";
-import { GlobalAlertProvider } from "../../src/context/GlobalAlertContext";
+import Header from "@/components/layout/Header";
+import { AuthProvider } from "@/providers/auth/AuthProvider";
+import { ThemeProvider } from "@/providers/theme/ThemeProvider";
+import { GlobalAlertProvider } from "@/providers/alerts/GlobalAlertProvider";
 
 const mockNavigate = jest.fn();
 const mockLogout = jest.fn();
@@ -15,26 +15,26 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
 }));
 
-// Mock auth context
-jest.mock("../../src/context/AuthContext", () => ({
-  ...jest.requireActual("../../src/context/AuthContext"),
+jest.mock("@/hooks/auth/useAuth", () => ({
+  ...jest.requireActual("@/hooks/auth/useAuth"),
   useAuth: () => ({
     logout: mockLogout,
   }),
 }));
 
-// Mock clearCache API
-jest.mock("../../src/utils/base/apiUtil", () => ({
-  clearCache: jest.fn(() => Promise.resolve()),
+jest.mock("@/lib/api/client", () => ({
+  CacheService: {
+    deleteV1AlbumCache: jest.fn(() => Promise.resolve()),
+  },
 }));
 
 const renderWithProviders = (component) => {
   return render(
     <BrowserRouter>
       <AuthProvider>
-        <DarkModeProvider>
+        <ThemeProvider>
           <GlobalAlertProvider>{component}</GlobalAlertProvider>
-        </DarkModeProvider>
+        </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>
   );
@@ -71,7 +71,7 @@ describe("Header Component", () => {
 
     // Mock GlobalAlertContext
     jest
-      .spyOn(require("../../src/context/GlobalAlertContext"), "useGlobalAlert")
+      .spyOn(require("@/hooks/alerts/useGlobalAlert"), "useGlobalAlert")
       .mockReturnValue({ triggerAlert: mockTriggerAlert });
 
     renderWithProviders(<Header text='Test Header' />);

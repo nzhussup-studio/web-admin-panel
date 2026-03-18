@@ -1,18 +1,19 @@
 import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import ClearCacheButton from "../../src/components/ClearCacheButton";
-import { clearCache } from "../../src/utils/base/apiUtil";
+import ClearCacheButton from "@/components/shared/ClearCacheButton";
+import { CacheService } from "@/lib/api/client";
 
-// Mock the apiUtil module
-jest.mock("../../src/utils/base/apiUtil", () => ({
-  clearCache: jest.fn(),
+jest.mock("@/lib/api/client", () => ({
+  CacheService: {
+    deleteV1AlbumCache: jest.fn(),
+  },
 }));
 
 describe("ClearCacheButton Component", () => {
   const mockTriggerAlertHandler = jest.fn();
 
   beforeEach(() => {
-    clearCache.mockClear();
+    CacheService.deleteV1AlbumCache.mockClear();
     mockTriggerAlertHandler.mockClear();
   });
 
@@ -24,7 +25,7 @@ describe("ClearCacheButton Component", () => {
   });
 
   test("handles successful cache clearing", async () => {
-    clearCache.mockResolvedValueOnce();
+    CacheService.deleteV1AlbumCache.mockResolvedValueOnce();
 
     render(<ClearCacheButton triggerAlertHandler={mockTriggerAlertHandler} />);
     const button = screen.getByRole("button");
@@ -33,13 +34,13 @@ describe("ClearCacheButton Component", () => {
       fireEvent.click(button);
     });
 
-    expect(clearCache).toHaveBeenCalledTimes(1);
+    expect(CacheService.deleteV1AlbumCache).toHaveBeenCalledTimes(1);
     expect(mockTriggerAlertHandler).toHaveBeenCalledWith(null);
   });
 
   test("handles cache clearing error", async () => {
     const error = new Error("Failed to clear cache");
-    clearCache.mockRejectedValueOnce(error);
+    CacheService.deleteV1AlbumCache.mockRejectedValueOnce(error);
 
     render(<ClearCacheButton triggerAlertHandler={mockTriggerAlertHandler} />);
     const button = screen.getByRole("button");
@@ -48,7 +49,7 @@ describe("ClearCacheButton Component", () => {
       fireEvent.click(button);
     });
 
-    expect(clearCache).toHaveBeenCalledTimes(1);
+    expect(CacheService.deleteV1AlbumCache).toHaveBeenCalledTimes(1);
     expect(mockTriggerAlertHandler).toHaveBeenCalledWith(error);
   });
 
@@ -58,7 +59,7 @@ describe("ClearCacheButton Component", () => {
     const clearPromise = new Promise((resolve) => {
       resolvePromise = resolve;
     });
-    clearCache.mockImplementationOnce(() => clearPromise);
+    CacheService.deleteV1AlbumCache.mockImplementationOnce(() => clearPromise);
 
     render(<ClearCacheButton triggerAlertHandler={mockTriggerAlertHandler} />);
     const button = screen.getByRole("button");

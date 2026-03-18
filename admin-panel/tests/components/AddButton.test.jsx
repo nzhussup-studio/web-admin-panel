@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import AddButton from "../../src/components/AddButton";
+import AddButton from "@/components/shared/AddButton";
 
 describe("AddButton Component", () => {
   const mockOpenPopup = jest.fn();

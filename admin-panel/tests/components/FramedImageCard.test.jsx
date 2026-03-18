@@ -1,8 +1,8 @@
 import React, { act } from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import FramedImageCard from "../../src/components/FramedImageCard";
-import { DarkModeProvider } from "../../src/context/DarkModeContext";
-import { GlobalAlertProvider } from "../../src/context/GlobalAlertContext";
+import FramedImageCard from "@/components/albums/FramedImageCard";
+import { ThemeProvider } from "@/providers/theme/ThemeProvider";
+import { GlobalAlertProvider } from "@/providers/alerts/GlobalAlertProvider";
 
 // Mock clipboard API
 const mockClipboard = {
@@ -11,28 +11,28 @@ const mockClipboard = {
 Object.assign(navigator, { clipboard: mockClipboard });
 
 // Mock context hooks
-jest.mock("../../src/context/GlobalAlertContext", () => ({
+jest.mock("@/hooks/alerts/useGlobalAlert", () => ({
   useGlobalAlert: jest.fn(),
 }));
 
-jest.mock("../../src/context/DarkModeContext", () => ({
+jest.mock("@/hooks/theme/useDarkMode", () => ({
   useDarkMode: jest.fn(() => ({
     isDarkMode: false,
     toggleDarkMode: jest.fn(),
   })),
-  DarkModeProvider: ({ children }) => <div>{children}</div>,
+  ThemeProvider: ({ children }) => <div>{children}</div>,
 }));
 
-jest.mock("../../src/context/GlobalAlertContext", () => ({
+jest.mock("@/hooks/alerts/useGlobalAlert", () => ({
   useGlobalAlert: jest.fn(() => ({ showAlert: jest.fn() })),
   GlobalAlertProvider: ({ children }) => <div>{children}</div>,
 }));
 
 const renderWithProviders = (component) => {
   return render(
-    <DarkModeProvider>
+    <ThemeProvider>
       <GlobalAlertProvider>{component}</GlobalAlertProvider>
-    </DarkModeProvider>
+    </ThemeProvider>
   );
 };
 
@@ -66,8 +66,8 @@ describe("FramedImageCard Component", () => {
   test("copies image URL when clicked", async () => {
     mockClipboard.writeText.mockResolvedValueOnce();
     const mockTriggerAlert = jest.fn();
-    const { useGlobalAlert } = require("../../src/context/GlobalAlertContext");
-    const { useDarkMode } = require("../../src/context/DarkModeContext");
+    const { useGlobalAlert } = require("@/hooks/alerts/useGlobalAlert");
+    const { useDarkMode } = require("@/hooks/theme/useDarkMode");
 
     useGlobalAlert.mockReturnValue({ triggerAlert: mockTriggerAlert });
     useDarkMode.mockReturnValue({ isDarkMode: false });
@@ -98,8 +98,8 @@ describe("FramedImageCard Component", () => {
   test("shows error alert when copy fails", async () => {
     mockClipboard.writeText.mockRejectedValueOnce(new Error("Copy failed"));
     const mockTriggerAlert = jest.fn();
-    const { useGlobalAlert } = require("../../src/context/GlobalAlertContext");
-    const { useDarkMode } = require("../../src/context/DarkModeContext");
+    const { useGlobalAlert } = require("@/hooks/alerts/useGlobalAlert");
+    const { useDarkMode } = require("@/hooks/theme/useDarkMode");
 
     useGlobalAlert.mockReturnValue({ triggerAlert: mockTriggerAlert });
     useDarkMode.mockReturnValue({ isDarkMode: false });
@@ -128,8 +128,8 @@ describe("FramedImageCard Component", () => {
   });
 
   test("applies dark mode styles when dark mode is enabled", async () => {
-    const { useDarkMode } = require("../../src/context/DarkModeContext");
-    const { useGlobalAlert } = require("../../src/context/GlobalAlertContext");
+    const { useDarkMode } = require("@/hooks/theme/useDarkMode");
+    const { useGlobalAlert } = require("@/hooks/alerts/useGlobalAlert");
 
     useDarkMode.mockReturnValue({ isDarkMode: true });
     useGlobalAlert.mockReturnValue({ triggerAlert: jest.fn() });

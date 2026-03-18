@@ -13,7 +13,10 @@
     "jsx": "react-jsx",
     "strict": false,
     "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
     "types": ["vite/client", "jest", "node"]
   },
-  "include": ["src"]
+  "include": ["src", "tests"]
 }

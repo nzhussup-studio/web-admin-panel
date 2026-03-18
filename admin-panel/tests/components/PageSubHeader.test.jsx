@@ -1,14 +1,14 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import PageSubHeader from "../../src/components/PageSubHeader";
+import PageSubHeader from "@/components/shared/PageSubHeader";
 
 // Mock the child components
-jest.mock("../../src/components/BackArrow", () => () => (
+jest.mock("@/components/shared/BackButton", () => () => (
   <div data-testid='mock-back-arrow'>Back Arrow</div>
 ));
 
-jest.mock("../../src/components/SortButton", () => ({ onSort }) => (
+jest.mock("@/components/shared/SortButton", () => ({ onSort }) => (
   <button data-testid='mock-sort-button' onClick={onSort}>
     Sort
   </button>

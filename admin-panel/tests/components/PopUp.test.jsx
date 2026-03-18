@@ -1,13 +1,13 @@
 import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import PopUp from "../../src/components/PopUp";
-import { DarkModeProvider } from "../../src/context/DarkModeContext";
+import PopUp from "@/components/shared/Popup";
+import { ThemeProvider } from "@/providers/theme/ThemeProvider";
 
 // Mock timer functions
 jest.useFakeTimers();
 
 const renderWithDarkMode = (component) => {
-  return render(<DarkModeProvider>{component}</DarkModeProvider>);
+  return render(<ThemeProvider>{component}</ThemeProvider>);
 };
 
 describe("PopUp Component", () => {

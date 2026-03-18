@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import FormInput from "../../src/components/FormInput";
+import FormInput from "@/components/shared/FormInput";
 
 describe("FormInput Component", () => {
   const mockOnChange = jest.fn();

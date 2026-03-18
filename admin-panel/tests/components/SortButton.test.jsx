@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import SortButton from "../../src/components/SortButton";
+import SortButton from "@/components/shared/SortButton";
 
 describe("SortButton Component", () => {
   const mockOnSort = jest.fn();

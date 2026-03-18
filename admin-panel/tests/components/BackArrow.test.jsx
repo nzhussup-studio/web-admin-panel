@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { useNavigate } from "react-router-dom";
-import BackArrow from "../../src/components/BackArrow";
+import BackArrow from "@/components/shared/BackButton";
 
 // Mock react-router-dom's useNavigate hook
 jest.mock("react-router-dom", () => ({

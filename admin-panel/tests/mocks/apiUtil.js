@@ -1,3 +1,5 @@
-jest.mock("../utils/base/apiUtil", () => ({
-  clearCache: jest.fn(() => Promise.resolve()),
+jest.mock("@/lib/api/client", () => ({
+  CacheService: {
+    deleteV1AlbumCache: jest.fn(() => Promise.resolve()),
+  },
 }));
