@@ -14,12 +14,12 @@
 
 ## Useful Links
 
-- [**Admin Panel Frontend (needs authentication)**](https://admin.nzhussup.com)
+- [**Admin Panel (needs authentication)**](https://admin.nzhussup.com)
 - [**API Gateway**](https://api.nzhussup.com)
 
 ## Overview
 
-This is a full-stack web application that serves as an [**Admin Panel**](https://admin.nzhussup.com) for managing data on my [personal website](https://nzhussup.com). The project includes a **backend API**, **frontend interface**, and **infrastructure setup** to provide a seamless and secure experience. The core functionality of the Admin Panel includes **CRUD operations** for managing content in the central database, while the personal website consumes the data through GET requests to display it.
+This is a full-stack web application that serves as an [**Admin Panel**](https://admin.nzhussup.com) for managing data on my [personal website](https://nzhussup.com). The project includes a **backend API**, **admin-panel interface**, and **infrastructure setup** to provide a seamless and secure experience. The core functionality of the Admin Panel includes **CRUD operations** for managing content in the central database, while the personal website consumes the data through GET requests to display it.
 
 ### Key Features:
 
@@ -49,11 +49,11 @@ Here is a collage showcasing various features and pages of the Admin Panel and t
 - **Backend**: Java, Spring Boot
   - Provides the backend logic for managing data and authentication.
   - JWT-based security for secure user login and access control.
-- **Frontend**: JavaScript, React.js, Bootstrap, CSS
+- **Admin Panel**: JavaScript, React.js, Bootstrap, CSS
   - React.js for building dynamic user interfaces.
   - Bootstrap for responsive layout and UI components.
 - **Infrastructure**: Docker, Kubernetes
-  - Docker for containerizing the backend and frontend applications.
+  - Docker for containerizing the backend and admin-panel applications.
   - Kubernetes for orchestrating containers in a scalable and robust environment.
 - **CI/CD**: GitHub Actions
   - Automates the build, test, and deployment process.
@@ -66,19 +66,19 @@ Here is a collage showcasing various features and pages of the Admin Panel and t
 This project is divided into the following components:
 
 1. **Backend**:
-
    - **Spring Boot API**: Provides routes for user authentication and CRUD operations on data.
    - **Security**: Implements JWT authentication to secure the routes and ensure authorized access to the Admin Panel.
 
-2. **Frontend**:
-
+2. **Admin Panel**:
    - **Admin Panel UI**: Built with React.js, this interface allows the admin to interact with the backend via RESTful APIs.
-   - **Responsive Design**: Utilizing Bootstrap and custom CSS, the frontend ensures a smooth user experience across different devices.
+
+- **Responsive Design**: Utilizing Bootstrap and custom CSS, the admin-panel ensures a smooth user experience across different devices.
 
 3. **Infrastructure**:
-   - **Docker**: Containers for the backend and frontend applications.
-   - **Kubernetes**: Orchestration for managing deployments and ensuring scalability.
-   - **CI/CD**: Automates building and deploying the application with GitHub Actions.
+
+- **Docker**: Containers for the backend and admin-panel applications.
+- **Kubernetes**: Orchestration for managing deployments and ensuring scalability.
+- **CI/CD**: Automates building and deploying the application with GitHub Actions.
 
 ---
 
@@ -130,7 +130,7 @@ vim configmap.yml
 kubectl apply -f secrets.yml
 kubectl apply -f configmap.yml
 kubectl apply -f panel-api-deployment.yml
-kubectl apply -f panel-frontend-deployment.yml
+kubectl apply -f panel-admin-panel-deployment.yml
 ```
 
 If no ingress and letsencrypt configured

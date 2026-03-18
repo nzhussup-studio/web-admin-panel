@@ -1,15 +1,15 @@
-name: Frontend CI/CD for Build and Deploy
+name: Admin Panel CI/CD for Build and Deploy
 
 on:
   push:
     branches:
       - "**"
     paths:
-      - "frontend/**"
+      - "admin-panel/**"
 
 jobs:
   test:
-    name: Run Frontend Tests
+    name: Run Admin Panel Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -23,14 +23,14 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
-        working-directory: frontend
+        working-directory: admin-panel
 
       - name: Run Tests
         run: npm test
-        working-directory: frontend
+        working-directory: admin-panel
 
   build:
-    name: Build Docker Image
+    name: Build Admin Panel Docker Image
     runs-on: ubuntu-latest
 
     steps:
@@ -55,12 +55,12 @@ jobs:
         run: |
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/panel-frontend:latest \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/panel-admin-panel:latest \
             --push .
-        working-directory: frontend
+        working-directory: admin-panel
 
   deploy:
-    name: Deploy to Kubernetes
+    name: Deploy Admin Panel to Kubernetes
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/main'
@@ -73,4 +73,4 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            kubectl rollout restart deployment/panel-frontend-deployment
+            kubectl rollout restart deployment/panel-admin-panel-deployment
