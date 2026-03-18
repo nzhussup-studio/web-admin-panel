@@ -18,7 +18,7 @@ import LoadingElement from "@/components/states/LoadingState";
 import ErrorElement from "@/components/states/ErrorState";
 import NoInfoFoundElement from "@/components/states/EmptyState";
 
-const Certs = () => {
+const CertificationsPage = () => {
   const [certificates, setCertificates] = useState<base_service_Certificate[]>(
     []
   );
@@ -177,4 +177,4 @@ const Certs = () => {
   );
 };
 
-export default Certs;
+export default CertificationsPage;

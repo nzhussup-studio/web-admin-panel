@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Header from "@/components/layout/Header";
 import PageWrapper from "@/motion/PageTransition";
 
-const LLMConfig = () => {
+const LlmConfigPage = () => {
   const [modelName, setModelName] = useState("");
   const [enableBackgroundGen, setEnableBackgroundGen] = useState(false);
 
@@ -86,4 +86,4 @@ const LLMConfig = () => {
   );
 };
 
-export default LLMConfig;
+export default LlmConfigPage;

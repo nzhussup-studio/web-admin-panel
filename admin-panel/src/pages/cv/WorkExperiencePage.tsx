@@ -18,7 +18,7 @@ import LoadingElement from "@/components/states/LoadingState";
 import ErrorElement from "@/components/states/ErrorState";
 import NoInfoFoundElement from "@/components/states/EmptyState";
 
-const WorkExp = () => {
+const WorkExperiencePage = () => {
   const [workExperience, setWorkExperience] = useState<
     base_service_WorkExperience[]
   >([]);
@@ -231,4 +231,4 @@ const WorkExp = () => {
   );
 };
 
-export default WorkExp;
+export default WorkExperiencePage;

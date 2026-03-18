@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const BackArrow = () => {
+const BackButton = () => {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -29,4 +29,4 @@ const BackArrow = () => {
   );
 };
 
-export default BackArrow;
+export default BackButton;

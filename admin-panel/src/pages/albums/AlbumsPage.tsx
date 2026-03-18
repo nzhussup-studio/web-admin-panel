@@ -33,7 +33,7 @@ const normalizeAlbumPreview = (
   images_count: album.image_count,
 });
 
-const AlbumsPreview = () => {
+const AlbumsPage = () => {
   const [albums, setAlbums] = useState<AlbumPreviewView[]>([]);
   const [isAscending, setIsAscending] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -196,4 +196,4 @@ const AlbumsPreview = () => {
     </>
   );
 };
-export default AlbumsPreview;
+export default AlbumsPage;

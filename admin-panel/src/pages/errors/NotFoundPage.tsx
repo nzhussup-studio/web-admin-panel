@@ -1,6 +1,6 @@
 import PageTransition from "@/motion/PageTransition";
 
-const NotFound = () => {
+const NotFoundPage = () => {
   return (
     <PageTransition>
       <div style={{ textAlign: "center", marginTop: "50px" }}>
@@ -11,4 +11,4 @@ const NotFound = () => {
   );
 };
 
-export default NotFound;
+export default NotFoundPage;

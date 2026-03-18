@@ -15,7 +15,7 @@ import LoadingElement from "@/components/states/LoadingState";
 import ErrorElement from "@/components/states/ErrorState";
 import NoInfoFoundElement from "@/components/states/EmptyState";
 
-const Skills = () => {
+const SkillsPage = () => {
   const [skills, setSkills] = useState<base_service_Skill[]>([]);
   const [isAscending, setIsAscending] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -176,4 +176,4 @@ const Skills = () => {
   );
 };
 
-export default Skills;
+export default SkillsPage;

@@ -24,7 +24,7 @@ const formatDateForInput = (dateString) => {
   return date.toISOString().split("T")[0];
 };
 
-const Edu = () => {
+const EducationPage = () => {
   const [education, setEducation] = useState<base_service_Education[]>([]);
   const [isAscending, setIsAscending] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -211,4 +211,4 @@ const Edu = () => {
   );
 };
 
-export default Edu;
+export default EducationPage;

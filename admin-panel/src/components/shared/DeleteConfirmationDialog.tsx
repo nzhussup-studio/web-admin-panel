@@ -6,7 +6,7 @@ interface DeleteConfirmationProps {
   onConfirm: () => void;
 }
 
-const DeleteConfirmation = ({
+const DeleteConfirmationDialog = ({
   isOpen,
   onClose,
   onConfirm,
@@ -84,4 +84,4 @@ const DeleteConfirmation = ({
   );
 };
 
-export default DeleteConfirmation;
+export default DeleteConfirmationDialog;

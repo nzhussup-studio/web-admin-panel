@@ -36,7 +36,7 @@ const Item = ({ title, subtitle, date, description, techStack = "" }) => (
   </div>
 );
 
-const CVTemplate = ({ data }) => {
+const CvTemplate = ({ data }) => {
   const {
     basic_info,
     work_experience,
@@ -229,4 +229,4 @@ const CVTemplate = ({ data }) => {
   );
 };
 
-export default CVTemplate;
+export default CvTemplate;

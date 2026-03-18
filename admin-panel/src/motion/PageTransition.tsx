@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { memo } from "react";
 import { motion } from "framer-motion";
 
-const PageWrapper = memo(({ children }: { children?: ReactNode }) => {
+const PageTransition = memo(({ children }: { children?: ReactNode }) => {
   const pageVariants = {
     initial: {
       opacity: 0,
@@ -35,6 +35,6 @@ const PageWrapper = memo(({ children }: { children?: ReactNode }) => {
   );
 });
 
-PageWrapper.displayName = "PageWrapper";
+PageTransition.displayName = "PageTransition";
 
-export default PageWrapper;
+export default PageTransition;

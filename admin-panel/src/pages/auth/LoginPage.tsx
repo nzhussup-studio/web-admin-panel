@@ -7,7 +7,7 @@ import DarkModeToggle from "@/components/shared/DarkModeToggle";
 import Loading from "@/components/states/LoadingState";
 import PageWrapper from "@/motion/PageTransition";
 
-const Login = () => {
+const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -150,4 +150,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginPage;

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Card from "@/components/shared/Card";
 import PageWrapper from "@/motion/PageTransition";
 
-const Home = () => {
+const HomePage = () => {
   const navigate = useNavigate();
 
   const handleNavigateProjects = () => {
@@ -105,4 +105,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default HomePage;

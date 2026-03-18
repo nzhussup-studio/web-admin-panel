@@ -22,7 +22,7 @@ import { generateCV } from "@/lib/cv/generateCv";
 type BasicInfo = Record<string, string>;
 type SelectedItems = Record<string, Set<string | number>>;
 
-const CVGenerator = () => {
+const CvGeneratorPage = () => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
@@ -357,4 +357,4 @@ const CVGenerator = () => {
   );
 };
 
-export default CVGenerator;
+export default CvGeneratorPage;

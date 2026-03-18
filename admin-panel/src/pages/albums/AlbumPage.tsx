@@ -27,7 +27,7 @@ import { useGlobalAlert } from "@/hooks/alerts/useGlobalAlert";
 
 type ImagePreview = { file: Blob; preview: string };
 
-const Album = () => {
+const AlbumPage = () => {
   const { id } = useParams();
   const { triggerAlert } = useGlobalAlert();
   const [album, setAlbum] = useState<image_service_model_Album | null>(null);
@@ -209,4 +209,4 @@ const Album = () => {
     </>
   );
 };
-export default Album;
+export default AlbumPage;

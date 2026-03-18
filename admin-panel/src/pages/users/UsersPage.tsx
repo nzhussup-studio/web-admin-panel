@@ -20,7 +20,7 @@ import ErrorElement from "@/components/states/ErrorState";
 import NoInfoFoundElement from "@/components/states/EmptyState";
 import GlobalAlert from "@/components/layout/GlobalAlert";
 
-const Users = () => {
+const UsersPage = () => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [users, setUsers] = useState<user_service_User[]>([]);
@@ -190,4 +190,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default UsersPage;

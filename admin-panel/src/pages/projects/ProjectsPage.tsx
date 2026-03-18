@@ -15,7 +15,7 @@ import LoadingElement from "@/components/states/LoadingState";
 import ErrorElement from "@/components/states/ErrorState";
 import NoInfoFoundElement from "@/components/states/EmptyState";
 
-const Projects = () => {
+const ProjectsPage = () => {
   const [projects, setProjects] = useState<base_service_Project[]>([]);
   const [isAscending, setIsAscending] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -192,4 +192,4 @@ const Projects = () => {
   );
 };
 
-export default Projects;
+export default ProjectsPage;

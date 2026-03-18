@@ -9,7 +9,7 @@ interface PopUpProps {
   onSubmit: () => Promise<void> | void;
 }
 
-const PopUp = ({ closePopup, title, children, onSubmit }: PopUpProps) => {
+const Popup = ({ closePopup, title, children, onSubmit }: PopUpProps) => {
   const { isDarkMode } = useDarkMode();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -117,4 +117,4 @@ const PopUp = ({ closePopup, title, children, onSubmit }: PopUpProps) => {
   );
 };
 
-export default PopUp;
+export default Popup;

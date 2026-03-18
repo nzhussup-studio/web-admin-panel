@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import BackArrow from "@/components/shared/BackButton";
 import PageWrapper from "@/motion/PageTransition";
 
-const CV = () => {
+const CvPage = () => {
   const navigate = useNavigate();
   return (
     <>
@@ -67,4 +67,4 @@ const CV = () => {
   );
 };
 
-export default CV;
+export default CvPage;
