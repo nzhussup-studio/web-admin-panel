@@ -130,7 +130,7 @@ vim configmap.yml
 kubectl apply -f secrets.yml
 kubectl apply -f configmap.yml
 kubectl apply -f panel-api-deployment.yml
-kubectl apply -f panel-admin-panel-deployment.yml
+kubectl apply -f web-admin-panel-deployment.yml
 ```
 
 If no ingress and letsencrypt configured
