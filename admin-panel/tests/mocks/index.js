@@ -1,5 +1,3 @@
-const React = require("react");
-
 exports.mockDarkModeContext = {
   useDarkMode: jest.fn(() => ({
     isDarkMode: false,

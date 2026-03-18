@@ -43,7 +43,7 @@ describe("EditableCard Component", () => {
   });
 
   test("does not throw error when onEdit is not provided", () => {
-    const { onEdit, ...propsWithoutEdit } = defaultProps;
+    const { onEdit: _onEdit, ...propsWithoutEdit } = defaultProps;
     renderWithDarkMode(<EditableCard {...propsWithoutEdit} />);
     const card = screen.getByText("Test Card").closest(".card");
     expect(() => fireEvent.click(card)).not.toThrow();

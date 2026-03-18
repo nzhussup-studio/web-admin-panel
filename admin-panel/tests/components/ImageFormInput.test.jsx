@@ -61,7 +61,7 @@ describe("ImageFormInput Component", () => {
 
     // Mock FileReader
     const createMockFileReader = (result) => ({
-      readAsDataURL: function (file) {
+      readAsDataURL: function (_file) {
         setTimeout(() => {
           this.result = result;
           this.onloadend();

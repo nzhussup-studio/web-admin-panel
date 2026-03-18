@@ -13,5 +13,6 @@ export default {
         runtime: "automatic",
       },
     ],
+    "@babel/preset-typescript",
   ],
 };

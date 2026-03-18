@@ -9,7 +9,7 @@ const config = {
     "^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
   },
   testMatch: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
-  extensionsToTreatAsEsm: [".jsx"],
+  extensionsToTreatAsEsm: [".jsx", ".ts", ".tsx"],
 };
 
 export default config;
