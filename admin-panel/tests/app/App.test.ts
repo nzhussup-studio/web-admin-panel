@@ -28,10 +28,10 @@ jest.mock("@/router/routes", () => ({
   ],
 }));
 
-jest.mock("@/router/ProtectedRoute", () => ({
+jest.mock("@/router/RequireAuth", () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) =>
-    mockCreateElement("div", { "data-testid": "protected-route" }, children),
+    mockCreateElement("div", { "data-testid": "require-auth" }, children),
 }));
 
 jest.mock("@/components/layout/GlobalAlert", () => ({
@@ -55,11 +55,11 @@ describe("app/App.tsx", () => {
     expect(screen.getByText("Home")).toBeInTheDocument();
   });
 
-  test("wraps only protected routes with ProtectedRoute", () => {
+  test("wraps only protected routes with RequireAuth", () => {
     render(mockCreateElement(App));
 
     expect(screen.getByTestId("route-/")).toContainElement(
-      screen.getByTestId("protected-route")
+      screen.getByTestId("require-auth")
     );
   });
 });

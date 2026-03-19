@@ -6,7 +6,7 @@ describe("config/app-config.ts", () => {
       apiBase: "http://localhost:8082",
       keycloakUrl: "http://localhost:8081",
       keycloakRealm: "backend-auth-dev",
-      keycloakClientId: "frontend-auth-client",
+      keycloakClientId: "frontend-admin-auth-client",
       showNoInfoDelay: 500,
       cvGeneratorLocalStorageKey: "cvGeneratorSelectedItems",
     });

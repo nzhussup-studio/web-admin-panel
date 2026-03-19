@@ -1,7 +1,7 @@
 const fallbackApiBase = "http://localhost:8082";
 const fallbackKeycloakUrl = "http://localhost:8081";
 const fallbackKeycloakRealm = "backend-auth-dev";
-const fallbackKeycloakClientId = "frontend-auth-client";
+const fallbackKeycloakClientId = "frontend-admin-auth-client";
 
 const config = {
   apiBase:
@@ -9,7 +9,8 @@ const config = {
       ? __APP_API_BASE__
       : fallbackApiBase,
   keycloakUrl:
-    typeof __APP_KEYCLOAK_URL__ === "string" && __APP_KEYCLOAK_URL__.trim().length > 0
+    typeof __APP_KEYCLOAK_URL__ === "string" &&
+    __APP_KEYCLOAK_URL__.trim().length > 0
       ? __APP_KEYCLOAK_URL__
       : fallbackKeycloakUrl,
   keycloakRealm:

@@ -16,27 +16,43 @@ const initialState: AuthState = {
 
 let keycloakInitPromise: Promise<boolean> | null = null;
 
+const getRoles = () => {
+  const realmRoles = keycloak.tokenParsed?.realm_access?.roles ?? [];
+  const clientRoles = Object.values(keycloak.tokenParsed?.resource_access ?? {}).flatMap(
+    (access) => access.roles ?? []
+  );
+
+  return Array.from(new Set([...realmRoles, ...clientRoles]));
+};
+
 export const AuthProvider = ({ children }: ProviderProps) => {
   const [state, setState] = useState<AuthState>(initialState);
 
   useEffect(() => {
     let mounted = true;
+    const isUnauthorizedRoute = window.location.pathname === "/unauthorized";
 
     const syncState = async () => {
-      const realmRoles = keycloak.tokenParsed?.realm_access?.roles ?? [];
-      const clientRoles = Object.values(keycloak.tokenParsed?.resource_access ?? {}).flatMap(
-        (access) => access.roles ?? []
-      );
-      const roles = Array.from(new Set([...realmRoles, ...clientRoles]));
+      const isAuthenticated = !!keycloak.authenticated;
+      const roles = getRoles();
       const username = keycloak.tokenParsed?.preferred_username ?? null;
       const email = keycloak.tokenParsed?.email ?? null;
+      const isUnauthorizedAdminUser = isAuthenticated && !isUnauthorizedRoute && !roles.includes("ROLE_ADMIN");
+
+      if (isUnauthorizedAdminUser) {
+        setState(initialState);
+        await keycloak.logout({
+          redirectUri: `${window.location.origin}/unauthorized`,
+        });
+        return;
+      }
 
       if (!mounted) {
         return;
       }
 
       setState({
-        isAuthenticated: !!keycloak.authenticated,
+        isAuthenticated,
         token: keycloak.token ?? null,
         expiration: keycloak.tokenParsed?.exp?.toString() ?? null,
         loading: false,
@@ -70,7 +86,7 @@ export const AuthProvider = ({ children }: ProviderProps) => {
 
         if (!keycloakInitPromise) {
           keycloakInitPromise = keycloak.init({
-            onLoad: window.location.pathname === "/unauthorized" ? "check-sso" : "login-required",
+            onLoad: isUnauthorizedRoute ? "check-sso" : "login-required",
             pkceMethod: "S256",
             checkLoginIframe: false,
           });
@@ -115,4 +131,8 @@ export const AuthProvider = ({ children }: ProviderProps) => {
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const resetKeycloakInitPromiseForTests = () => {
+  keycloakInitPromise = null;
 };

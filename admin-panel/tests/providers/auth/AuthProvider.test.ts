@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { act, render, screen, waitFor } from "@testing-library/react";
-import { AuthProvider } from "@/providers/auth/AuthProvider";
+import { AuthProvider, resetKeycloakInitPromiseForTests } from "@/providers/auth/AuthProvider";
 import { AuthContext } from "@/providers/auth/auth-context";
 import keycloak from "@/lib/auth/keycloak";
 
@@ -36,7 +36,7 @@ const Consumer = () => {
     React.createElement(
       "span",
       { "data-testid": "auth-state" },
-      JSON.stringify(context.state)
+      JSON.stringify(context.state),
     ),
     React.createElement(
       "button",
@@ -46,7 +46,7 @@ const Consumer = () => {
           void context.login();
         },
       },
-      "login"
+      "login",
     ),
     React.createElement(
       "button",
@@ -54,13 +54,14 @@ const Consumer = () => {
         type: "button",
         onClick: context.logout,
       },
-      "logout"
-    )
+      "logout",
+    ),
   );
 };
 
 describe("providers/auth/AuthProvider.tsx", () => {
   beforeEach(() => {
+    resetKeycloakInitPromiseForTests();
     jest.clearAllMocks();
     mockKeycloak.authenticated = false;
     mockKeycloak.token = undefined;
@@ -69,14 +70,15 @@ describe("providers/auth/AuthProvider.tsx", () => {
     mockKeycloak.login.mockResolvedValue(undefined);
     mockKeycloak.logout.mockResolvedValue(undefined);
     mockKeycloak.updateToken.mockResolvedValue(true);
+    window.history.pushState({}, "", "/projects");
   });
 
   test("initializes keycloak with login-required and settles state", async () => {
-    render(React.createElement(AuthProvider, null, React.createElement(Consumer)));
-
-    await waitFor(() =>
-      expect(mockKeycloak.init).toHaveBeenCalled()
+    render(
+      React.createElement(AuthProvider, null, React.createElement(Consumer)),
     );
+
+    await waitFor(() => expect(mockKeycloak.init).toHaveBeenCalled());
     expect(mockKeycloak.init).toHaveBeenCalledWith({
       onLoad: "login-required",
       pkceMethod: "S256",
@@ -84,10 +86,12 @@ describe("providers/auth/AuthProvider.tsx", () => {
     });
     await waitFor(() =>
       expect(screen.getByTestId("auth-state")).toHaveTextContent(
-        '"isAuthenticated":false'
-      )
+        '"isAuthenticated":false',
+      ),
     );
-    expect(screen.getByTestId("auth-state")).toHaveTextContent('"loading":false');
+    expect(screen.getByTestId("auth-state")).toHaveTextContent(
+      '"loading":false',
+    );
   });
 
   test("hydrates authenticated state from keycloak", async () => {
@@ -101,30 +105,68 @@ describe("providers/auth/AuthProvider.tsx", () => {
         roles: ["ROLE_ADMIN", "ROLE_USER"],
       },
       resource_access: {
-        "frontend-auth-client": {
+        "frontend-admin-auth-client": {
           roles: ["ui-access"],
         },
       },
     };
     mockKeycloak.init.mockResolvedValue(true);
 
-    render(React.createElement(AuthProvider, null, React.createElement(Consumer)));
+    render(
+      React.createElement(AuthProvider, null, React.createElement(Consumer)),
+    );
 
     await waitFor(() =>
       expect(screen.getByTestId("auth-state")).toHaveTextContent(
-        '"isAuthenticated":true'
-      )
+        '"isAuthenticated":true',
+      ),
     );
-    expect(screen.getByTestId("auth-state")).toHaveTextContent('"username":"admin"');
+    expect(screen.getByTestId("auth-state")).toHaveTextContent(
+      '"username":"admin"',
+    );
     expect(screen.getByTestId("auth-state")).toHaveTextContent('"ROLE_ADMIN"');
     expect(screen.getByTestId("auth-state")).toHaveTextContent('"ui-access"');
   });
 
-  test("login and logout delegate to keycloak", async () => {
-    render(React.createElement(AuthProvider, null, React.createElement(Consumer)));
+  test("logs out authenticated users without the admin role", async () => {
+    mockKeycloak.authenticated = true;
+    mockKeycloak.token = "stored-token";
+    mockKeycloak.tokenParsed = {
+      exp: Math.floor(Date.now() / 1000) + 3600,
+      preferred_username: "jane.user",
+      email: "jane.user@example.com",
+      realm_access: {
+        roles: ["ROLE_USER"],
+      },
+      resource_access: {
+        "frontend-admin-auth-client": {
+          roles: ["ui-access"],
+        },
+      },
+    };
+    mockKeycloak.init.mockResolvedValue(true);
+
+    render(
+      React.createElement(AuthProvider, null, React.createElement(Consumer)),
+    );
 
     await waitFor(() =>
-      expect(screen.getByTestId("auth-state")).toHaveTextContent('"loading":false')
+      expect(mockKeycloak.logout).toHaveBeenCalledWith({
+        redirectUri: `${window.location.origin}/unauthorized`,
+      }),
+    );
+    expect(screen.queryByTestId("auth-state")).not.toBeInTheDocument();
+  });
+
+  test("login and logout delegate to keycloak", async () => {
+    render(
+      React.createElement(AuthProvider, null, React.createElement(Consumer)),
+    );
+
+    await waitFor(() =>
+      expect(screen.getByTestId("auth-state")).toHaveTextContent(
+        '"loading":false',
+      ),
     );
 
     act(() => {

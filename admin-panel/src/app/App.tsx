@@ -2,7 +2,7 @@ import React from "react";
 import { AnimatePresence } from "framer-motion";
 import { Routes, Route, useLocation } from "react-router-dom";
 import routes from "@/router/routes";
-import ProtectedRoute from "@/router/ProtectedRoute";
+import RequireAuth from "@/router/RequireAuth";
 import GlobalAlert from "@/components/layout/GlobalAlert";
 import PageTransition from "@/motion/PageTransition";
 
@@ -30,11 +30,11 @@ function MainApp() {
                 key={route.path}
                 path={route.path}
                 element={
-                  <ProtectedRoute>
+                  <RequireAuth>
                     <PageTransition>
                       <Component />
                     </PageTransition>
-                  </ProtectedRoute>
+                  </RequireAuth>
                 }
               />
             );

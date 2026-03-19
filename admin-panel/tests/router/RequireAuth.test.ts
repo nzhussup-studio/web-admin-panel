@@ -1,7 +1,7 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import ProtectedRoute from "@/router/ProtectedRoute";
+import RequireAuth from "@/router/RequireAuth";
 import { useAuth } from "@/hooks/auth/useAuth";
 
 jest.mock("@/hooks/auth/useAuth", () => ({
@@ -10,7 +10,7 @@ jest.mock("@/hooks/auth/useAuth", () => ({
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 
-describe("router/ProtectedRoute.tsx", () => {
+describe("router/RequireAuth.tsx", () => {
   test("renders children when the user is authenticated", () => {
     mockUseAuth.mockReturnValue({
       state: {
@@ -31,7 +31,7 @@ describe("router/ProtectedRoute.tsx", () => {
         MemoryRouter,
         null,
         React.createElement(
-          ProtectedRoute,
+          RequireAuth,
           null,
           React.createElement("div", null, "Private content")
         )
@@ -61,7 +61,7 @@ describe("router/ProtectedRoute.tsx", () => {
         MemoryRouter,
         { initialEntries: ["/projects"] },
         React.createElement(
-          ProtectedRoute,
+          RequireAuth,
           null,
           React.createElement("div", null, "Hidden content")
         )
@@ -69,39 +69,5 @@ describe("router/ProtectedRoute.tsx", () => {
     );
 
     expect(screen.queryByText("Hidden content")).not.toBeInTheDocument();
-  });
-
-  test("logs out authenticated users without the admin role", async () => {
-    const logout = jest.fn().mockResolvedValue(undefined);
-
-    mockUseAuth.mockReturnValue({
-      state: {
-        isAuthenticated: true,
-        token: "token",
-        expiration: "tomorrow",
-        loading: false,
-        roles: ["ROLE_USER"],
-        username: "jane.user",
-        email: "jane.user@example.com",
-      },
-      login: jest.fn().mockResolvedValue(undefined),
-      logout,
-    });
-
-    render(
-      React.createElement(
-        MemoryRouter,
-        null,
-        React.createElement(
-          ProtectedRoute,
-          null,
-          React.createElement("div", null, "Hidden content")
-        )
-      )
-    );
-
-    await waitFor(() =>
-      expect(logout).toHaveBeenCalledWith(`${window.location.origin}/unauthorized`)
-    );
   });
 });
