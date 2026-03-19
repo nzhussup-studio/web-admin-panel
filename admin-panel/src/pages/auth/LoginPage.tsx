@@ -10,7 +10,7 @@ import { useAuth } from "@/hooks/auth/useAuth";
 import { AuthControllerService } from "@/lib/api/client";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
 import Loading from "@/components/states/LoadingState";
-import { BrightnessHighIcon, MoonStarsIcon } from "@/assets/icons";
+import ThemeToggle from "@/components/shared/ThemeToggle";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -107,21 +107,7 @@ const LoginPage = () => {
                   >
                     Please sign in
                   </h1>
-                  <Form.Check
-                    type='switch'
-                    id='login-dark-mode-switch'
-                    className='mb-0'
-                    label={
-                      isDarkMode ? (
-                        <MoonStarsIcon width={16} height={16} color='black' />
-                      ) : (
-                        <BrightnessHighIcon width={16} height={16} />
-                      )
-                    }
-                    checked={isDarkMode}
-                    onChange={toggleDarkMode}
-                    aria-label='Toggle dark mode'
-                  />
+                  <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleDarkMode} />
                 </div>
 
                 {error && <div className='alert alert-danger'>{error}</div>}

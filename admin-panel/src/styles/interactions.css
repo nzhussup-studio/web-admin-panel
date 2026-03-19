@@ -86,6 +86,82 @@
   letter-spacing: -0.03em;
 }
 
+.app-theme-toggle {
+  --bs-btn-bg: rgba(var(--bs-body-bg-rgb), 0.72);
+  --bs-btn-border-color: var(--app-border);
+  --bs-btn-hover-bg: rgba(var(--bs-body-bg-rgb), 0.88);
+  --bs-btn-hover-border-color: rgba(13, 110, 253, 0.28);
+  --bs-btn-active-bg: rgba(var(--bs-body-bg-rgb), 0.92);
+  --bs-btn-active-border-color: rgba(13, 110, 253, 0.34);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.4rem;
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+}
+
+.app-theme-toggle-track {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: center;
+  width: 3.6rem;
+  height: 2rem;
+  padding: 0.2rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.18), rgba(13, 110, 253, 0.18));
+  border: 1px solid rgba(13, 110, 253, 0.14);
+}
+
+.app-theme-toggle-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(var(--bs-body-color-rgb), 0.65);
+  z-index: 1;
+}
+
+.app-theme-toggle-thumb {
+  position: absolute;
+  top: 0.2rem;
+  left: 0.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffffff, #eef4ff);
+  color: #0d6efd;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), background 0.24s ease, color 0.24s ease;
+}
+
+.app-theme-toggle-thumb.is-dark {
+  transform: translateX(1.6rem);
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #f8fafc;
+}
+
+.app-theme-toggle:hover .app-theme-toggle-thumb,
+.app-theme-toggle:focus-visible .app-theme-toggle-thumb {
+  transform: scale(1.04);
+}
+
+.app-theme-toggle:hover .app-theme-toggle-thumb.is-dark,
+.app-theme-toggle:focus-visible .app-theme-toggle-thumb.is-dark {
+  transform: translateX(1.6rem) scale(1.04);
+}
+
+.app-theme-toggle:focus-visible {
+  box-shadow:
+    0 0 0 0.2rem rgba(13, 110, 253, 0.18),
+    0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
 .app-alert-toast {
   min-width: min(36rem, calc(100vw - 2rem));
   border-radius: 1rem;

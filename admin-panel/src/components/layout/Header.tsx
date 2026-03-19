@@ -3,18 +3,14 @@ import { useNavigate } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
-import Form from "react-bootstrap/Form";
 import Navbar from "react-bootstrap/Navbar";
 import Row from "react-bootstrap/Row";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
 import { CacheService } from "@/lib/api/client";
 import { useGlobalAlert } from "@/hooks/alerts/useGlobalAlert";
-import {
-  BrightnessHighIcon,
-  CodeSlashIcon,
-  MoonStarsIcon,
-} from "@/assets/icons";
+import { CodeSlashIcon } from "@/assets/icons";
+import ThemeToggle from "@/components/shared/ThemeToggle";
 
 const Header = ({ text }: { text: string }) => {
   const { logout } = useAuth();
@@ -72,21 +68,7 @@ const Header = ({ text }: { text: string }) => {
 
           <Col xs={12} md={4}>
             <div className='d-flex flex-wrap align-items-center justify-content-center justify-content-md-end gap-2'>
-              <Form.Check
-                type='switch'
-                id='header-dark-mode-switch'
-                className='mb-0'
-                label={
-                  isDarkMode ? (
-                    <MoonStarsIcon width={16} height={16} color='black' />
-                  ) : (
-                    <BrightnessHighIcon width={16} height={16} />
-                  )
-                }
-                checked={isDarkMode}
-                onChange={toggleDarkMode}
-                aria-label='Toggle dark mode'
-              />
+              <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleDarkMode} />
               <Button
                 type='button'
                 variant='outline-danger'
