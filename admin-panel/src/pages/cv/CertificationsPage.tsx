@@ -120,16 +120,6 @@ const CertificationsPage = () => {
               </div>
               <div className='app-card-actions'>
                 <Button
-                  variant='outline-primary'
-                  size='sm'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openPopup(certificate);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
                   variant='outline-danger'
                   size='sm'
                   onClick={(e) => {

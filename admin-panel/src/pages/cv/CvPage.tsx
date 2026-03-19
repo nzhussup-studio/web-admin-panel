@@ -61,9 +61,6 @@ const CvPage = () => {
                   <Card.Text className='text-secondary flex-grow-1'>
                     {section.description}
                   </Card.Text>
-                  <div className='app-card-actions'>
-                    <Button onClick={() => navigate(section.path)}>Open</Button>
-                  </div>
                 </Card.Body>
               </Card>
             </Col>

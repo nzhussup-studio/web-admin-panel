@@ -86,17 +86,6 @@ const EditableAlbumCard = ({
           📸 {album.images_count} images
         </Card.Text>
         <div className='app-card-actions mt-3'>
-          <Button
-            variant='outline-primary'
-            size='sm'
-            onClick={(e) => {
-              e.stopPropagation();
-              handleNavigate();
-            }}
-            aria-label='Open album'
-          >
-            Open
-          </Button>
           {onEdit ? (
             <Button
               variant='outline-secondary'

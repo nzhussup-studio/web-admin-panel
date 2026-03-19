@@ -145,16 +145,6 @@ const UsersPage = () => {
               </div>
               <div className='app-card-actions'>
                 <Button
-                  variant='outline-primary'
-                  size='sm'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openPopup(user);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
                   variant='outline-danger'
                   size='sm'
                   onClick={(e) => {

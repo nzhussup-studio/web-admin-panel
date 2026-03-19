@@ -111,16 +111,6 @@ const SkillsPage = () => {
               </div>
               <div className='app-card-actions'>
                 <Button
-                  variant='outline-primary'
-                  size='sm'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openPopup(skill);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
                   variant='outline-danger'
                   size='sm'
                   onClick={(e) => {
