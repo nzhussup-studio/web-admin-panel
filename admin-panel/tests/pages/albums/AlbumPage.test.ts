@@ -1,10 +1,7 @@
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import AlbumPage from "@/pages/albums/AlbumPage";
-import {
-  AlbumService,
-  ImageService,
-} from "@/lib/api/client";
+import { AlbumService, ImageService } from "@/lib/api/client";
 import { useGlobalAlert } from "@/hooks/alerts/useGlobalAlert";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -71,7 +68,7 @@ jest.mock("@/components/pages/PageState", () => ({
         "data-loading": String(loading),
         "data-error": error ? "true" : "false",
       },
-      children
+      children,
     );
   },
 }));
@@ -103,9 +100,9 @@ jest.mock("@/components/shared/Popup", () => ({
       ReactLocal.createElement(
         "button",
         { type: "button", onClick: closePopup },
-        "Close popup"
+        "Close popup",
       ),
-      ReactLocal.createElement("button", { type: "submit" }, "Submit popup")
+      ReactLocal.createElement("button", { type: "submit" }, "Submit popup"),
     );
   },
 }));
@@ -129,13 +126,13 @@ jest.mock("@/components/shared/ConfirmDialog", () => ({
           ReactLocal.createElement(
             "button",
             { onClick: onConfirm },
-            "Confirm delete"
+            "Confirm delete",
           ),
           ReactLocal.createElement(
             "button",
             { onClick: onClose },
-            "Cancel delete"
-          )
+            "Cancel delete",
+          ),
         )
       : null;
   },
@@ -160,7 +157,11 @@ jest.mock("@/components/albums/FramedImageCard", () => ({
       null,
       ReactLocal.createElement("span", null, `${alt}:${imageUrl}`),
       ReactLocal.createElement("button", { onClick: onEdit }, `Edit ${alt}`),
-      ReactLocal.createElement("button", { onClick: onDelete }, `Delete ${alt}`)
+      ReactLocal.createElement(
+        "button",
+        { onClick: onDelete },
+        `Delete ${alt}`,
+      ),
     );
   },
 }));
@@ -214,16 +215,14 @@ describe("pages/albums/AlbumPage.tsx", () => {
   test("fetches the album on mount and renders image cards with prefixed urls", async () => {
     render(React.createElement(AlbumPage));
 
-    await waitFor(() =>
-      expect(mockGetAlbum).toHaveBeenCalledWith("album-1")
-    );
+    await waitFor(() => expect(mockGetAlbum).toHaveBeenCalledWith("album-1"));
 
     expect(screen.getByText("Header: Album Summer Album")).toBeInTheDocument();
     expect(
-      screen.getByText("img-1:https://api.nzhussup.com/images/1.jpg")
+      screen.getByText("img-1:http://localhost:8080/images/1.jpg"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("img-2:https://api.nzhussup.com/images/2.jpg")
+      screen.getByText("img-2:http://localhost:8080/images/2.jpg"),
     ).toBeInTheDocument();
   });
 
@@ -251,13 +250,15 @@ describe("pages/albums/AlbumPage.tsx", () => {
     fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() =>
-      expect(screen.getByAltText("Preview 0")).toBeInTheDocument()
+      expect(screen.getByAltText("Preview 0")).toBeInTheDocument(),
     );
 
-    fireEvent.submit(screen.getByText("Submit popup").closest("form") as HTMLFormElement);
+    fireEvent.submit(
+      screen.getByText("Submit popup").closest("form") as HTMLFormElement,
+    );
 
     await waitFor(() =>
-      expect(mockUploadImage).toHaveBeenCalledWith("album-1", { file })
+      expect(mockUploadImage).toHaveBeenCalledWith("album-1", { file }),
     );
     await waitFor(() => expect(mockGetAlbum).toHaveBeenCalledTimes(2));
   });
@@ -275,18 +276,20 @@ describe("pages/albums/AlbumPage.tsx", () => {
       target: { value: "cover-image" },
     });
 
-    fireEvent.submit(screen.getByText("Submit popup").closest("form") as HTMLFormElement);
+    fireEvent.submit(
+      screen.getByText("Submit popup").closest("form") as HTMLFormElement,
+    );
 
     await waitFor(() =>
       expect(mockRenameImage).toHaveBeenCalledWith(
         "album-1",
         "img-1",
-        "cover-image"
-      )
+        "cover-image",
+      ),
     );
     expect(mockTriggerAlert).toHaveBeenCalledWith(
       "Successfully changed id to cover-image",
-      "success"
+      "success",
     );
     await waitFor(() => expect(mockGetAlbum).toHaveBeenCalledTimes(2));
   });
@@ -299,7 +302,7 @@ describe("pages/albums/AlbumPage.tsx", () => {
     fireEvent.click(screen.getByText("Confirm delete"));
 
     await waitFor(() =>
-      expect(mockDeleteImage).toHaveBeenCalledWith("album-1", "img-2")
+      expect(mockDeleteImage).toHaveBeenCalledWith("album-1", "img-2"),
     );
     await waitFor(() => expect(mockGetAlbum).toHaveBeenCalledTimes(2));
   });
