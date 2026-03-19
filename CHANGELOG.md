@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.2.0...v3.3.0) (2026-03-19)
+
+
+### Features
+
+* add animated background ([95ae47e](https://github.com/nzhussup/admin-panel-personal-website/commit/95ae47e7c9883a996b6c47b07895f8481e5f5214))
+* add animated background ([78885eb](https://github.com/nzhussup/admin-panel-personal-website/commit/78885eba809f8b8a9fed9864961bf0d853a9a6a9))
+* add api base as envvar ([9c58914](https://github.com/nzhussup/admin-panel-personal-website/commit/9c5891450ac69cf07a2bf2779ad3017b91b341dc))
+* add complete components test ([0fb339e](https://github.com/nzhussup/admin-panel-personal-website/commit/0fb339e82c7baf4718e96b2da966dfdeedd8824a))
+* add component test ([b623793](https://github.com/nzhussup/admin-panel-personal-website/commit/b623793490141c74de231f12404d05558856808c))
+* add more component tests ([1f488a4](https://github.com/nzhussup/admin-panel-personal-website/commit/1f488a4821bcc389634d82c5d877eb83d5812604))
+* add theme toggle ([5bfa477](https://github.com/nzhussup/admin-panel-personal-website/commit/5bfa477f5b87af46e8bc732c5c07b5a12afe1ac9))
+* allow renaming images ([ca540a1](https://github.com/nzhussup/admin-panel-personal-website/commit/ca540a16a718f1407792a2bf6785f0b8774cbf3a))
+* allow renaming images ([fd520f5](https://github.com/nzhussup/admin-panel-personal-website/commit/fd520f5bd723c10895587f7984113d98c09f7563))
+* provide extensive unit tests ([5451de2](https://github.com/nzhussup/admin-panel-personal-website/commit/5451de2ddd989958326a9197464c364989f752ff))
+
+
+### Bug Fixes
+
+* add delay in background summarization to avoid rate limiting issues ([2ec1e89](https://github.com/nzhussup/admin-panel-personal-website/commit/2ec1e89ff690c1e673905df08724a6359b926952))
+* add test stage for frontend ([5e23fd3](https://github.com/nzhussup/admin-panel-personal-website/commit/5e23fd318cc2f4920db7636115022afe1103701d))
+* cicd ([b6d5892](https://github.com/nzhussup/admin-panel-personal-website/commit/b6d5892192db00d635f730c1de824a995cdf5bfb))
+* cicd ([35bcc6a](https://github.com/nzhussup/admin-panel-personal-website/commit/35bcc6a0148e86483cd30aa048934672551e873d))
+* cicd of llm service ([804f2ee](https://github.com/nzhussup/admin-panel-personal-website/commit/804f2ee89f5b66b136a73a83d452dfdd555b5dfb))
+* fix dockerfile and java code logic ([97100bf](https://github.com/nzhussup/admin-panel-personal-website/commit/97100bf1200fcc57e2da24088b08974c87a4ab68))
+* fix documentation of llm ([0c4c141](https://github.com/nzhussup/admin-panel-personal-website/commit/0c4c141a111f7cb9d59f071fcaa9c557c3ccf579))
+* fix documentation of llm ([f3e761c](https://github.com/nzhussup/admin-panel-personal-website/commit/f3e761cc79b69e6701fc0f97d5de309eaa047c1e))
+* fix llm endpoint ([5c9fc51](https://github.com/nzhussup/admin-panel-personal-website/commit/5c9fc51b2587bf74c80fbbaa0459dd739f0ccdb9))
+* fix openrouter api endpoint ([b2b785c](https://github.com/nzhussup/admin-panel-personal-website/commit/b2b785cfd27831fd196eb92448bac2d080078c57))
+* fix routes ([ef5a5d6](https://github.com/nzhussup/admin-panel-personal-website/commit/ef5a5d6eac4ddfba7040eb81ed1c818de94403b2))
+* fix system prompts ([9102d1c](https://github.com/nzhussup/admin-panel-personal-website/commit/9102d1c611fa6f5267e4f5be27a4bf43574444e8))
+* improve image uploading step adding concurrent processing ([ea00f24](https://github.com/nzhussup/admin-panel-personal-website/commit/ea00f24c440c92175dc9bfb364d7b93d0e3da667))
+* move backend code into separate repo ([c1fdee5](https://github.com/nzhussup/admin-panel-personal-website/commit/c1fdee5bde4f1adab091f15cae983e5d11056205))
+* rename summarizer to llm ([1b2ce7f](https://github.com/nzhussup/admin-panel-personal-website/commit/1b2ce7f3812b6d5bcf92464db8fcf8e9002ad93b))
+* unify cicd and release ([5309f24](https://github.com/nzhussup/admin-panel-personal-website/commit/5309f24d0b64fa100ced50badae12d9a46440eb8))
+
 ## [3.2.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.1.0...v3.2.0) (2025-06-20)
 
 
