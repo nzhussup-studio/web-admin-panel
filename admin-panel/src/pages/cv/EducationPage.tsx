@@ -1,15 +1,15 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
+import Form from "react-bootstrap/Form";
 import CrudPageLayout from "@/components/pages/CrudPageLayout";
 import Popup from "@/components/shared/Popup";
-import FormInput from "@/components/shared/FormInput";
 import {
   EducationControllerService,
   type base_service_Education,
 } from "@/lib/api/client";
 import { useCrudPage } from "@/hooks/crud/useCrudPage";
-import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
 
 const formatDateForInput = (dateString) => {
   if (!dateString) return "";
@@ -59,65 +59,81 @@ const EducationPage = () => {
       title={isEditMode ? "Edit Education" : "Add Education"}
       onSubmit={saveItem}
     >
-      <FormInput
-        label='Institution'
-        value={formData.institution}
-        onChange={(e) =>
-          setFormData({ ...formData, institution: e.target.value })
-        }
-        required={true}
-      />
-      <FormInput
-        label='Location'
-        value={formData.location}
-        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-        required={true}
-      />
-      <FormInput
-        label='Start Date'
-        type='date'
-        value={formatDateForInput(formData.startDate)}
-        onChange={(e) =>
-          setFormData({ ...formData, startDate: e.target.value })
-        }
-        required={true}
-      />
-      <FormInput
-        label='End Date'
-        type='date'
-        value={formatDateForInput(formData.endDate)}
-        onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-      />
-      <FormInput
-        label='Degree'
-        value={formData.degree}
-        onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
-        required={true}
-      />
-      <FormInput
-        label='Thesis'
-        value={formData.thesis}
-        onChange={(e) => setFormData({ ...formData, thesis: e.target.value })}
-      />
-      <FormInput
-        label='Description'
-        value={formData.description}
-        onChange={(e) =>
-          setFormData({ ...formData, description: e.target.value })
-        }
-      />
-      <FormInput
-        label='Order Display'
-        type='number'
-        value={formData.displayOrder}
-        onChange={(e) =>
-          setFormData({
-            ...formData,
-            displayOrder: Number(e.target.value),
-          })
-        }
-        required={true}
-      />
+      <Form.Group className='mb-3'>
+        <Form.Label>Institution</Form.Label>
+        <Form.Control
+          value={formData.institution ?? ""}
+          onChange={(e) =>
+            setFormData({ ...formData, institution: e.target.value })
+          }
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Location</Form.Label>
+        <Form.Control
+          value={formData.location ?? ""}
+          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Start Date</Form.Label>
+        <Form.Control
+          type='date'
+          value={formatDateForInput(formData.startDate)}
+          onChange={(e) =>
+            setFormData({ ...formData, startDate: e.target.value })
+          }
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>End Date</Form.Label>
+        <Form.Control
+          type='date'
+          value={formatDateForInput(formData.endDate)}
+          onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Degree</Form.Label>
+        <Form.Control
+          value={formData.degree ?? ""}
+          onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Thesis</Form.Label>
+        <Form.Control
+          value={formData.thesis ?? ""}
+          onChange={(e) => setFormData({ ...formData, thesis: e.target.value })}
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Description</Form.Label>
+        <Form.Control
+          value={formData.description ?? ""}
+          onChange={(e) =>
+            setFormData({ ...formData, description: e.target.value })
+          }
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Order Display</Form.Label>
+        <Form.Control
+          type='number'
+          value={formData.displayOrder ?? ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              displayOrder: Number(e.target.value),
+            })
+          }
+          required
+        />
+      </Form.Group>
     </Popup>
   );
 
@@ -187,11 +203,13 @@ const EducationPage = () => {
       onAdd={() => openPopup()}
       modal={showPopup ? eduForm : null}
       deleteDialog={
-        <DeleteConfirmation
-        isOpen={isDeleteModalOpen}
-        onClose={closeDeleteModal}
-        onConfirm={handleDelete}
-      />
+        <ConfirmDialog
+          isOpen={isDeleteModalOpen}
+          title='Delete Education'
+          message='Are you sure you want to delete this education entry?'
+          onClose={closeDeleteModal}
+          onConfirm={handleDelete}
+        />
       }
     >
       {eduPage}

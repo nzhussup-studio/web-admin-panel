@@ -2,15 +2,15 @@ import React from "react";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
+import Form from "react-bootstrap/Form";
 import CrudPageLayout from "@/components/pages/CrudPageLayout";
 import Popup from "@/components/shared/Popup";
-import FormInput from "@/components/shared/FormInput";
 import {
   WorkExperienceControllerService,
   type base_service_WorkExperience,
 } from "@/lib/api/client";
 import { useCrudPage } from "@/hooks/crud/useCrudPage";
-import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
 
 const WorkExperiencePage = () => {
   const {
@@ -57,68 +57,82 @@ const WorkExperiencePage = () => {
       title={isEditMode ? "Edit Work Experience" : "Add Work Experience"}
       onSubmit={saveItem}
     >
-      <FormInput
-        label='Job Title'
-        value={formData.position}
-        onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-        required={true}
-      />
-      <FormInput
-        label='Company'
-        value={formData.company}
-        onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-        required={true}
-      />
-      <FormInput
-        label={"Location"}
-        value={formData.location}
-        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-        required={true}
-      />
-      <FormInput
-        label='Start Date'
-        value={formData.startDate}
-        onChange={(e) =>
-          setFormData({ ...formData, startDate: e.target.value })
-        }
-        required={true}
-      />
-      <FormInput
-        label='End Date'
-        value={formData.endDate}
-        onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-        required={false}
-      />
-      <FormInput
-        label='Description'
-        type='textarea'
-        rows={10}
-        value={formData.description}
-        onChange={(e) =>
-          setFormData({ ...formData, description: e.target.value })
-        }
-        required={true}
-      />
-      <FormInput
-        label='Tech Stack (comma-separated)'
-        value={formData.techStack}
-        onChange={(e) =>
-          setFormData({ ...formData, techStack: e.target.value })
-        }
-        required={false}
-      />
-      <FormInput
-        label='Order Display'
-        type='number'
-        value={formData.displayOrder}
-        onChange={(e) =>
-          setFormData({
-            ...formData,
-            displayOrder: Number(e.target.value),
-          })
-        }
-        required={true}
-      />
+      <Form.Group className='mb-3'>
+        <Form.Label>Job Title</Form.Label>
+        <Form.Control
+          value={formData.position ?? ""}
+          onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Company</Form.Label>
+        <Form.Control
+          value={formData.company ?? ""}
+          onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Location</Form.Label>
+        <Form.Control
+          value={formData.location ?? ""}
+          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Start Date</Form.Label>
+        <Form.Control
+          value={formData.startDate ?? ""}
+          onChange={(e) =>
+            setFormData({ ...formData, startDate: e.target.value })
+          }
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>End Date</Form.Label>
+        <Form.Control
+          value={formData.endDate ?? ""}
+          onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Description</Form.Label>
+        <Form.Control
+          as='textarea'
+          rows={10}
+          value={formData.description ?? ""}
+          onChange={(e) =>
+            setFormData({ ...formData, description: e.target.value })
+          }
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Tech Stack (comma-separated)</Form.Label>
+        <Form.Control
+          value={formData.techStack ?? ""}
+          onChange={(e) =>
+            setFormData({ ...formData, techStack: e.target.value })
+          }
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Order Display</Form.Label>
+        <Form.Control
+          type='number'
+          value={formData.displayOrder ?? ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              displayOrder: Number(e.target.value),
+            })
+          }
+          required
+        />
+      </Form.Group>
     </Popup>
   );
 
@@ -199,11 +213,13 @@ const WorkExperiencePage = () => {
       onAdd={() => openPopup()}
       modal={showPopup ? wexForm : null}
       deleteDialog={
-        <DeleteConfirmation
-        isOpen={isDeleteModalOpen}
-        onClose={closeDeleteModal}
-        onConfirm={handleDelete}
-      />
+        <ConfirmDialog
+          isOpen={isDeleteModalOpen}
+          title='Delete Work Experience'
+          message='Are you sure you want to delete this work experience entry?'
+          onClose={closeDeleteModal}
+          onConfirm={handleDelete}
+        />
       }
     >
       {wexPage}

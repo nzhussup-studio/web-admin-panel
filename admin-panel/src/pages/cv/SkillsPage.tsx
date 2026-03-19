@@ -2,12 +2,12 @@ import React from "react";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
+import Form from "react-bootstrap/Form";
 import CrudPageLayout from "@/components/pages/CrudPageLayout";
 import Popup from "@/components/shared/Popup";
-import FormInput from "@/components/shared/FormInput";
 import { SkillControllerService, type base_service_Skill } from "@/lib/api/client";
 import { useCrudPage } from "@/hooks/crud/useCrudPage";
-import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
 
 const SkillsPage = () => {
   const {
@@ -51,32 +51,38 @@ const SkillsPage = () => {
       title={isEditMode ? "Edit Skill" : "Add Skill"}
       onSubmit={saveItem}
     >
-      <FormInput
-        label='Category'
-        value={formData.category}
-        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-        required={true}
-      />
-      <FormInput
-        label='Skill Names (comma-separated)'
-        value={formData.skillNames}
-        onChange={(e) =>
-          setFormData({ ...formData, skillNames: e.target.value })
-        }
-        required={true}
-      />
-      <FormInput
-        label='Order Display'
-        type='number'
-        value={formData.displayOrder}
-        onChange={(e) =>
-          setFormData({
-            ...formData,
-            displayOrder: Number(e.target.value),
-          })
-        }
-        required={true}
-      />
+      <Form.Group className='mb-3'>
+        <Form.Label>Category</Form.Label>
+        <Form.Control
+          value={formData.category ?? ""}
+          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Skill Names (comma-separated)</Form.Label>
+        <Form.Control
+          value={formData.skillNames ?? ""}
+          onChange={(e) =>
+            setFormData({ ...formData, skillNames: e.target.value })
+          }
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Order Display</Form.Label>
+        <Form.Control
+          type='number'
+          value={formData.displayOrder ?? ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              displayOrder: Number(e.target.value),
+            })
+          }
+          required
+        />
+      </Form.Group>
     </Popup>
   );
 
@@ -143,11 +149,13 @@ const SkillsPage = () => {
       onAdd={() => openPopup()}
       modal={showPopup ? skillForm : null}
       deleteDialog={
-        <DeleteConfirmation
-        isOpen={isDeleteModalOpen}
-        onClose={closeDeleteModal}
-        onConfirm={handleDelete}
-      />
+        <ConfirmDialog
+          isOpen={isDeleteModalOpen}
+          title='Delete Skill Group'
+          message='Are you sure you want to delete this skill group?'
+          onClose={closeDeleteModal}
+          onConfirm={handleDelete}
+        />
       }
     >
       {skillPage}

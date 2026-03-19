@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
+import Form from "react-bootstrap/Form";
 import CrudPageLayout from "@/components/pages/CrudPageLayout";
 import {
   AdminUserControllerService,
@@ -11,8 +12,7 @@ import {
 import { normalizeApiError } from "@/lib/api/errors";
 import { useCrudPage } from "@/hooks/crud/useCrudPage";
 import Popup from "@/components/shared/Popup";
-import FormInput from "@/components/shared/FormInput";
-import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import GlobalAlert from "@/components/layout/GlobalAlert";
 
 const UsersPage = () => {
@@ -89,26 +89,36 @@ const UsersPage = () => {
       title={isEditMode ? "Edit User" : "Add User"}
       onSubmit={saveItem}
     >
-      <FormInput
-        label='Username'
-        value={formData.username}
-        onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-        required={true}
-      />
-      <FormInput
-        label='Password'
-        value={formData.password}
-        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-        required={true}
-      />
-      <FormInput
-        label='Role'
-        type='select'
-        options={["ROLE_USER", "ROLE_ADMIN"]}
-        value={formData.role}
-        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-        required={true}
-      />
+      <Form.Group className='mb-3'>
+        <Form.Label>Username</Form.Label>
+        <Form.Control
+          value={formData.username ?? ""}
+          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Password</Form.Label>
+        <Form.Control
+          value={formData.password ?? ""}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Role</Form.Label>
+        <Form.Select
+          value={formData.role ?? ""}
+          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+          required
+        >
+          <option value='' disabled>
+            Select a role
+          </option>
+          <option value='ROLE_USER'>ROLE_USER</option>
+          <option value='ROLE_ADMIN'>ROLE_ADMIN</option>
+        </Form.Select>
+      </Form.Group>
     </Popup>
   );
 
@@ -176,13 +186,15 @@ const UsersPage = () => {
           message={alertMessage}
           show={alertVisible}
           onClose={() => setAlertVisible(false)}
-          type='alert-danger'
+          type='danger'
         />
       }
       modal={showPopup ? userForm : null}
       deleteDialog={
-        <DeleteConfirmation
+        <ConfirmDialog
           isOpen={isDeleteModalOpen}
+          title='Delete User'
+          message='Are you sure you want to delete this user?'
           onClose={closeDeleteModal}
           onConfirm={handleDelete}
         />

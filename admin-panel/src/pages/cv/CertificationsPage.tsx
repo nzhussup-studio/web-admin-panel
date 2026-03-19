@@ -1,15 +1,15 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
+import Form from "react-bootstrap/Form";
 import CrudPageLayout from "@/components/pages/CrudPageLayout";
 import Popup from "@/components/shared/Popup";
-import FormInput from "@/components/shared/FormInput";
 import {
   CertificateControllerService,
   type base_service_Certificate,
 } from "@/lib/api/client";
 import { useCrudPage } from "@/hooks/crud/useCrudPage";
-import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
 
 const CertificationsPage = () => {
   const {
@@ -53,30 +53,36 @@ const CertificationsPage = () => {
       title={isEditMode ? "Edit Certificate" : "Add Certificate"}
       onSubmit={saveItem}
     >
-      <FormInput
-        label='Certificate Name'
-        value={formData.name}
-        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        required={true}
-      />
-      <FormInput
-        label='Certificate URL'
-        value={formData.url}
-        onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-        required={true}
-      />
-      <FormInput
-        label='Order Display'
-        type='number'
-        value={formData.displayOrder}
-        onChange={(e) =>
-          setFormData({
-            ...formData,
-            displayOrder: Number(e.target.value),
-          })
-        }
-        required={true}
-      />
+      <Form.Group className='mb-3'>
+        <Form.Label>Certificate Name</Form.Label>
+        <Form.Control
+          value={formData.name ?? ""}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Certificate URL</Form.Label>
+        <Form.Control
+          value={formData.url ?? ""}
+          onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Order Display</Form.Label>
+        <Form.Control
+          type='number'
+          value={formData.displayOrder ?? ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              displayOrder: Number(e.target.value),
+            })
+          }
+          required
+        />
+      </Form.Group>
     </Popup>
   );
 
@@ -152,11 +158,13 @@ const CertificationsPage = () => {
       onAdd={() => openPopup()}
       modal={showPopup ? certForm : null}
       deleteDialog={
-        <DeleteConfirmation
-        isOpen={isDeleteModalOpen}
-        onClose={closeDeleteModal}
-        onConfirm={handleDelete}
-      />
+        <ConfirmDialog
+          isOpen={isDeleteModalOpen}
+          title='Delete Certificate'
+          message='Are you sure you want to delete this certificate?'
+          onClose={closeDeleteModal}
+          onConfirm={handleDelete}
+        />
       }
     >
       {certPage}

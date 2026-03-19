@@ -18,22 +18,18 @@ export interface DarkModeContextValue {
   toggleDarkMode: () => void;
 }
 
+export type AlertVariant = "success" | "danger" | "warning" | "info";
+
 export interface GlobalAlertState {
   show: boolean;
   message: string;
-  type: string;
+  type: AlertVariant;
 }
 
 export interface GlobalAlertContextValue {
   alert: GlobalAlertState;
-  triggerAlert: (message: string, type?: string) => void;
+  triggerAlert: (message: string, type?: AlertVariant) => void;
   closeAlert: () => void;
-}
-
-export interface RouteConfig {
-  path: string;
-  element: ReactNode;
-  isProtected: boolean;
 }
 
 export interface ProviderProps {

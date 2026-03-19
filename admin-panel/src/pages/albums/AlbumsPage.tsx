@@ -1,4 +1,7 @@
 import React from "react";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import InputGroup from "react-bootstrap/InputGroup";
 import CrudPageLayout from "@/components/pages/CrudPageLayout";
 import EditableAlbumCard from "@/components/albums/EditableAlbumCard";
 import {
@@ -8,8 +11,7 @@ import {
 } from "@/lib/api/client";
 import { useCrudPage } from "@/hooks/crud/useCrudPage";
 import Popup from "@/components/shared/Popup";
-import FormInput from "@/components/shared/FormInput";
-import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
 
 type AlbumPreviewView = image_service_model_AlbumPreview & {
   description?: string;
@@ -74,48 +76,66 @@ const AlbumsPage = () => {
       title={isEditMode ? "Edit Album" : "Add Album"}
       onSubmit={saveItem}
     >
-      <FormInput
-        label='Album Title'
-        value={formData.title}
-        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-        required={true}
-      />
-      <FormInput
-        label='Album Description'
-        type='textarea'
-        value={formData.desc}
-        onChange={(e) => setFormData({ ...formData, desc: e.target.value })}
-        required={false}
-      />
-      <FormInput
-        label='Date'
-        type='date'
-        value={formData.date}
-        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-        required={false}
-      />
-      <FormInput
-        label='Type'
-        type='select'
-        value={formData.type}
-        onChange={(e) =>
-          setFormData({
-            ...formData,
-            type: e.target.value as image_service_model_AlbumType,
-          })
-        }
-        options={["private", "semi-public", "public"]}
-        required={false}
-      />
-      <FormInput
-        label='Image Preview URL'
-        type='clearable_text'
-        value={formData.preview_image}
-        onChange={(e) =>
-          setFormData({ ...formData, preview_image: e.target.value })
-        }
-        required={false}
-      />
+      <Form.Group className='mb-3'>
+        <Form.Label>Album Title</Form.Label>
+        <Form.Control
+          value={formData.title ?? ""}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Album Description</Form.Label>
+        <Form.Control
+          as='textarea'
+          rows={3}
+          value={formData.desc ?? ""}
+          onChange={(e) => setFormData({ ...formData, desc: e.target.value })}
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Date</Form.Label>
+        <Form.Control
+          type='date'
+          value={formData.date ?? ""}
+          onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Type</Form.Label>
+        <Form.Select
+          value={formData.type ?? ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              type: e.target.value as image_service_model_AlbumType,
+            })
+          }
+        >
+          <option value=''>Select album visibility</option>
+          <option value='private'>private</option>
+          <option value='semi-public'>semi-public</option>
+          <option value='public'>public</option>
+        </Form.Select>
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Image Preview URL</Form.Label>
+        <InputGroup>
+          <Form.Control
+            value={formData.preview_image ?? ""}
+            onChange={(e) =>
+              setFormData({ ...formData, preview_image: e.target.value })
+            }
+          />
+          <Button
+            variant='outline-secondary'
+            onClick={() => setFormData({ ...formData, preview_image: "" })}
+            disabled={!formData.preview_image}
+          >
+            Clear
+          </Button>
+        </InputGroup>
+      </Form.Group>
     </Popup>
   );
 
@@ -145,11 +165,13 @@ const AlbumsPage = () => {
       topContent={<br />}
       modal={showPopup ? albumForm : null}
       deleteDialog={
-        <DeleteConfirmation
-        isOpen={isDeleteModalOpen}
-        onClose={closeDeleteModal}
-        onConfirm={handleDelete}
-      />
+        <ConfirmDialog
+          isOpen={isDeleteModalOpen}
+          title='Delete Album'
+          message='Are you sure you want to delete this album?'
+          onClose={closeDeleteModal}
+          onConfirm={handleDelete}
+        />
       }
     >
       {albumsPreviewPage}

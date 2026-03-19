@@ -2,12 +2,12 @@ import React from "react";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
+import Form from "react-bootstrap/Form";
 import CrudPageLayout from "@/components/pages/CrudPageLayout";
 import { ProjectControllerService, type base_service_Project } from "@/lib/api/client";
 import { useCrudPage } from "@/hooks/crud/useCrudPage";
 import Popup from "@/components/shared/Popup";
-import FormInput from "@/components/shared/FormInput";
-import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
 
 const ProjectsPage = () => {
   const {
@@ -51,39 +51,48 @@ const ProjectsPage = () => {
       title={isEditMode ? "Edit Project" : "Add Project"}
       onSubmit={saveItem}
     >
-      <FormInput
-        label='Project Name'
-        value={formData.name}
-        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        required={true}
-      />
-      <FormInput
-        label='Tech Stack'
-        type='textarea'
-        value={formData.techStack}
-        onChange={(e) =>
-          setFormData({ ...formData, techStack: e.target.value })
-        }
-        required={true}
-      />
-      <FormInput
-        label='URL'
-        value={formData.url}
-        onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-        required={true}
-      />
-      <FormInput
-        label='Order Display'
-        type='number'
-        value={formData.displayOrder}
-        onChange={(e) =>
-          setFormData({
-            ...formData,
-            displayOrder: Number(e.target.value),
-          })
-        }
-        required={true}
-      />
+      <Form.Group className='mb-3'>
+        <Form.Label>Project Name</Form.Label>
+        <Form.Control
+          value={formData.name ?? ""}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Tech Stack</Form.Label>
+        <Form.Control
+          as='textarea'
+          rows={3}
+          value={formData.techStack ?? ""}
+          onChange={(e) =>
+            setFormData({ ...formData, techStack: e.target.value })
+          }
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>URL</Form.Label>
+        <Form.Control
+          value={formData.url ?? ""}
+          onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Order Display</Form.Label>
+        <Form.Control
+          type='number'
+          value={formData.displayOrder ?? ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              displayOrder: Number(e.target.value),
+            })
+          }
+          required
+        />
+      </Form.Group>
     </Popup>
   );
 
@@ -165,11 +174,13 @@ const ProjectsPage = () => {
       onAdd={() => openPopup()}
       modal={showPopup ? projectForm : null}
       deleteDialog={
-        <DeleteConfirmation
-        isOpen={isDeleteModalOpen}
-        onClose={closeDeleteModal}
-        onConfirm={handleDelete}
-      />
+        <ConfirmDialog
+          isOpen={isDeleteModalOpen}
+          title='Delete Project'
+          message='Are you sure you want to delete this project?'
+          onClose={closeDeleteModal}
+          onConfirm={handleDelete}
+        />
       }
     >
       {projectPage}

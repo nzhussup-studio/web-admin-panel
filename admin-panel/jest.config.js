@@ -1,7 +1,7 @@
 /** @type {import('jest').Config} */
 const config = {
   testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["./tests/setup.js"],
+  setupFilesAfterEnv: ["./tests/setup.ts"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",

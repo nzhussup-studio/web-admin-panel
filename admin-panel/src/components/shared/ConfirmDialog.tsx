@@ -2,17 +2,27 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
 
-interface DeleteConfirmationProps {
+interface ConfirmDialogProps {
   isOpen: boolean;
+  title?: string;
+  message?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  confirmVariant?: string;
   onClose: () => void;
   onConfirm: () => void;
 }
 
-const DeleteConfirmationDialog = ({
+const ConfirmDialog = ({
   isOpen,
+  title = "Confirm Action",
+  message = "Are you sure you want to continue?",
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
+  confirmVariant = "danger",
   onClose,
   onConfirm,
-}: DeleteConfirmationProps) => {
+}: ConfirmDialogProps) => {
   const { isDarkMode } = useDarkMode();
 
   if (!isOpen) return null;
@@ -23,25 +33,25 @@ const DeleteConfirmationDialog = ({
       onHide={onClose}
       centered
       animation={false}
-      backdropClassName='delete-confirmation-backdrop'
+      backdropClassName='confirm-dialog-backdrop'
       contentClassName={`app-modal-content${isDarkMode ? " text-light" : ""}`}
     >
       <Modal.Header closeButton>
-        <Modal.Title id='delete-confirmation-title'>Confirm Deletion</Modal.Title>
+        <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p className='mb-0'>Are you sure you want to delete this item?</p>
+        <p className='mb-0'>{message}</p>
       </Modal.Body>
       <Modal.Footer className='justify-content-between'>
         <Button variant='secondary' onClick={onClose}>
-          Cancel
+          {cancelLabel}
         </Button>
-        <Button variant='danger' onClick={onConfirm}>
-          Confirm
+        <Button variant={confirmVariant} onClick={onConfirm}>
+          {confirmLabel}
         </Button>
       </Modal.Footer>
     </Modal>
   );
 };
 
-export default DeleteConfirmationDialog;
+export default ConfirmDialog;

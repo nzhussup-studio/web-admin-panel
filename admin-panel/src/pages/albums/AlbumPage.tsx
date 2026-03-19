@@ -1,8 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, type ChangeEvent } from "react";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
+import InputGroup from "react-bootstrap/InputGroup";
 import Stack from "react-bootstrap/Stack";
 import Header from "@/components/layout/Header";
 import PageState from "@/components/pages/PageState";
@@ -13,17 +15,17 @@ import {
   type image_service_model_Image,
 } from "@/lib/api/client";
 import { normalizeApiError } from "@/lib/api/errors";
-import { usePopup } from "@/hooks/shared/usePopup";
 import Popup from "@/components/shared/Popup";
-import DeleteConfirmation from "@/components/shared/DeleteConfirmationDialog";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import FramedImageCard from "@/components/albums/FramedImageCard";
-import ImageFormInput from "@/components/shared/ImageFormInput";
-import FormInput from "@/components/shared/FormInput";
 import config from "@/config/app-config";
 import { useGlobalAlert } from "@/hooks/alerts/useGlobalAlert";
 import { BackCircleIcon, FunnelIcon } from "@/assets/icons";
 
 type ImagePreview = { file: Blob; preview: string };
+type AlbumImageFormData = Partial<
+  image_service_model_Image & { file?: ImagePreview[]; newId?: string }
+>;
 
 const AlbumPage = () => {
   const { id } = useParams();
@@ -34,18 +36,12 @@ const AlbumPage = () => {
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [showLoading, setShowLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<unknown>(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [formData, setFormData] = useState<AlbumImageFormData>({});
 
-  const {
-    showPopup,
-    formData,
-    isEditMode,
-    openPopup,
-    closePopup,
-    setFormData,
-  } = usePopup<image_service_model_Image & { file?: ImagePreview[]; newId?: string }>();
-
-  const fetchItem = async () => {
+  const fetchItem = useCallback(async () => {
     if (!id) return;
     setShowLoading(true);
     setError(null);
@@ -65,11 +61,46 @@ const AlbumPage = () => {
     } finally {
       setShowLoading(false);
     }
-  };
+  }, [id, isAscending]);
 
   useEffect(() => {
     fetchItem();
-  }, [id, isAscending]);
+  }, [fetchItem]);
+
+  const openPopup = (data?: AlbumImageFormData | null) => {
+    setIsEditMode(Boolean(data));
+    setFormData(data || {});
+    setShowPopup(true);
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
+    setFormData({});
+    setIsEditMode(false);
+  };
+
+  const handleFileInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+
+    const readFiles = files.map((file) => {
+      return new Promise<ImagePreview>((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+          resolve({ file, preview: String(reader.result || "") });
+        };
+      });
+    });
+
+    const results = await Promise.all(readFiles);
+    const updatedPreviews = [...(formData.file || []), ...results];
+    setFormData({ ...formData, file: updatedPreviews });
+  };
+
+  const removeImagePreview = (index: number) => {
+    const updatedPreviews = (formData.file || []).filter((_, i) => i !== index);
+    setFormData({ ...formData, file: updatedPreviews });
+  };
 
   const saveImage = async () => {
     if (!id) return;
@@ -86,11 +117,63 @@ const AlbumPage = () => {
       title={isEditMode ? "Edit Image" : "Add Image"}
       onSubmit={saveImage}
     >
-      <ImageFormInput
-        value={formData.file}
-        onChange={(files) => setFormData({ ...formData, file: files })}
-        required={true}
-      />
+      <Form.Group className='mb-4'>
+        <Form.Label>Upload Images</Form.Label>
+        <Form.Control
+          type='file'
+          accept='image/*'
+          multiple
+          onChange={handleFileInputChange}
+          required
+          aria-label='Choose files'
+        />
+      </Form.Group>
+
+      {(formData.file || []).length > 0 ? (
+        <div className='d-flex flex-wrap gap-2 mt-3'>
+          {(formData.file || []).map((image, index) => (
+            <div
+              key={index}
+              style={{
+                position: "relative",
+                width: "80px",
+                height: "80px",
+              }}
+            >
+              <img
+                src={image.preview}
+                alt={`Preview ${index}`}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "4px",
+                  border: "1px solid #ccc",
+                }}
+              />
+              <Button
+                type='button'
+                onClick={() => removeImagePreview(index)}
+                aria-label='Remove image'
+                variant='danger'
+                size='sm'
+                style={{
+                  position: "absolute",
+                  top: "-6px",
+                  right: "-6px",
+                  borderRadius: "50%",
+                  width: "20px",
+                  height: "20px",
+                  fontSize: "12px",
+                  padding: 0,
+                }}
+              >
+                ×
+              </Button>
+            </div>
+          ))}
+        </div>
+      ) : null}
     </Popup>
   );
 
@@ -122,23 +205,25 @@ const AlbumPage = () => {
       }}
     >
       {formData.id}
-      <FormInput
-        value={formData.newId}
-        type='clearable_text'
-        onChange={(e) => setFormData({ ...formData, newId: e.target.value })}
-        required={true}
-      />
+      <Form.Group className='mt-3'>
+        <Form.Label>New Image ID</Form.Label>
+        <InputGroup>
+          <Form.Control
+            value={formData.newId ?? ""}
+            onChange={(e) => setFormData({ ...formData, newId: e.target.value })}
+            required
+          />
+          <Button
+            variant='outline-secondary'
+            onClick={() => setFormData({ ...formData, newId: "" })}
+            disabled={!formData.newId}
+          >
+            Clear
+          </Button>
+        </InputGroup>
+      </Form.Group>
     </Popup>
   );
-
-  const renderForm = () => {
-    if (showPopup) {
-      if (isEditMode) {
-        return imageForm;
-      }
-      return albumForm;
-    }
-  };
 
   const confirmDelete = (itemId?: string) => {
     setSelectedItemId(itemId ?? null);
@@ -221,13 +306,15 @@ const AlbumPage = () => {
         </PageState>
       </Container>
 
-      <DeleteConfirmation
+      <ConfirmDialog
         isOpen={isDeleteModalOpen}
+        title='Delete Image'
+        message='Are you sure you want to delete this image?'
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleDelete}
       />
 
-      {renderForm()}
+      {showPopup ? (isEditMode ? imageForm : albumForm) : null}
     </>
   );
 };

@@ -1,7 +1,7 @@
 import Header from "@/components/layout/Header";
 import PageState from "@/components/pages/PageState";
 import GlobalAlert from "@/components/layout/GlobalAlert";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Card from "react-bootstrap/Card";
@@ -71,7 +71,7 @@ const CvGeneratorPage = () => {
   const [showLoading, setShowLoading] = useState(false);
   const [error, setError] = useState<any>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setShowLoading(true);
     setError(null);
     try {
@@ -108,11 +108,11 @@ const CvGeneratorPage = () => {
     } finally {
       setShowLoading(false);
     }
-  };
+  }, [isAscending]);
 
   useEffect(() => {
     fetchData();
-  }, [isAscending]);
+  }, [fetchData]);
 
   const [selectedItems, setSelectedItems] = useState<SelectedItems>(() => {
     try {
@@ -305,7 +305,7 @@ const CvGeneratorPage = () => {
         message={alertMessage}
         show={alertVisible}
         onClose={() => setAlertVisible(false)}
-        type='alert-danger'
+        type='danger'
       />
       <Container className='my-5'>
         <Stack

@@ -1,17 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import CloseButton from "react-bootstrap/CloseButton";
+import Stack from "react-bootstrap/Stack";
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
 import { useGlobalAlert } from "@/hooks/alerts/useGlobalAlert";
+import type { AlertVariant } from "@/types/common";
 
 interface GlobalAlertProps {
   message?: string;
   show?: boolean;
   onClose?: () => void;
-  type?: string;
+  type?: AlertVariant;
 }
 
 const GlobalAlert = ({ message, show, onClose, type }: GlobalAlertProps = {}) => {
   const globalAlert = useGlobalAlert();
-  const [visible, setVisible] = useState(false);
-  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const alert = {
     message: message ?? globalAlert.alert.message,
     show: show ?? globalAlert.alert.show,
@@ -19,50 +21,31 @@ const GlobalAlert = ({ message, show, onClose, type }: GlobalAlertProps = {}) =>
   };
   const closeAlert = onClose ?? globalAlert.closeAlert;
 
-  useEffect(() => {
-    if (alert.show) {
-      setVisible(false);
-
-      requestAnimationFrame(() => {
-        setVisible(true);
-      });
-
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current);
-      }
-
-      hideTimeoutRef.current = setTimeout(() => {
-        setVisible(false);
-        hideTimeoutRef.current = setTimeout(() => {
-          closeAlert();
-        }, 500);
-      }, 3000);
-    }
-
-    return () => {
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current);
-      }
-    };
-  }, [alert.show, alert.message, closeAlert]);
-
-  if (!alert.show && !visible) return null;
+  if (!alert.show) return null;
 
   return (
-    <div
-      className={`alert alert-${alert.type} position-fixed top-0 start-50 translate-middle-x mt-3 shadow`}
-      role='alert'
-      style={{
-        zIndex: 1050,
-        minWidth: "300px",
-        maxWidth: "90vw",
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translate(-50%, 0)" : "translate(-50%, -20px)",
-        transition: "opacity 0.5s ease, transform 0.5s ease",
-      }}
-    >
-      {alert.message}
-    </div>
+    <ToastContainer position='bottom-center' className='p-3' style={{ zIndex: 1080 }}>
+      <Toast
+        show={alert.show}
+        onClose={closeAlert}
+        delay={3000}
+        autohide
+        animation
+        className={`border-0 shadow app-alert-toast text-bg-${alert.type}`}
+        role='alert'
+      >
+        <Toast.Body className='app-alert-toast-body'>
+          <Stack direction='horizontal' gap={3} className='align-items-start'>
+            <div className='flex-grow-1'>{alert.message}</div>
+            <CloseButton
+              variant={alert.type === "warning" ? undefined : "white"}
+              onClick={closeAlert}
+              aria-label='Dismiss alert'
+            />
+          </Stack>
+        </Toast.Body>
+      </Toast>
+    </ToastContainer>
   );
 };
 

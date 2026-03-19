@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit",
     "api-gen": "openapi --input ./openapi.yaml --output ./src/gen/api --client axios --useUnionTypes"

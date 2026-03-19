@@ -4,15 +4,12 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import routes from "@/router/routes";
 import ProtectedRoute from "@/router/ProtectedRoute";
 import GlobalAlert from "@/components/layout/GlobalAlert";
-import FloatingEmojis from "@/components/layout/FloatingEmojis";
 import PageTransition from "@/motion/PageTransition";
-import "@/app/App.css";
 
 function App() {
   return (
     <>
       <GlobalAlert />
-      <FloatingEmojis />
       <MainApp />
     </>
   );

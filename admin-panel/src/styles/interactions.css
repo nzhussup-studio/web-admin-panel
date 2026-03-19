@@ -86,8 +86,49 @@
   letter-spacing: -0.03em;
 }
 
+.app-alert-toast {
+  min-width: min(36rem, calc(100vw - 2rem));
+  border-radius: 1rem;
+  box-shadow: 0 1.25rem 3rem rgba(15, 23, 42, 0.2);
+  overflow: hidden;
+  animation: app-alert-slide-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.app-alert-toast-body {
+  padding: 1rem 1rem 1rem 1.125rem;
+  font-weight: 500;
+}
+
+.app-alert-toast .btn-close {
+  margin-top: 0.125rem;
+  opacity: 0.8;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.app-alert-toast .btn-close:hover,
+.app-alert-toast .btn-close:focus-visible {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+@keyframes app-alert-slide-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
 @media (max-width: 768px) {
   .app-header-shell {
     margin: 8px;
+  }
+
+  .app-alert-toast {
+    min-width: calc(100vw - 1.5rem);
   }
 }
