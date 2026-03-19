@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.3.2](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.3.1...v3.3.2) (2026-03-19)
+
+
+### Bug Fixes
+
+* unit tests ([9a1b60e](https://github.com/nzhussup/admin-panel-personal-website/commit/9a1b60e7712960a401d72446d834d7f097c8cca8))
+
 ### [3.3.1](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.3.0...v3.3.1) (2026-03-19)
 
 ## [3.3.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.2.0...v3.3.0) (2026-03-19)
