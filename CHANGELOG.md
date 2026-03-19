@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.4.0...v3.5.0) (2026-03-19)
+
+
+### Features
+
+* globalize alert on api error ([2b45c9d](https://github.com/nzhussup/admin-panel-personal-website/commit/2b45c9dcfa024d16af7eee30acf9af2433205383))
+
 ## [3.4.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.3.2...v3.4.0) (2026-03-19)
 
 
