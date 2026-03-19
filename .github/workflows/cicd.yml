@@ -64,6 +64,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Validate API base
+        run: |
+          if [ -z "${{ vars.API_BASE }}" ]; then
+            echo "vars.API_BASE is empty"
+            exit 1
+          fi
+          echo "Using API base: ${{ vars.API_BASE }}"
+
       - name: Build and Push Docker Image
         run: |
           docker buildx build \
