@@ -3,6 +3,7 @@ const config = {
   testEnvironment: "jsdom",
   setupFilesAfterEnv: ["./tests/setup.ts"],
   moduleNameMapper: {
+    "^@/(.*)\\.(css|less|scss|sass)$": "identity-obj-proxy",
     "^@/(.*)$": "<rootDir>/src/$1",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
   },

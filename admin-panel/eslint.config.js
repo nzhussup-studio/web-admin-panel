@@ -53,4 +53,10 @@ export default [
       'react/display-name': 'off',
     },
   },
+  {
+    files: ['tests/**/*.ts', 'tests/**/*.tsx'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
 ]

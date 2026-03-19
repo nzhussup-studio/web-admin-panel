@@ -1,6 +1,16 @@
 import "@testing-library/jest-dom";
 import { TextDecoder, TextEncoder } from "util";
 
+jest.mock("html2pdf.js", () => {
+  const chain = {
+    set: jest.fn(() => chain),
+    from: jest.fn(() => chain),
+    save: jest.fn(() => Promise.resolve()),
+  };
+
+  return jest.fn(() => chain);
+});
+
 const mockFetch = jest.fn(() =>
   Promise.resolve({
     ok: true,
