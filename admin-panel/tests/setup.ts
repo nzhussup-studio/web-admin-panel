@@ -23,6 +23,9 @@ global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder as typeof global.TextDecoder;
 
 const storedValues = new Map<string, string>();
+const appGlobals = globalThis as typeof globalThis & {
+  __APP_API_BASE__?: string;
+};
 
 const localStorageMock: Storage = {
   get length() {
@@ -40,6 +43,7 @@ Object.defineProperty(window, "localStorage", {
 });
 
 beforeEach(() => {
+  appGlobals.__APP_API_BASE__ = undefined;
   storedValues.clear();
   storedValues.set("isDarkMode", "false");
   mockFetch.mockClear();
