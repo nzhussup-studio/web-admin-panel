@@ -11,7 +11,7 @@
 
 ## Overview
 
-This repository contains the web-based administration interface for managing the content behind `nzhussup.com`. It is intended for authenticated internal use and provides a single place to create, update, organize, and remove structured data that is later consumed by the public-facing website and related services.
+This repository contains the web-based administration interface for managing the content behind `nzhussup.dev`. It is intended for authenticated internal use and provides a single place to create, update, organize, and remove structured data that is later consumed by the public-facing website and related services.
 
 The project focuses on operational content management rather than public presentation. Its purpose is to reduce manual data maintenance, standardize editing workflows, and provide a stable UI for administrative tasks across multiple content domains.
 

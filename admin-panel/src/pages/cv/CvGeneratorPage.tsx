@@ -44,7 +44,7 @@ const CvGeneratorPage = () => {
             address: "123 Main St, Vienna, Austria",
             email: "john.doe@example.com",
             phone: "+7 777 777 7777",
-            website: "https://nzhussup.com",
+            website: "https://nzhussup.dev",
             linkedin: "https://www.linkedin.com/in/nurzhanat-zhussup/",
             github: "https://github.com/nzhussup",
             about:
@@ -60,7 +60,7 @@ const CvGeneratorPage = () => {
       address: "123 Main St, Vienna, Austria",
       email: "john.doe@example.com",
       phone: "+7 777 777 7777",
-      website: "https://nzhussup.com",
+      website: "https://nzhussup.dev",
       linkedin: "https://www.linkedin.com/in/nurzhanat-zhussup/",
       github: "https://github.com/nzhussup",
       about:
@@ -77,25 +77,20 @@ const CvGeneratorPage = () => {
     setShowLoading(true);
     setError(null);
     try {
-      const [
-        work_experience,
-        education,
-        skills,
-        projects,
-        certificates,
-      ] = await Promise.all([
-        WorkExperienceControllerService.listWorkExperience(),
-        EducationControllerService.listEducation(),
-        SkillControllerService.listSkill(),
-        ProjectControllerService.listProject(),
-        CertificateControllerService.listCertificate(),
-      ]);
+      const [work_experience, education, skills, projects, certificates] =
+        await Promise.all([
+          WorkExperienceControllerService.listWorkExperience(),
+          EducationControllerService.listEducation(),
+          SkillControllerService.listSkill(),
+          ProjectControllerService.listProject(),
+          CertificateControllerService.listCertificate(),
+        ]);
 
       const sortItems = (items: Record<string, any>[]) =>
         [...items].sort((a, b) =>
           isAscending
             ? Number(a.displayOrder) - Number(b.displayOrder)
-            : Number(b.displayOrder) - Number(a.displayOrder)
+            : Number(b.displayOrder) - Number(a.displayOrder),
         );
 
       setData([
@@ -110,7 +105,7 @@ const CvGeneratorPage = () => {
       setError(normalizedError);
       triggerAlert(
         getApiErrorMessage(fetchError, "Failed to load CV data"),
-        "danger"
+        "danger",
       );
     } finally {
       setShowLoading(false);
@@ -151,7 +146,7 @@ const CvGeneratorPage = () => {
 
     localStorage.setItem(
       config.cvGeneratorLocalStorageKey,
-      JSON.stringify(fullState)
+      JSON.stringify(fullState),
     );
   }, [selectedItems, basicInfo]);
 
@@ -175,7 +170,7 @@ const CvGeneratorPage = () => {
       const selectedIndices = selectedItems[sectionName];
       if (selectedIndices && selectedIndices.size > 0) {
         selectedData[sectionName] = items.filter((item) =>
-          selectedIndices.has(item.id)
+          selectedIndices.has(item.id),
         );
       }
     }
@@ -197,7 +192,9 @@ const CvGeneratorPage = () => {
     <div>
       <Card className='rounded-4 app-interactive-card mt-4'>
         <Card.Body className='p-4 app-card-body'>
-          <Card.Title className='fw-semibold mb-4 app-card-title'>Basic Information</Card.Title>
+          <Card.Title className='fw-semibold mb-4 app-card-title'>
+            Basic Information
+          </Card.Title>
           <Form onSubmit={(e) => e.preventDefault()}>
             <Row className='g-3'>
               {Object.entries(basicInfo).map(([key, value]) => (
@@ -243,7 +240,7 @@ const CvGeneratorPage = () => {
         const items = sectionObj[sectionName];
 
         const allSelected = items.every((item) =>
-          selectedItems[sectionName]?.has(item.id)
+          selectedItems[sectionName]?.has(item.id),
         );
 
         const handleToggleAll = () => {
@@ -274,30 +271,33 @@ const CvGeneratorPage = () => {
                   {allSelected ? "Deselect All" : "Select All"}
                 </Button>
               </div>
-            {Array.isArray(items) && items.length > 0 ? (
-              items.map((item) => {
-                const itemId = item.id;
-                const isChecked =
-                  selectedItems[sectionName]?.has(itemId) || false;
+              {Array.isArray(items) && items.length > 0 ? (
+                items.map((item) => {
+                  const itemId = item.id;
+                  const isChecked =
+                    selectedItems[sectionName]?.has(itemId) || false;
 
-                return (
-                  <Form.Check
-                    key={itemId}
-                    type='checkbox'
-                    className={`rounded-3 border p-3 mb-2 ${isChecked ? "bg-primary-subtle" : "bg-body-tertiary"}`}
-                    checked={isChecked}
-                    onChange={() => toggleSelect(sectionName, itemId)}
-                    label={
-                      <pre className='mb-0 text-wrap' style={{ whiteSpace: "pre-wrap" }}>
-                        {JSON.stringify(item, null, 2)}
-                      </pre>
-                    }
-                  />
-                );
-              })
-            ) : (
-              <div className='text-secondary'>No items</div>
-            )}
+                  return (
+                    <Form.Check
+                      key={itemId}
+                      type='checkbox'
+                      className={`rounded-3 border p-3 mb-2 ${isChecked ? "bg-primary-subtle" : "bg-body-tertiary"}`}
+                      checked={isChecked}
+                      onChange={() => toggleSelect(sectionName, itemId)}
+                      label={
+                        <pre
+                          className='mb-0 text-wrap'
+                          style={{ whiteSpace: "pre-wrap" }}
+                        >
+                          {JSON.stringify(item, null, 2)}
+                        </pre>
+                      }
+                    />
+                  );
+                })
+              ) : (
+                <div className='text-secondary'>No items</div>
+              )}
             </Card.Body>
           </Card>
         );
@@ -358,7 +358,11 @@ const CvGeneratorPage = () => {
           </div>
         </Stack>
 
-        <PageState isEmpty={data.length === 0} loading={showLoading} error={error}>
+        <PageState
+          isEmpty={data.length === 0}
+          loading={showLoading}
+          error={error}
+        >
           {generatorPage}
         </PageState>
       </Container>

@@ -12,7 +12,7 @@ describe("components/cv/CvTemplate.tsx", () => {
           basic_info: {
             name: "Nurzhanat Zhussup",
             email: "user@test.com",
-            website: "https://nzhussup.com",
+            website: "https://nzhussup.dev",
             github: "https://github.com/nzhussup",
             linkedin: "https://linkedin.test/profile",
             about: "Backend engineer",
@@ -44,16 +44,32 @@ describe("components/cv/CvTemplate.tsx", () => {
             },
           ],
           skills: [
-            { id: 3, displayOrder: 1, category: "Languages", skillNames: "TypeScript, Go" },
+            {
+              id: 3,
+              displayOrder: 1,
+              category: "Languages",
+              skillNames: "TypeScript, Go",
+            },
           ],
           projects: [
-            { id: 4, displayOrder: 1, name: "Portfolio", url: "https://project.test", techStack: "React" },
+            {
+              id: 4,
+              displayOrder: 1,
+              name: "Portfolio",
+              url: "https://project.test",
+              techStack: "React",
+            },
           ],
           certificates: [
-            { id: 5, displayOrder: 1, name: "AWS SA", url: "https://cert.test" },
+            {
+              id: 5,
+              displayOrder: 1,
+              name: "AWS SA",
+              url: "https://cert.test",
+            },
           ],
         },
-      })
+      }),
     );
 
     expect(screen.getByText("Nurzhanat Zhussup")).toBeInTheDocument();
@@ -75,12 +91,13 @@ describe("components/cv/CvTemplate.tsx", () => {
             { id: 2, displayOrder: 10, category: "Earlier", skillNames: "Two" },
           ],
         },
-      })
+      }),
     );
 
-    const skillSection = screen.getByText("Skills").parentElement?.textContent || "";
+    const skillSection =
+      screen.getByText("Skills").parentElement?.textContent || "";
     expect(skillSection.indexOf("Earlier:")).toBeLessThan(
-      skillSection.indexOf("Later:")
+      skillSection.indexOf("Later:"),
     );
   });
 });
