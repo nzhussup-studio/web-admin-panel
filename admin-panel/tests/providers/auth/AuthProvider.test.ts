@@ -73,6 +73,10 @@ describe("providers/auth/AuthProvider.tsx", () => {
     window.history.pushState({}, "", "/projects");
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   test("initializes keycloak with login-required and settles state", async () => {
     render(
       React.createElement(AuthProvider, null, React.createElement(Consumer)),
@@ -172,11 +176,37 @@ describe("providers/auth/AuthProvider.tsx", () => {
     act(() => {
       screen.getByText("login").click();
     });
-    expect(mockKeycloak.login).toHaveBeenCalled();
+    expect(mockKeycloak.login).toHaveBeenCalledWith({
+      redirectUri: window.location.href,
+    });
 
     act(() => {
       screen.getByText("logout").click();
     });
     expect(mockKeycloak.logout).toHaveBeenCalled();
+  });
+
+  test("forces a fresh login prompt from the unauthorized page", async () => {
+    window.history.pushState({}, "", "/unauthorized");
+
+    render(
+      React.createElement(AuthProvider, null, React.createElement(Consumer)),
+    );
+
+    await waitFor(() =>
+      expect(screen.getByTestId("auth-state")).toHaveTextContent(
+        '"loading":false',
+      ),
+    );
+
+    act(() => {
+      screen.getByText("login").click();
+    });
+
+    expect(mockKeycloak.login).toHaveBeenCalledWith({
+      redirectUri: window.location.origin,
+      prompt: "login",
+      maxAge: 0,
+    });
   });
 });

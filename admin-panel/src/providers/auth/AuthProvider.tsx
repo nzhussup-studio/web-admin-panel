@@ -25,6 +25,21 @@ const getRoles = () => {
   return Array.from(new Set([...realmRoles, ...clientRoles]));
 };
 
+const buildLoginOptions = () => {
+  const isUnauthorizedRoute = window.location.pathname === "/unauthorized";
+  const redirectUri = isUnauthorizedRoute ? window.location.origin : window.location.href;
+
+  return {
+    redirectUri,
+    ...(isUnauthorizedRoute
+      ? {
+          prompt: "login" as const,
+          maxAge: 0,
+        }
+      : {}),
+  };
+};
+
 export const AuthProvider = ({ children }: ProviderProps) => {
   const [state, setState] = useState<AuthState>(initialState);
 
@@ -78,9 +93,7 @@ export const AuthProvider = ({ children }: ProviderProps) => {
         };
         keycloak.onTokenExpired = () => {
           void keycloak.updateToken(30).then(syncState).catch(() => {
-            void keycloak.login({
-              redirectUri: window.location.href,
-            });
+            void keycloak.login(buildLoginOptions());
           });
         };
 
@@ -111,9 +124,7 @@ export const AuthProvider = ({ children }: ProviderProps) => {
   }, []);
 
   const login = async () => {
-    await keycloak.login({
-      redirectUri: window.location.href,
-    });
+    await keycloak.login(buildLoginOptions());
   };
 
   const logout = async (redirectUri?: string) => {
