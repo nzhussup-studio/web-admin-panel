@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 
 ARG NODE_OPTIONS=--max_old_space_size=4096
-ARG VITE_API_BASE=http://localhost:8080
+ARG VITE_API_BASE=http://localhost:8082
 ENV NODE_OPTIONS=$NODE_OPTIONS
 ENV VITE_API_BASE=$VITE_API_BASE
 

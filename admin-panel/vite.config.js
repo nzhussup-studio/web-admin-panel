@@ -5,12 +5,13 @@ import path from 'node:path'
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  const apiBase = env.VITE_API_BASE || 'http://localhost:8080'
+  const apiBase =
+    process.env.VITE_API_BASE || env.VITE_API_BASE || 'http://localhost:8082'
 
   return {
     plugins: [react()],
     define: {
-      'globalThis.__APP_API_BASE__': JSON.stringify(apiBase),
+      __APP_API_BASE__: JSON.stringify(apiBase),
     },
     resolve: {
       alias: {

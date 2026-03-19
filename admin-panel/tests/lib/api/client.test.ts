@@ -5,7 +5,7 @@ describe("lib/api/client.ts", () => {
     const moduleExports = await import("@/lib/api/client");
     const tokenResolver = moduleExports.OpenAPI.TOKEN as () => Promise<string>;
 
-    expect(moduleExports.OpenAPI.BASE).toBe("http://localhost:8080");
+    expect(moduleExports.OpenAPI.BASE).toBe("http://localhost:8082");
     await expect(tokenResolver()).resolves.toBe("token-123");
   });
 

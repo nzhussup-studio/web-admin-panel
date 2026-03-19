@@ -219,10 +219,10 @@ describe("pages/albums/AlbumPage.tsx", () => {
 
     expect(screen.getByText("Header: Album Summer Album")).toBeInTheDocument();
     expect(
-      screen.getByText("img-1:http://localhost:8080/images/1.jpg"),
+      screen.getByText("img-1:http://localhost:8082/images/1.jpg"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("img-2:http://localhost:8080/images/2.jpg"),
+      screen.getByText("img-2:http://localhost:8082/images/2.jpg"),
     ).toBeInTheDocument();
   });
 
