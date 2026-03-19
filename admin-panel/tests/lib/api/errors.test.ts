@@ -1,5 +1,5 @@
 import { ApiError } from "@/lib/api/client";
-import { normalizeApiError } from "@/lib/api/errors";
+import { getApiErrorMessage, normalizeApiError } from "@/lib/api/errors";
 
 describe("lib/api/errors.ts", () => {
   test("normalizes ApiError instances using body message fields", () => {
@@ -27,5 +27,26 @@ describe("lib/api/errors.ts", () => {
     expect(normalizeApiError("oops")).toEqual({
       response: "An unexpected error occurred.",
     });
+  });
+
+  test("builds prefixed API error messages", () => {
+    const apiError = new ApiError(
+      { method: "POST", path: "/projects" } as never,
+      {
+        url: "",
+        ok: false,
+        status: 500,
+        statusText: "Server Error",
+        body: { detail: "Database unavailable" },
+      } as never,
+      "Server Error"
+    );
+
+    expect(getApiErrorMessage(apiError, "Failed to save project")).toBe(
+      "Failed to save project: Database unavailable"
+    );
+    expect(getApiErrorMessage(new Error("Network down"), "Failed to load")).toBe(
+      "Failed to load: Network down"
+    );
   });
 });

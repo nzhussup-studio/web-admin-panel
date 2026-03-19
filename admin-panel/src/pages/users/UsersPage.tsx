@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -9,17 +9,17 @@ import {
   type user_service_AdminUserRegistryRequest,
   type user_service_User,
 } from "@/lib/api/client";
-import { normalizeApiError } from "@/lib/api/errors";
+import { getApiErrorMessage, normalizeApiError } from "@/lib/api/errors";
+import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
 import { useCrudPage } from "@/hooks/crud/useCrudPage";
 import Popup from "@/components/shared/Popup";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import GlobalAlert from "@/components/layout/GlobalAlert";
 
 const UsersPage = () => {
+  const { triggerAlert } = useOptionalGlobalAlert();
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const [response, setResponse] = useState<{ status: number } | null>(null);
-
   const {
     items: users,
     loading,
@@ -57,29 +57,23 @@ const UsersPage = () => {
       ),
   });
 
-  useEffect(() => {
-    if (response) {
-      if (response.status === 403) {
-        setAlertMessage("Can't delete last admin");
-        setAlertVisible(true);
-      } else if (response.status === 404) {
-        setAlertMessage("User not found");
-        setAlertVisible(true);
-      }
-      setResponse(null);
-    }
-  }, [response, setResponse]);
-
   const handleDelete = async () => {
     try {
       await handleDeleteBase();
-      setResponse({ status: 200 });
     } catch (deleteError) {
       const normalizedError = normalizeApiError(deleteError);
-      setResponse(
-        normalizedError.status ? { status: normalizedError.status } : null
-      );
       setError(normalizedError);
+
+      const message =
+        normalizedError.status === 403
+          ? "Can't delete last admin"
+          : normalizedError.status === 404
+            ? "User not found"
+            : getApiErrorMessage(deleteError, "Failed to delete user");
+
+      setAlertMessage(message);
+      setAlertVisible(true);
+      triggerAlert(message, "danger");
     }
   };
 

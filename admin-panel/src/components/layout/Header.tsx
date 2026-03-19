@@ -8,7 +8,8 @@ import Row from "react-bootstrap/Row";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
 import { CacheService } from "@/lib/api/client";
-import { useGlobalAlert } from "@/hooks/alerts/useGlobalAlert";
+import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
+import { getApiErrorMessage } from "@/lib/api/errors";
 import { CodeSlashIcon } from "@/assets/icons";
 import ThemeToggle from "@/components/shared/ThemeToggle";
 
@@ -16,7 +17,7 @@ const Header = ({ text }: { text: string }) => {
   const { logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
-  const { triggerAlert } = useGlobalAlert();
+  const { triggerAlert } = useOptionalGlobalAlert();
 
   const handleLogout = () => {
     logout();
@@ -28,20 +29,12 @@ const Header = ({ text }: { text: string }) => {
     navigate("/");
   };
 
-  const handleClearCache = async (error: unknown) => {
-    if (error) {
-      triggerAlert("Error clearing cache", "danger");
-    } else {
-      triggerAlert("Cache cleared successfully", "success");
-    }
-  };
-
   const onClearCache = async () => {
     try {
       await CacheService.deleteV1AlbumCache();
-      handleClearCache(null);
+      triggerAlert("Cache cleared successfully", "success");
     } catch (error) {
-      handleClearCache(error);
+      triggerAlert(getApiErrorMessage(error, "Failed to clear cache"), "danger");
     }
   };
 

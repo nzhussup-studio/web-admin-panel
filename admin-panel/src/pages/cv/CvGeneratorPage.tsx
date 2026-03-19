@@ -17,17 +17,19 @@ import {
   SkillControllerService,
   WorkExperienceControllerService,
 } from "@/lib/api/client";
-import { normalizeApiError } from "@/lib/api/errors";
+import { getApiErrorMessage, normalizeApiError } from "@/lib/api/errors";
 import config from "@/config/app-config";
 import { generateCV } from "@/lib/cv/generateCv";
 import { BackCircleIcon, DownloadIcon, FunnelIcon } from "@/assets/icons";
 import { useNavigate } from "react-router-dom";
+import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
 
 type BasicInfo = Record<string, string>;
 type SelectedItems = Record<string, Set<string | number>>;
 
 const CvGeneratorPage = () => {
   const navigate = useNavigate();
+  const { triggerAlert } = useOptionalGlobalAlert();
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
@@ -104,11 +106,16 @@ const CvGeneratorPage = () => {
         { certificates: sortItems(certificates) },
       ]);
     } catch (fetchError) {
-      setError(normalizeApiError(fetchError));
+      const normalizedError = normalizeApiError(fetchError);
+      setError(normalizedError);
+      triggerAlert(
+        getApiErrorMessage(fetchError, "Failed to load CV data"),
+        "danger"
+      );
     } finally {
       setShowLoading(false);
     }
-  }, [isAscending]);
+  }, [isAscending, triggerAlert]);
 
   useEffect(() => {
     fetchData();

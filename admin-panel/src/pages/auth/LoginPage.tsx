@@ -8,7 +8,9 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { AuthControllerService } from "@/lib/api/client";
+import { getApiErrorMessage } from "@/lib/api/errors";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
+import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
 import Loading from "@/components/states/LoadingState";
 import ThemeToggle from "@/components/shared/ThemeToggle";
 
@@ -20,6 +22,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const { triggerAlert } = useOptionalGlobalAlert();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,7 +53,10 @@ const LoginPage = () => {
       login(token, expiration);
       navigate("/", { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed.");
+      const message =
+        err instanceof Error ? err.message : getApiErrorMessage(err, "Login failed");
+      setError(message);
+      triggerAlert(message, "danger");
     } finally {
       setLoading(false);
     }

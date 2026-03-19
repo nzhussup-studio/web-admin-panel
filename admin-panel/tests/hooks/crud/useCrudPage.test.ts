@@ -1,8 +1,28 @@
+import React from "react";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { ApiError } from "@/lib/api/client";
 import { useCrudPage } from "@/hooks/crud/useCrudPage";
+import { GlobalAlertContext } from "@/providers/alerts/global-alert-context";
+
+const mockTriggerAlert = jest.fn();
+const wrapper = ({ children }: { children: React.ReactNode }) =>
+  React.createElement(
+    GlobalAlertContext.Provider,
+    {
+      value: {
+        alert: { show: false, message: "", type: "info" },
+        triggerAlert: mockTriggerAlert,
+        closeAlert: jest.fn(),
+      },
+    },
+    children
+  );
 
 describe("hooks/crud/useCrudPage.ts", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test("loads, sorts, opens popups, saves items, and deletes items", async () => {
     const loadItems = jest.fn().mockResolvedValue([
       { id: 1, name: "B" },
@@ -31,7 +51,8 @@ describe("hooks/crud/useCrudPage.ts", () => {
         sortItems,
         toPayload,
         initialFormData: { id: 0, name: "" },
-      })
+      }),
+      { wrapper }
     );
 
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -100,11 +121,16 @@ describe("hooks/crud/useCrudPage.ts", () => {
         updateItem: jest.fn(),
         deleteItem,
         getItemId: (item) => item.id,
-      })
+      }),
+      { wrapper }
     );
 
     await waitFor(() =>
       expect(result.current.error).toEqual({ response: "Fetch failed" })
+    );
+    expect(mockTriggerAlert).toHaveBeenCalledWith(
+      "Failed to load data: Fetch failed",
+      "danger"
     );
 
     act(() => {
@@ -120,5 +146,57 @@ describe("hooks/crud/useCrudPage.ts", () => {
       response: "In use",
       body: { detail: "In use" },
     });
+    expect(mockTriggerAlert).toHaveBeenCalledWith(
+      "Failed to delete item: In use",
+      "danger"
+    );
+  });
+
+  test("shows alerts for create and update failures", async () => {
+    const loadItems = jest.fn().mockResolvedValue([]);
+    const createItem = jest.fn().mockRejectedValue(new Error("Create failed"));
+    const updateItem = jest.fn().mockRejectedValue(new Error("Update failed"));
+
+    const { result } = renderHook(
+      () =>
+        useCrudPage<{ id: number; name: string }, { id: number; name: string }, number>({
+          loadItems,
+          createItem,
+          updateItem,
+          deleteItem: jest.fn(),
+          getItemId: (item) => item.id,
+          initialFormData: { id: 0, name: "" },
+        }),
+      { wrapper }
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    act(() => {
+      result.current.openPopup();
+      result.current.setFormData({ id: 0, name: "Created" });
+    });
+
+    await act(async () => {
+      await result.current.saveItem();
+    });
+
+    expect(mockTriggerAlert).toHaveBeenCalledWith(
+      "Failed to create item: Create failed",
+      "danger"
+    );
+
+    act(() => {
+      result.current.openPopup({ id: 1, name: "Updated" });
+    });
+
+    await act(async () => {
+      await result.current.saveItem();
+    });
+
+    expect(mockTriggerAlert).toHaveBeenCalledWith(
+      "Failed to update item: Update failed",
+      "danger"
+    );
   });
 });

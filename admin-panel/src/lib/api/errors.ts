@@ -6,8 +6,16 @@ export interface NormalizedApiError {
   body?: unknown;
 }
 
+export const getApiErrorMessage = (
+  error: unknown,
+  prefix = "Request failed"
+) => {
+  const normalizedError = normalizeApiError(error);
+  return `${prefix}: ${normalizedError.response}`;
+};
+
 export const normalizeApiError = (error: unknown): NormalizedApiError => {
-  if (error instanceof ApiError) {
+  if (typeof ApiError === "function" && error instanceof ApiError) {
     const body = error.body as
       | { message?: string; error?: string; detail?: string }
       | undefined;

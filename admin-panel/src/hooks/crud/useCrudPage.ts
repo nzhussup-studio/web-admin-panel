@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { normalizeApiError } from "@/lib/api/errors";
+import { getApiErrorMessage, normalizeApiError } from "@/lib/api/errors";
+import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
 
 type RecordLike = Record<string, any>;
 
@@ -30,6 +31,7 @@ export const useCrudPage = <
   toPayload,
   initialFormData = {},
 }: UseCrudPageOptions<TItem, TForm, TId>) => {
+  const { triggerAlert } = useOptionalGlobalAlert();
   const [items, setItems] = useState<TItem[]>([]);
   const [isAscending, setIsAscending] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -62,11 +64,13 @@ export const useCrudPage = <
       const fetchedItems = await loadItemsRef.current();
       setItems(sortItemsRef.current([...fetchedItems], isAscending));
     } catch (fetchError) {
-      setError(normalizeApiError(fetchError));
+      const normalizedError = normalizeApiError(fetchError);
+      setError(normalizedError);
+      triggerAlert(getApiErrorMessage(fetchError, "Failed to load data"), "danger");
     } finally {
       setLoading(false);
     }
-  }, [isAscending]);
+  }, [isAscending, triggerAlert]);
 
   useEffect(() => {
     refresh();
@@ -88,14 +92,26 @@ export const useCrudPage = <
       ? toPayloadRef.current(formData)
       : (formData as TForm);
 
-    if (isEditMode) {
-      await updateItemRef.current(payload);
-    } else {
-      await createItemRef.current(payload);
-    }
+    try {
+      if (isEditMode) {
+        await updateItemRef.current(payload);
+      } else {
+        await createItemRef.current(payload);
+      }
 
-    await refresh();
-    closePopup();
+      await refresh();
+      closePopup();
+    } catch (saveError) {
+      const normalizedError = normalizeApiError(saveError);
+      setError(normalizedError);
+      triggerAlert(
+        getApiErrorMessage(
+          saveError,
+          isEditMode ? "Failed to update item" : "Failed to create item"
+        ),
+        "danger"
+      );
+    }
   };
 
   const confirmDelete = (itemId?: TId | null) => {
@@ -118,6 +134,10 @@ export const useCrudPage = <
     } catch (deleteError) {
       const normalizedError = normalizeApiError(deleteError);
       setError(normalizedError);
+      triggerAlert(
+        getApiErrorMessage(deleteError, "Failed to delete item"),
+        "danger"
+      );
       throw normalizedError;
     }
   };

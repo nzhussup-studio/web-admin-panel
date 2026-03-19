@@ -14,12 +14,12 @@ import {
   type image_service_model_Album,
   type image_service_model_Image,
 } from "@/lib/api/client";
-import { normalizeApiError } from "@/lib/api/errors";
+import { getApiErrorMessage, normalizeApiError } from "@/lib/api/errors";
 import Popup from "@/components/shared/Popup";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import FramedImageCard from "@/components/albums/FramedImageCard";
 import config from "@/config/app-config";
-import { useGlobalAlert } from "@/hooks/alerts/useGlobalAlert";
+import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
 import { BackCircleIcon, FunnelIcon } from "@/assets/icons";
 
 type ImagePreview = { file: Blob; preview: string };
@@ -30,7 +30,7 @@ type AlbumImageFormData = Partial<
 const AlbumPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { triggerAlert } = useGlobalAlert();
+  const { triggerAlert } = useOptionalGlobalAlert();
   const [album, setAlbum] = useState<image_service_model_Album | null>(null);
   const [isAscending, setIsAscending] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -57,7 +57,9 @@ const AlbumPage = () => {
       }
       setAlbum(fetchedAlbum);
     } catch (fetchError) {
-      setError(normalizeApiError(fetchError));
+      const normalizedError = normalizeApiError(fetchError);
+      setError(normalizedError);
+      triggerAlert(getApiErrorMessage(fetchError, "Failed to load album"), "danger");
     } finally {
       setShowLoading(false);
     }
@@ -104,11 +106,15 @@ const AlbumPage = () => {
 
   const saveImage = async () => {
     if (!id) return;
-    for (const file of formData.file || []) {
-      await ImageService.postV1AlbumUpload(id, { file: file.file });
+    try {
+      for (const file of formData.file || []) {
+        await ImageService.postV1AlbumUpload(id, { file: file.file });
+      }
+      await fetchItem();
+      closePopup();
+    } catch (saveError) {
+      triggerAlert(getApiErrorMessage(saveError, "Failed to upload image"), "danger");
     }
-    await fetchItem();
-    closePopup();
   };
 
   const albumForm = (
@@ -195,10 +201,7 @@ const AlbumPage = () => {
           );
           closePopup();
         } catch (err) {
-          triggerAlert(
-            err instanceof Error ? err.message : "An unexpected error occurred",
-            "danger"
-          );
+          triggerAlert(getApiErrorMessage(err, "Failed to rename image"), "danger");
         } finally {
           await fetchItem();
         }
@@ -238,7 +241,9 @@ const AlbumPage = () => {
       setSelectedItemId(null);
       await fetchItem();
     } catch (deleteError) {
-      setError(normalizeApiError(deleteError));
+      const normalizedError = normalizeApiError(deleteError);
+      setError(normalizedError);
+      triggerAlert(getApiErrorMessage(deleteError, "Failed to delete image"), "danger");
     }
   };
 
