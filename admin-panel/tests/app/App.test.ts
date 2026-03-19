@@ -25,11 +25,6 @@ jest.mock("@/router/routes", () => ({
       component: () => mockCreateElement("div", null, "Home"),
       isProtected: true,
     },
-    {
-      path: "/login",
-      component: () => mockCreateElement("div", null, "Login"),
-      isProtected: false,
-    },
   ],
 }));
 
@@ -56,9 +51,8 @@ describe("app/App.tsx", () => {
 
     expect(screen.getByTestId("global-alert")).toBeInTheDocument();
     expect(screen.getByTestId("animate-presence")).toBeInTheDocument();
-    expect(screen.getAllByTestId("page-transition")).toHaveLength(2);
+    expect(screen.getAllByTestId("page-transition")).toHaveLength(1);
     expect(screen.getByText("Home")).toBeInTheDocument();
-    expect(screen.getByText("Login")).toBeInTheDocument();
   });
 
   test("wraps only protected routes with ProtectedRoute", () => {
@@ -66,9 +60,6 @@ describe("app/App.tsx", () => {
 
     expect(screen.getByTestId("route-/")).toContainElement(
       screen.getByTestId("protected-route")
-    );
-    expect(screen.getByTestId("route-/login")).not.toContainElement(
-      screen.queryByTestId("protected-route")
     );
   });
 });

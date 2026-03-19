@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import config from "@/config/app-config";
 import LoadingState from "@/components/states/LoadingState";
+import UnauthorizedPage from "@/pages/errors/UnauthorizedPage";
 
 interface PageStateProps {
   children: ReactNode;
@@ -35,6 +36,10 @@ const PageState = ({
 
   if (error) {
     const normalizedError = error as { status?: number; response?: string };
+
+    if (normalizedError.status === 401) {
+      return <UnauthorizedPage />;
+    }
 
     if (normalizedError.status === 404) {
       return (

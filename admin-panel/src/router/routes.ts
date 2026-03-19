@@ -1,5 +1,4 @@
 import type { AppRoute } from "@/types/router";
-import LoginPage from "@/pages/auth/LoginPage";
 import HomePage from "@/pages/home/HomePage";
 import CvPage from "@/pages/cv/CvPage";
 import ProjectsPage from "@/pages/projects/ProjectsPage";
@@ -8,17 +7,13 @@ import EducationPage from "@/pages/cv/EducationPage";
 import WorkExperiencePage from "@/pages/cv/WorkExperiencePage";
 import SkillsPage from "@/pages/cv/SkillsPage";
 import NotFoundPage from "@/pages/errors/NotFoundPage";
+import UnauthorizedPage from "@/pages/errors/UnauthorizedPage";
 import UsersPage from "@/pages/users/UsersPage";
 import AlbumsPage from "@/pages/albums/AlbumsPage";
 import AlbumPage from "@/pages/albums/AlbumPage";
 import CvGeneratorPage from "@/pages/cv/CvGeneratorPage";
 
 const routes: AppRoute[] = [
-  {
-    path: "/login",
-    component: LoginPage,
-    isProtected: false,
-  },
   {
     path: "/",
     component: HomePage,
@@ -73,6 +68,11 @@ const routes: AppRoute[] = [
     path: "/cv-generator",
     component: CvGeneratorPage,
     isProtected: true,
+  },
+  {
+    path: "/unauthorized",
+    component: UnauthorizedPage,
+    isProtected: false,
   },
   {
     path: "*",

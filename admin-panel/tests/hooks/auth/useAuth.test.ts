@@ -9,9 +9,12 @@ const mockContextValue = {
     token: "token-1",
     expiration: "123",
     loading: false,
+    roles: ["ROLE_ADMIN"],
+    username: "admin",
+    email: "admin@example.com",
   },
-  login: jest.fn(),
-  logout: jest.fn(),
+  login: jest.fn().mockResolvedValue(undefined),
+  logout: jest.fn().mockResolvedValue(undefined),
 };
 
 describe("hooks/auth/useAuth.ts", () => {

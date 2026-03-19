@@ -13,9 +13,12 @@ describe("providers/auth/auth-context.ts", () => {
         token: "abc",
         expiration: "123",
         loading: false,
+        roles: ["ROLE_ADMIN"],
+        username: "admin",
+        email: "admin@example.com",
       },
-      login: jest.fn(),
-      logout: jest.fn(),
+      login: jest.fn().mockResolvedValue(undefined),
+      logout: jest.fn().mockResolvedValue(undefined),
     };
     const wrapper = ({ children }: { children: React.ReactNode }) =>
       React.createElement(AuthContext.Provider, { value }, children);

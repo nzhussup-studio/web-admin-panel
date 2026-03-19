@@ -199,4 +199,43 @@ describe("hooks/crud/useCrudPage.ts", () => {
       "danger"
     );
   });
+
+  test("settles on 401 fetch errors without retry looping or global alerts", async () => {
+    const unauthorizedError = new ApiError(
+      { method: "GET", path: "/projects" } as never,
+      {
+        url: "",
+        ok: false,
+        status: 401,
+        statusText: "Unauthorized",
+        body: { message: "Unauthorized" },
+      } as never,
+      "Unauthorized"
+    );
+
+    const loadItems = jest.fn().mockRejectedValue(unauthorizedError);
+
+    const { result } = renderHook(
+      () =>
+        useCrudPage<{ id: number }, { id: number }, number>({
+          loadItems,
+          createItem: jest.fn(),
+          updateItem: jest.fn(),
+          deleteItem: jest.fn(),
+          getItemId: (item) => item.id,
+        }),
+      { wrapper }
+    );
+
+    await waitFor(() =>
+      expect(result.current.error).toEqual({
+        status: 401,
+        response: "Unauthorized",
+        body: { message: "Unauthorized" },
+      })
+    );
+
+    expect(loadItems).toHaveBeenCalledTimes(1);
+    expect(mockTriggerAlert).not.toHaveBeenCalled();
+  });
 });

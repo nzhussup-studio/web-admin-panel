@@ -13,19 +13,39 @@ import { getApiErrorMessage } from "@/lib/api/errors";
 import { CodeSlashIcon } from "@/assets/icons";
 import ThemeToggle from "@/components/shared/ThemeToggle";
 
-const Header = ({ text }: { text: string }) => {
-  const { logout } = useAuth();
+interface HeaderProps {
+  text: string;
+  showClearCacheButton?: boolean;
+  authActionLabel?: "Login" | "Logout";
+}
+
+const Header = ({
+  text,
+  showClearCacheButton = true,
+  authActionLabel = "Logout",
+}: HeaderProps) => {
+  const { login, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
   const { triggerAlert } = useOptionalGlobalAlert();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
+  const handleAuthAction = () => {
+    if (authActionLabel === "Login") {
+      void login();
+      return;
+    }
+
+    void logout();
   };
 
   const handleLogoClick = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
+
+    if (authActionLabel === "Login") {
+      void login();
+      return;
+    }
+
     navigate("/");
   };
 
@@ -62,16 +82,18 @@ const Header = ({ text }: { text: string }) => {
           <Col xs={12} md={4}>
             <div className='d-flex flex-wrap align-items-center justify-content-center justify-content-md-end gap-2'>
               <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleDarkMode} />
-              <Button
-                type='button'
-                variant='outline-danger'
-                onClick={onClearCache}
-                data-testid='clear-cache-button'
-              >
-                Clear Cache
-              </Button>
-              <Button type='button' variant='outline-primary' onClick={handleLogout}>
-                Logout
+              {showClearCacheButton && (
+                <Button
+                  type='button'
+                  variant='outline-danger'
+                  onClick={onClearCache}
+                  data-testid='clear-cache-button'
+                >
+                  Clear Cache
+                </Button>
+              )}
+              <Button type='button' variant='outline-primary' onClick={handleAuthAction}>
+                {authActionLabel}
               </Button>
             </div>
           </Col>

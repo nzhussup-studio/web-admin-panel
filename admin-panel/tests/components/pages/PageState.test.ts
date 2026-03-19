@@ -9,6 +9,10 @@ jest.mock("@/components/states/LoadingState", () => ({
   __esModule: true,
   default: () => mockCreateElement("div", null, "Loading state"),
 }));
+jest.mock("@/pages/errors/UnauthorizedPage", () => ({
+  __esModule: true,
+  default: () => mockCreateElement("div", null, "Unauthorized page"),
+}));
 
 describe("components/pages/PageState.tsx", () => {
   test("renders loading state when loading", () => {
@@ -24,8 +28,18 @@ describe("components/pages/PageState.tsx", () => {
     expect(screen.getByText("Loading state")).toBeInTheDocument();
   });
 
-  test("renders 404 and generic error states", () => {
+  test("renders 401, 404 and generic error states", () => {
     const { rerender } = render(
+      mockCreateElement(PageState, {
+        isEmpty: false,
+        loading: false,
+        error: { status: 401 },
+        children: mockCreateElement("div", null, "Children"),
+      })
+    );
+    expect(screen.getByText("Unauthorized page")).toBeInTheDocument();
+
+    rerender(
       mockCreateElement(PageState, {
         isEmpty: false,
         loading: false,

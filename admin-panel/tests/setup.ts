@@ -1,6 +1,22 @@
 import "@testing-library/jest-dom";
 import { TextDecoder, TextEncoder } from "util";
 
+jest.mock("keycloak-js", () =>
+  jest.fn().mockImplementation(() => ({
+    authenticated: false,
+    token: undefined,
+    tokenParsed: undefined,
+    onAuthSuccess: undefined,
+    onAuthRefreshSuccess: undefined,
+    onAuthLogout: undefined,
+    onTokenExpired: undefined,
+    init: jest.fn().mockResolvedValue(false),
+    login: jest.fn().mockResolvedValue(undefined),
+    logout: jest.fn().mockResolvedValue(undefined),
+    updateToken: jest.fn().mockResolvedValue(true),
+  }))
+);
+
 jest.mock("html2pdf.js", () => {
   const chain = {
     set: jest.fn(() => chain),

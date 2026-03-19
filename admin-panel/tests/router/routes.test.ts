@@ -4,7 +4,6 @@ describe("router/routes.ts", () => {
   test("defines the expected public and protected paths", () => {
     expect(routes).toHaveLength(13);
     expect(routes.map((route) => route.path)).toEqual([
-      "/login",
       "/",
       "/projects",
       "/cv",
@@ -16,15 +15,16 @@ describe("router/routes.ts", () => {
       "/albums",
       "/albums/:id",
       "/cv-generator",
+      "/unauthorized",
       "*",
     ]);
   });
 
-  test("marks only login and not-found as public routes", () => {
+  test("marks only unauthorized and not-found as public routes", () => {
     const publicRoutes = routes.filter((route) => !route.isProtected);
 
     expect(publicRoutes).toHaveLength(2);
-    expect(publicRoutes.map((route) => route.path)).toEqual(["/login", "*"]);
+    expect(publicRoutes.map((route) => route.path)).toEqual(["/unauthorized", "*"]);
   });
 
   test("assigns a component to every route", () => {

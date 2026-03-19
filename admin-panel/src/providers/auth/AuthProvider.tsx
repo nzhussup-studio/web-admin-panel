@@ -2,64 +2,107 @@ import { useEffect, useState } from "react";
 import LoadingState from "@/components/states/LoadingState";
 import { AuthContext } from "@/providers/auth/auth-context";
 import type { AuthState, ProviderProps } from "@/types/common";
+import keycloak from "@/lib/auth/keycloak";
 
 const initialState: AuthState = {
   isAuthenticated: false,
   token: null,
   expiration: null,
   loading: true,
+  roles: [],
+  username: null,
+  email: null,
 };
+
+let keycloakInitPromise: Promise<boolean> | null = null;
 
 export const AuthProvider = ({ children }: ProviderProps) => {
   const [state, setState] = useState<AuthState>(initialState);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const expirationDate = localStorage.getItem("expiration");
+    let mounted = true;
 
-    if (token && expirationDate) {
-      const expirationTime = parseInt(expirationDate, 10) * 1000;
-      if (expirationTime > new Date().getTime()) {
-        setState({
-          isAuthenticated: true,
-          token,
-          expiration: expirationDate,
-          loading: false,
-        });
-      } else {
-        localStorage.removeItem("token");
-        localStorage.removeItem("expiration");
-        setState({
-          isAuthenticated: false,
-          token: null,
-          expiration: null,
-          loading: false,
-        });
+    const syncState = async () => {
+      const realmRoles = keycloak.tokenParsed?.realm_access?.roles ?? [];
+      const clientRoles = Object.values(keycloak.tokenParsed?.resource_access ?? {}).flatMap(
+        (access) => access.roles ?? []
+      );
+      const roles = Array.from(new Set([...realmRoles, ...clientRoles]));
+      const username = keycloak.tokenParsed?.preferred_username ?? null;
+      const email = keycloak.tokenParsed?.email ?? null;
+
+      if (!mounted) {
+        return;
       }
-    } else {
+
       setState({
-        isAuthenticated: false,
-        token: null,
-        expiration: null,
+        isAuthenticated: !!keycloak.authenticated,
+        token: keycloak.token ?? null,
+        expiration: keycloak.tokenParsed?.exp?.toString() ?? null,
         loading: false,
+        roles,
+        username,
+        email,
       });
-    }
+    };
+
+    const initialize = async () => {
+      try {
+        keycloak.onAuthSuccess = () => {
+          void syncState();
+        };
+        keycloak.onAuthRefreshSuccess = () => {
+          void syncState();
+        };
+        keycloak.onAuthLogout = () => {
+          if (!mounted) {
+            return;
+          }
+          setState({ ...initialState, loading: false });
+        };
+        keycloak.onTokenExpired = () => {
+          void keycloak.updateToken(30).then(syncState).catch(() => {
+            void keycloak.login({
+              redirectUri: window.location.href,
+            });
+          });
+        };
+
+        if (!keycloakInitPromise) {
+          keycloakInitPromise = keycloak.init({
+            onLoad: window.location.pathname === "/unauthorized" ? "check-sso" : "login-required",
+            pkceMethod: "S256",
+            checkLoginIframe: false,
+          });
+        }
+
+        await keycloakInitPromise;
+
+        await syncState();
+      } catch {
+        if (!mounted) {
+          return;
+        }
+        setState({ ...initialState, loading: false });
+      }
+    };
+
+    void initialize();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const login = (token: string, expiration: string) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("expiration", expiration);
-    setState({ isAuthenticated: true, token, expiration, loading: false });
+  const login = async () => {
+    await keycloak.login({
+      redirectUri: window.location.href,
+    });
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("expiration");
-    setState({
-      isAuthenticated: false,
-      token: null,
-      expiration: null,
-      loading: false,
+  const logout = async (redirectUri?: string) => {
+    await keycloak.logout({
+      redirectUri: redirectUri ?? window.location.origin,
     });
   };
 

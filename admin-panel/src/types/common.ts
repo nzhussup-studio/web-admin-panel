@@ -5,12 +5,15 @@ export interface AuthState {
   token: string | null;
   expiration: string | null;
   loading: boolean;
+  roles: string[];
+  username: string | null;
+  email: string | null;
 }
 
 export interface AuthContextValue {
   state: AuthState;
-  login: (token: string, expiration: string) => void;
-  logout: () => void;
+  login: () => Promise<void>;
+  logout: (redirectUri?: string) => Promise<void>;
 }
 
 export interface DarkModeContextValue {

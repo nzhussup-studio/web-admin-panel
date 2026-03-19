@@ -41,6 +41,7 @@ export const useCrudPage = <
   const [showPopup, setShowPopup] = useState(false);
   const [formData, setFormData] = useState<Partial<TForm>>(initialFormData);
   const [isEditMode, setIsEditMode] = useState(false);
+  const triggerAlertRef = useRef(triggerAlert);
   const loadItemsRef = useRef(loadItems);
   const sortItemsRef = useRef(sortItems);
   const initialFormDataRef = useRef(initialFormData);
@@ -56,6 +57,7 @@ export const useCrudPage = <
   createItemRef.current = createItem;
   updateItemRef.current = updateItem;
   deleteItemRef.current = deleteItem;
+  triggerAlertRef.current = triggerAlert;
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -66,11 +68,16 @@ export const useCrudPage = <
     } catch (fetchError) {
       const normalizedError = normalizeApiError(fetchError);
       setError(normalizedError);
-      triggerAlert(getApiErrorMessage(fetchError, "Failed to load data"), "danger");
+      if (normalizedError.status !== 401) {
+        triggerAlertRef.current(
+          getApiErrorMessage(fetchError, "Failed to load data"),
+          "danger"
+        );
+      }
     } finally {
       setLoading(false);
     }
-  }, [isAscending, triggerAlert]);
+  }, [isAscending]);
 
   useEffect(() => {
     refresh();
@@ -104,13 +111,15 @@ export const useCrudPage = <
     } catch (saveError) {
       const normalizedError = normalizeApiError(saveError);
       setError(normalizedError);
-      triggerAlert(
-        getApiErrorMessage(
-          saveError,
-          isEditMode ? "Failed to update item" : "Failed to create item"
-        ),
-        "danger"
-      );
+      if (normalizedError.status !== 401) {
+        triggerAlertRef.current(
+          getApiErrorMessage(
+            saveError,
+            isEditMode ? "Failed to update item" : "Failed to create item"
+          ),
+          "danger"
+        );
+      }
     }
   };
 
@@ -134,10 +143,12 @@ export const useCrudPage = <
     } catch (deleteError) {
       const normalizedError = normalizeApiError(deleteError);
       setError(normalizedError);
-      triggerAlert(
-        getApiErrorMessage(deleteError, "Failed to delete item"),
-        "danger"
-      );
+      if (normalizedError.status !== 401) {
+        triggerAlertRef.current(
+          getApiErrorMessage(deleteError, "Failed to delete item"),
+          "danger"
+        );
+      }
       throw normalizedError;
     }
   };
