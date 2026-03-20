@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { base_service_Education } from '@/gen/api/models/base_service_Education';
-import type { CancelablePromise } from '@/gen/api/core/CancelablePromise';
-import { OpenAPI } from '@/gen/api/core/OpenAPI';
-import { request as __request } from '@/gen/api/core/request';
+import type { base_service_Education } from '../models/base_service_Education';
+import type { CancelablePromise } from '../core/CancelablePromise';
+import { OpenAPI } from '../core/OpenAPI';
+import { request as __request } from '../core/request';
 export class EducationControllerService {
     /**
      * @returns any OK

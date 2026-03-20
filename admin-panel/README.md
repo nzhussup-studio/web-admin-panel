@@ -1,8 +1,37 @@
-# ADMIN PANEL
+# Admin Panel App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This directory contains the React/Vite application for the admin UI.
 
-Currently, two official plugins are available:
+## Runtime Variables
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The build uses these Vite variables:
+
+- `VITE_API_BASE`
+- `VITE_KEYCLOAK_URL`
+- `VITE_KEYCLOAK_REALM`
+- `VITE_KEYCLOAK_CLIENT_ID`
+
+Example local values:
+
+```bash
+VITE_API_BASE=http://localhost:8082
+VITE_KEYCLOAK_URL=http://localhost:8081
+VITE_KEYCLOAK_REALM=backend-auth-dev
+VITE_KEYCLOAK_CLIENT_ID=frontend-admin-auth-client
+```
+
+## Commands
+
+```bash
+npm ci
+npm run dev
+npm test
+npm run typecheck
+npm run build
+```
+
+## Notes
+
+- Authentication is handled entirely through Keycloak redirects.
+- The internal `/users` page was removed; the dashboard links to the Keycloak admin users section instead.
+- API access tokens are sourced from Keycloak and sent to the backend as bearer tokens.

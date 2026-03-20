@@ -2,12 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { image_service_model_Album } from '@/gen/api/models/image_service_model_Album';
-import type { image_service_model_AlbumPreview } from '@/gen/api/models/image_service_model_AlbumPreview';
-import type { image_service_model_SuccessResponse } from '@/gen/api/models/image_service_model_SuccessResponse';
-import type { CancelablePromise } from '@/gen/api/core/CancelablePromise';
-import { OpenAPI } from '@/gen/api/core/OpenAPI';
-import { request as __request } from '@/gen/api/core/request';
+import type { image_service_model_Album } from '../models/image_service_model_Album';
+import type { image_service_model_AlbumPreview } from '../models/image_service_model_AlbumPreview';
+import type { image_service_model_SuccessResponse } from '../models/image_service_model_SuccessResponse';
+import type { CancelablePromise } from '../core/CancelablePromise';
+import { OpenAPI } from '../core/OpenAPI';
+import { request as __request } from '../core/request';
 export class AlbumService {
     /**
      * Get album previews

@@ -2,9 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { CancelablePromise } from '@/gen/api/core/CancelablePromise';
-import { OpenAPI } from '@/gen/api/core/OpenAPI';
-import { request as __request } from '@/gen/api/core/request';
+import type { CancelablePromise } from '../core/CancelablePromise';
+import { OpenAPI } from '../core/OpenAPI';
+import { request as __request } from '../core/request';
 export class CacheControllerService {
     /**
      * @returns string OK

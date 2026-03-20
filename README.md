@@ -19,11 +19,11 @@ The project focuses on operational content management rather than public present
 
 The admin panel currently covers these areas:
 
-- authentication and protected access for administrative users
+- Keycloak-based authentication and protected access for administrative users
 - project management
 - CV data management, including work experience, education, skills, and certifications
 - album and image management
-- administrative user management
+- navigation into Keycloak for user and realm-level account administration
 - CV generation workflows based on maintained data
 
 ## Technology Stack
@@ -57,7 +57,7 @@ This repository contains only the web admin client. It is one part of a larger s
 - presenting administrative workflows in the browser
 - validating and submitting user input
 - calling backend endpoints for CRUD operations
-- enforcing authenticated access on the client side
+- enforcing authenticated access on the client side with Keycloak redirects
 - supporting deployment through container-based CI/CD workflows
 
 ## Local Development
@@ -66,6 +66,15 @@ This repository contains only the web admin client. It is one part of a larger s
 cd admin-panel
 npm ci
 npm run dev
+```
+
+The app expects these runtime values in development or CI builds:
+
+```bash
+VITE_API_BASE=http://localhost:8082
+VITE_KEYCLOAK_URL=http://localhost:8081
+VITE_KEYCLOAK_REALM=backend-auth-dev
+VITE_KEYCLOAK_CLIENT_ID=frontend-admin-auth-client
 ```
 
 Useful commands:
