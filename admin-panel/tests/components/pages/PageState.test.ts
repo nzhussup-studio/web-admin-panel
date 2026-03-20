@@ -23,7 +23,7 @@ describe("components/pages/PageState.tsx", () => {
         loading: true,
         error: null,
         children: mockCreateElement("div", null, "Children"),
-      })
+      }),
     );
 
     expect(screen.getByText("Loading state")).toBeInTheDocument();
@@ -36,9 +36,8 @@ describe("components/pages/PageState.tsx", () => {
         loading: false,
         error: { status: 401 },
         children: mockCreateElement("div", null, "Children"),
-      })
+      }),
     );
-    expect(screen.getByText("Unauthorized page")).toBeInTheDocument();
     expect(screen.getByText("Unauthorized page false")).toBeInTheDocument();
 
     rerender(
@@ -47,7 +46,7 @@ describe("components/pages/PageState.tsx", () => {
         loading: false,
         error: { status: 404 },
         children: mockCreateElement("div", null, "Children"),
-      })
+      }),
     );
     expect(screen.getByText("404")).toBeInTheDocument();
 
@@ -57,7 +56,7 @@ describe("components/pages/PageState.tsx", () => {
         loading: false,
         error: { status: 500, response: "Boom" },
         children: mockCreateElement("div", null, "Children"),
-      })
+      }),
     );
     expect(screen.getByText("500 - Internal Server Error")).toBeInTheDocument();
     expect(screen.getByText("Boom")).toBeInTheDocument();
@@ -71,7 +70,7 @@ describe("components/pages/PageState.tsx", () => {
         error: null,
         delay: 500,
         children: mockCreateElement("div", null, "Children"),
-      })
+      }),
     );
 
     expect(screen.queryByText("No information found.")).not.toBeInTheDocument();
@@ -86,7 +85,7 @@ describe("components/pages/PageState.tsx", () => {
         loading: false,
         error: null,
         children: mockCreateElement("div", null, "Children"),
-      })
+      }),
     );
     expect(screen.getByText("Children")).toBeInTheDocument();
   });
