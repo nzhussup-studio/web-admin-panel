@@ -11,7 +11,7 @@ const RequireAuth = ({ children }: { children: ReactNode }) => {
   }
 
   if (!state.roles.includes("ROLE_ADMIN")) {
-    return <Navigate to='/forbidden' replace />;
+    return <Navigate to="/forbidden" replace />;
   }
 
   return children;

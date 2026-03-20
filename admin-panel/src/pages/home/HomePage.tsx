@@ -67,21 +67,21 @@ const HomePage = () => {
       <Header
         text={`Welcome to the Admin Panel, ${state.firstName || "User"}!`}
       />
-      <Container className='my-5'>
-        <Row xs={1} md={2} className='g-4'>
+      <Container className="my-5">
+        <Row xs={1} md={2} className="g-4">
           {dashboardSections.map((section) => (
             <Col key={section.path || section.externalUrl}>
               <Card
-                className='h-100 rounded-4 app-interactive-card app-navigation-card'
+                className="h-100 rounded-4 app-interactive-card app-navigation-card"
                 onClick={() =>
                   handleSectionClick(section.path, section.externalUrl)
                 }
               >
-                <Card.Body className='d-flex flex-column p-4 app-card-body'>
-                  <Card.Title className='fw-semibold fs-4 app-card-title'>
+                <Card.Body className="d-flex flex-column p-4 app-card-body">
+                  <Card.Title className="fw-semibold fs-4 app-card-title">
                     {section.title}
                   </Card.Title>
-                  <Card.Text className='text-secondary flex-grow-1'>
+                  <Card.Text className="text-secondary flex-grow-1">
                     {section.description}
                   </Card.Text>
                 </Card.Body>

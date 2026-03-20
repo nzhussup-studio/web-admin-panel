@@ -33,17 +33,17 @@ const ConfirmDialog = ({
       onHide={onClose}
       centered
       animation={false}
-      backdropClassName='confirm-dialog-backdrop'
+      backdropClassName="confirm-dialog-backdrop"
       contentClassName={`app-modal-content${isDarkMode ? " text-light" : ""}`}
     >
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p className='mb-0'>{message}</p>
+        <p className="mb-0">{message}</p>
       </Modal.Body>
-      <Modal.Footer className='justify-content-between'>
-        <Button variant='secondary' onClick={onClose}>
+      <Modal.Footer className="justify-content-between">
+        <Button variant="secondary" onClick={onClose}>
           {cancelLabel}
         </Button>
         <Button variant={confirmVariant} onClick={onConfirm}>

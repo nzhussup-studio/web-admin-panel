@@ -3,9 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type base_service_Skill = {
-    id?: number;
-    category?: string;
-    skillNames?: string;
-    displayOrder?: number;
+  id?: number;
+  category?: string;
+  skillNames?: string;
+  displayOrder?: number;
 };
-

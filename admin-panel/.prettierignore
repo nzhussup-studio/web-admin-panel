@@ -1,0 +1,9 @@
+dist
+coverage
+node_modules
+src/gen/api
+tests
+.prettierrc
+eslint.config.js
+index.html
+openapi.yaml

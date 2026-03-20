@@ -36,15 +36,17 @@ const EducationPage = () => {
     handleDelete,
   } = useCrudPage<base_service_Education, base_service_Education, number>({
     loadItems: () => EducationControllerService.listEducation(),
-    createItem: (payload) => EducationControllerService.createEducation(payload),
-    updateItem: (payload) => EducationControllerService.updateEducation(payload),
+    createItem: (payload) =>
+      EducationControllerService.createEducation(payload),
+    updateItem: (payload) =>
+      EducationControllerService.updateEducation(payload),
     deleteItem: (id) => EducationControllerService.deleteEducation({ id }),
     getItemId: (item) => item.id ?? null,
     sortItems: (items, isAscending) =>
       items.sort((a, b) =>
         isAscending
           ? Number(a.displayOrder) - Number(b.displayOrder)
-          : Number(b.displayOrder) - Number(a.displayOrder)
+          : Number(b.displayOrder) - Number(a.displayOrder),
       ),
     toPayload: (data) =>
       ({
@@ -59,7 +61,7 @@ const EducationPage = () => {
       title={isEditMode ? "Edit Education" : "Add Education"}
       onSubmit={saveItem}
     >
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Institution</Form.Label>
         <Form.Control
           value={formData.institution ?? ""}
@@ -69,18 +71,20 @@ const EducationPage = () => {
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Location</Form.Label>
         <Form.Control
           value={formData.location ?? ""}
-          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, location: e.target.value })
+          }
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Start Date</Form.Label>
         <Form.Control
-          type='date'
+          type="date"
           value={formatDateForInput(formData.startDate)}
           onChange={(e) =>
             setFormData({ ...formData, startDate: e.target.value })
@@ -88,15 +92,17 @@ const EducationPage = () => {
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>End Date</Form.Label>
         <Form.Control
-          type='date'
+          type="date"
           value={formatDateForInput(formData.endDate)}
-          onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, endDate: e.target.value })
+          }
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Degree</Form.Label>
         <Form.Control
           value={formData.degree ?? ""}
@@ -104,14 +110,14 @@ const EducationPage = () => {
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Thesis</Form.Label>
         <Form.Control
           value={formData.thesis ?? ""}
           onChange={(e) => setFormData({ ...formData, thesis: e.target.value })}
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Description</Form.Label>
         <Form.Control
           value={formData.description ?? ""}
@@ -120,10 +126,10 @@ const EducationPage = () => {
           }
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Order Display</Form.Label>
         <Form.Control
-          type='number'
+          type="number"
           value={formData.displayOrder ?? ""}
           onChange={(e) =>
             setFormData({
@@ -138,18 +144,20 @@ const EducationPage = () => {
   );
 
   const eduPage = (
-    <div className='d-grid gap-3'>
+    <div className="d-grid gap-3">
       {education.map((edu) => (
         <Card
           key={edu.id}
-          className='rounded-4 app-interactive-card app-resource-card'
+          className="rounded-4 app-interactive-card app-resource-card"
           onClick={() => openPopup(edu)}
         >
-          <Card.Body className='p-4 app-card-body'>
-            <div className='d-flex justify-content-between align-items-start gap-3'>
+          <Card.Body className="p-4 app-card-body">
+            <div className="d-flex justify-content-between align-items-start gap-3">
               <div>
-                <Card.Title className='fw-semibold mb-3 app-card-title'>{edu.degree}</Card.Title>
-                <div className='d-flex flex-column gap-2 text-secondary'>
+                <Card.Title className="fw-semibold mb-3 app-card-title">
+                  {edu.degree}
+                </Card.Title>
+                <div className="d-flex flex-column gap-2 text-secondary">
                   <div>{edu.institution}</div>
                   <div>{edu.location}</div>
                   <div>
@@ -163,10 +171,10 @@ const EducationPage = () => {
                   <div>Order: {edu.displayOrder}</div>
                 </div>
               </div>
-              <div className='app-card-actions'>
+              <div className="app-card-actions">
                 <Button
-                  variant='outline-danger'
-                  size='sm'
+                  variant="outline-danger"
+                  size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     confirmDelete(edu.id ?? null);
@@ -184,7 +192,7 @@ const EducationPage = () => {
 
   return (
     <CrudPageLayout
-      title='Education'
+      title="Education"
       toggleSort={toggleSort}
       loading={loading}
       error={error}
@@ -195,8 +203,8 @@ const EducationPage = () => {
       deleteDialog={
         <ConfirmDialog
           isOpen={isDeleteModalOpen}
-          title='Delete Education'
-          message='Are you sure you want to delete this education entry?'
+          title="Delete Education"
+          message="Are you sure you want to delete this education entry?"
           onClose={closeDeleteModal}
           onConfirm={handleDelete}
         />

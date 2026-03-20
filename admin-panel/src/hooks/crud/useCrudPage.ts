@@ -15,7 +15,7 @@ interface UseCrudPageOptions<TItem, TForm extends RecordLike, TId> {
   initialFormData?: Partial<TForm>;
 }
 
-const defaultSortItems = <TItem,>(items: TItem[]) => items;
+const defaultSortItems = <TItem>(items: TItem[]) => items;
 
 export const useCrudPage = <
   TItem,
@@ -71,7 +71,7 @@ export const useCrudPage = <
       if (normalizedError.status !== 401) {
         triggerAlertRef.current(
           getApiErrorMessage(fetchError, "Failed to load data"),
-          "danger"
+          "danger",
         );
       }
     } finally {
@@ -115,9 +115,9 @@ export const useCrudPage = <
         triggerAlertRef.current(
           getApiErrorMessage(
             saveError,
-            isEditMode ? "Failed to update item" : "Failed to create item"
+            isEditMode ? "Failed to update item" : "Failed to create item",
           ),
-          "danger"
+          "danger",
         );
       }
     }
@@ -146,7 +146,7 @@ export const useCrudPage = <
       if (normalizedError.status !== 401) {
         triggerAlertRef.current(
           getApiErrorMessage(deleteError, "Failed to delete item"),
-          "danger"
+          "danger",
         );
       }
       throw normalizedError;

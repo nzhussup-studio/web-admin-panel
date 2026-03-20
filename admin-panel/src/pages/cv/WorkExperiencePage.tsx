@@ -29,7 +29,11 @@ const WorkExperiencePage = () => {
     confirmDelete,
     closeDeleteModal,
     handleDelete,
-  } = useCrudPage<base_service_WorkExperience, base_service_WorkExperience, number>({
+  } = useCrudPage<
+    base_service_WorkExperience,
+    base_service_WorkExperience,
+    number
+  >({
     loadItems: () => WorkExperienceControllerService.listWorkExperience(),
     createItem: (payload) =>
       WorkExperienceControllerService.createWorkExperience(payload),
@@ -42,7 +46,7 @@ const WorkExperiencePage = () => {
       items.sort((a, b) =>
         isAscending
           ? Number(a.displayOrder) - Number(b.displayOrder)
-          : Number(b.displayOrder) - Number(a.displayOrder)
+          : Number(b.displayOrder) - Number(a.displayOrder),
       ),
     toPayload: (data) =>
       ({
@@ -57,31 +61,37 @@ const WorkExperiencePage = () => {
       title={isEditMode ? "Edit Work Experience" : "Add Work Experience"}
       onSubmit={saveItem}
     >
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Job Title</Form.Label>
         <Form.Control
           value={formData.position ?? ""}
-          onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, position: e.target.value })
+          }
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Company</Form.Label>
         <Form.Control
           value={formData.company ?? ""}
-          onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, company: e.target.value })
+          }
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Location</Form.Label>
         <Form.Control
           value={formData.location ?? ""}
-          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, location: e.target.value })
+          }
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Start Date</Form.Label>
         <Form.Control
           value={formData.startDate ?? ""}
@@ -91,17 +101,19 @@ const WorkExperiencePage = () => {
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>End Date</Form.Label>
         <Form.Control
           value={formData.endDate ?? ""}
-          onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, endDate: e.target.value })
+          }
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Description</Form.Label>
         <Form.Control
-          as='textarea'
+          as="textarea"
           rows={10}
           value={formData.description ?? ""}
           onChange={(e) =>
@@ -110,7 +122,7 @@ const WorkExperiencePage = () => {
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Tech Stack (comma-separated)</Form.Label>
         <Form.Control
           value={formData.techStack ?? ""}
@@ -119,10 +131,10 @@ const WorkExperiencePage = () => {
           }
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Order Display</Form.Label>
         <Form.Control
-          type='number'
+          type="number"
           value={formData.displayOrder ?? ""}
           onChange={(e) =>
             setFormData({
@@ -137,23 +149,23 @@ const WorkExperiencePage = () => {
   );
 
   const wexPage = (
-    <div className='d-grid gap-3'>
+    <div className="d-grid gap-3">
       {workExperience.map((experience) => (
         <Card
           key={experience.id}
-          className='rounded-4 app-interactive-card app-resource-card'
+          className="rounded-4 app-interactive-card app-resource-card"
           onClick={() => openPopup(experience)}
         >
-          <Card.Body className='p-4 app-card-body'>
-            <div className='d-flex justify-content-between align-items-start gap-3'>
+          <Card.Body className="p-4 app-card-body">
+            <div className="d-flex justify-content-between align-items-start gap-3">
               <div>
-                <Card.Title className='fw-semibold mb-1 app-card-title'>
+                <Card.Title className="fw-semibold mb-1 app-card-title">
                   {experience.position}
                 </Card.Title>
-                <Card.Subtitle className='mb-3 text-secondary'>
+                <Card.Subtitle className="mb-3 text-secondary">
                   {experience.company}
                 </Card.Subtitle>
-                <div className='d-flex flex-column gap-2 text-secondary'>
+                <div className="d-flex flex-column gap-2 text-secondary">
                   <div>{experience.location}</div>
                   <div>
                     {experience.startDate} -{" "}
@@ -162,10 +174,10 @@ const WorkExperiencePage = () => {
                   <div style={{ whiteSpace: "pre-line" }}>
                     {experience.description}
                   </div>
-                  <div className='d-flex flex-wrap gap-2'>
+                  <div className="d-flex flex-wrap gap-2">
                     {experience.techStack &&
                       experience.techStack.split(",").map((tech, index) => (
-                        <Badge key={index} bg='primary-subtle' text='primary'>
+                        <Badge key={index} bg="primary-subtle" text="primary">
                           {tech.trim()}
                         </Badge>
                       ))}
@@ -173,10 +185,10 @@ const WorkExperiencePage = () => {
                   <div>Order: {experience.displayOrder}</div>
                 </div>
               </div>
-              <div className='app-card-actions'>
+              <div className="app-card-actions">
                 <Button
-                  variant='outline-danger'
-                  size='sm'
+                  variant="outline-danger"
+                  size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     confirmDelete(experience.id ?? null);
@@ -194,7 +206,7 @@ const WorkExperiencePage = () => {
 
   return (
     <CrudPageLayout
-      title='Work Experience'
+      title="Work Experience"
       toggleSort={toggleSort}
       loading={loading}
       error={error}
@@ -205,8 +217,8 @@ const WorkExperiencePage = () => {
       deleteDialog={
         <ConfirmDialog
           isOpen={isDeleteModalOpen}
-          title='Delete Work Experience'
-          message='Are you sure you want to delete this work experience entry?'
+          title="Delete Work Experience"
+          message="Are you sure you want to delete this work experience entry?"
           onClose={closeDeleteModal}
           onConfirm={handleDelete}
         />

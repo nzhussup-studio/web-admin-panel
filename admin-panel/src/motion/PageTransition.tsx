@@ -23,9 +23,9 @@ const PageTransition = memo(({ children }: { children?: ReactNode }) => {
 
   return (
     <motion.div
-      initial='initial'
-      animate='animate'
-      exit='exit'
+      initial="initial"
+      animate="animate"
+      exit="exit"
       variants={pageVariants}
       transition={{ duration: 0.5, ease: "easeInOut" }}
       style={{ willChange: "transform, opacity" }}

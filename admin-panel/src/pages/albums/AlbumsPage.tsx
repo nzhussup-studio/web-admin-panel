@@ -19,7 +19,7 @@ type AlbumPreviewView = image_service_model_AlbumPreview & {
 };
 
 const normalizeAlbumPreview = (
-  album: image_service_model_AlbumPreview
+  album: image_service_model_AlbumPreview,
 ): AlbumPreviewView => ({
   ...album,
   description: album.desc,
@@ -53,7 +53,7 @@ const AlbumsPage = () => {
     updateItem: (payload) =>
       AlbumService.putV1Album(
         String(payload.id),
-        payload as image_service_model_AlbumPreview
+        payload as image_service_model_AlbumPreview,
       ),
     deleteItem: (id) => AlbumService.deleteV1Album(id),
     getItemId: (item) => item.id ?? null,
@@ -76,7 +76,7 @@ const AlbumsPage = () => {
       title={isEditMode ? "Edit Album" : "Add Album"}
       onSubmit={saveItem}
     >
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Album Title</Form.Label>
         <Form.Control
           value={formData.title ?? ""}
@@ -84,24 +84,24 @@ const AlbumsPage = () => {
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Album Description</Form.Label>
         <Form.Control
-          as='textarea'
+          as="textarea"
           rows={3}
           value={formData.desc ?? ""}
           onChange={(e) => setFormData({ ...formData, desc: e.target.value })}
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Date</Form.Label>
         <Form.Control
-          type='date'
+          type="date"
           value={formData.date ?? ""}
           onChange={(e) => setFormData({ ...formData, date: e.target.value })}
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Type</Form.Label>
         <Form.Select
           value={formData.type ?? ""}
@@ -112,13 +112,13 @@ const AlbumsPage = () => {
             })
           }
         >
-          <option value=''>Select album visibility</option>
-          <option value='private'>private</option>
-          <option value='semi-public'>semi-public</option>
-          <option value='public'>public</option>
+          <option value="">Select album visibility</option>
+          <option value="private">private</option>
+          <option value="semi-public">semi-public</option>
+          <option value="public">public</option>
         </Form.Select>
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Image Preview URL</Form.Label>
         <InputGroup>
           <Form.Control
@@ -128,7 +128,7 @@ const AlbumsPage = () => {
             }
           />
           <Button
-            variant='outline-secondary'
+            variant="outline-secondary"
             onClick={() => setFormData({ ...formData, preview_image: "" })}
             disabled={!formData.preview_image}
           >
@@ -140,9 +140,9 @@ const AlbumsPage = () => {
   );
 
   const albumsPreviewPage = (
-    <div className='row row-cols-1 row-cols-md-2 g-4'>
+    <div className="row row-cols-1 row-cols-md-2 g-4">
       {albums.map((album) => (
-        <div key={album.id} className='col'>
+        <div key={album.id} className="col">
           <EditableAlbumCard
             album={album}
             onEdit={() => openPopup(album)}
@@ -155,7 +155,7 @@ const AlbumsPage = () => {
 
   return (
     <CrudPageLayout
-      title='Album Management'
+      title="Album Management"
       toggleSort={toggleSort}
       loading={loading}
       error={error}
@@ -167,8 +167,8 @@ const AlbumsPage = () => {
       deleteDialog={
         <ConfirmDialog
           isOpen={isDeleteModalOpen}
-          title='Delete Album'
-          message='Are you sure you want to delete this album?'
+          title="Delete Album"
+          message="Are you sure you want to delete this album?"
           onClose={closeDeleteModal}
           onConfirm={handleDelete}
         />

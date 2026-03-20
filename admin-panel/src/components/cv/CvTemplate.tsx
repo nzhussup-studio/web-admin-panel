@@ -79,8 +79,8 @@ const CvTemplate = ({ data }) => {
             {basic_info.website && (
               <a
                 href={basic_info.website}
-                target='_blank'
-                rel='noopener noreferrer'
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 {basic_info.website}
               </a>
@@ -114,7 +114,7 @@ const CvTemplate = ({ data }) => {
       {work_experience && (
         <>
           <hr style={{ margin: "6px 0" }} />
-          <Section title='Work Experience'>
+          <Section title="Work Experience">
             {work_experience
               .sort((a, b) => b.displayOrder - a.displayOrder)
               .map((exp) => (
@@ -134,7 +134,7 @@ const CvTemplate = ({ data }) => {
       {education && (
         <>
           <hr style={{ margin: "6px 0" }} />
-          <Section title='Education'>
+          <Section title="Education">
             {education
               .sort((a, b) => b.displayOrder - a.displayOrder)
               .map((edu) => {
@@ -167,7 +167,7 @@ const CvTemplate = ({ data }) => {
       {skills && (
         <>
           <hr style={{ margin: "6px 0" }} />
-          <Section title='Skills'>
+          <Section title="Skills">
             {skills
               .sort((a, b) => b.displayOrder - a.displayOrder)
               .map((skill) => (
@@ -182,7 +182,7 @@ const CvTemplate = ({ data }) => {
       {projects && (
         <>
           <hr style={{ margin: "6px 0" }} />
-          <Section title='Projects'>
+          <Section title="Projects">
             {projects
               .sort((a, b) => b.displayOrder - a.displayOrder)
               .map((project) => (
@@ -207,7 +207,7 @@ const CvTemplate = ({ data }) => {
       {certificates && (
         <>
           <hr style={{ margin: "6px 0" }} />
-          <Section title='Certificates'>
+          <Section title="Certificates">
             {certificates
               .sort((a, b) => b.displayOrder - a.displayOrder)
               .map((cert) => (

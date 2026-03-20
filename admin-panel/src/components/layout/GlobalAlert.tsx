@@ -12,7 +12,12 @@ interface GlobalAlertProps {
   type?: AlertVariant;
 }
 
-const GlobalAlert = ({ message, show, onClose, type }: GlobalAlertProps = {}) => {
+const GlobalAlert = ({
+  message,
+  show,
+  onClose,
+  type,
+}: GlobalAlertProps = {}) => {
   const globalAlert = useGlobalAlert();
   const alert = {
     message: message ?? globalAlert.alert.message,
@@ -24,7 +29,11 @@ const GlobalAlert = ({ message, show, onClose, type }: GlobalAlertProps = {}) =>
   if (!alert.show) return null;
 
   return (
-    <ToastContainer position='bottom-center' className='p-3' style={{ zIndex: 1080 }}>
+    <ToastContainer
+      position="bottom-center"
+      className="p-3"
+      style={{ zIndex: 1080 }}
+    >
       <Toast
         show={alert.show}
         onClose={closeAlert}
@@ -32,15 +41,15 @@ const GlobalAlert = ({ message, show, onClose, type }: GlobalAlertProps = {}) =>
         autohide
         animation
         className={`border-0 shadow app-alert-toast text-bg-${alert.type}`}
-        role='alert'
+        role="alert"
       >
-        <Toast.Body className='app-alert-toast-body'>
-          <Stack direction='horizontal' gap={3} className='align-items-start'>
-            <div className='flex-grow-1'>{alert.message}</div>
+        <Toast.Body className="app-alert-toast-body">
+          <Stack direction="horizontal" gap={3} className="align-items-start">
+            <div className="flex-grow-1">{alert.message}</div>
             <CloseButton
               variant={alert.type === "warning" ? undefined : "white"}
               onClick={closeAlert}
-              aria-label='Dismiss alert'
+              aria-label="Dismiss alert"
             />
           </Stack>
         </Toast.Body>

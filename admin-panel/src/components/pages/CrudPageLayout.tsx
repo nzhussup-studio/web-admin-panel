@@ -43,33 +43,33 @@ const CrudPageLayout = ({
     <>
       <Header text={title} />
       {afterHeader}
-      <Container className='my-5'>
+      <Container className="my-5">
         <Stack
-          direction='horizontal'
+          direction="horizontal"
           gap={3}
-          className='align-items-center justify-content-between flex-wrap mb-4'
+          className="align-items-center justify-content-between flex-wrap mb-4"
         >
           <Button
-            variant='outline-secondary'
-            className='d-inline-flex align-items-center gap-2'
+            variant="outline-secondary"
+            className="d-inline-flex align-items-center gap-2"
             onClick={() => navigate(-1)}
           >
             <BackCircleIcon width={16} height={16} />
             Back
           </Button>
-          <div className='d-flex align-items-center gap-2 flex-wrap ms-auto'>
+          <div className="d-flex align-items-center gap-2 flex-wrap ms-auto">
             {topContent}
             <ButtonGroup>
               <Button
-                variant='outline-primary'
-                className='d-inline-flex align-items-center gap-2'
+                variant="outline-primary"
+                className="d-inline-flex align-items-center gap-2"
                 onClick={toggleSort}
               >
                 <FunnelIcon width={16} height={16} />
                 Sort
               </Button>
               {showAddButton && onAdd ? (
-                <Button variant='primary' onClick={onAdd}>
+                <Button variant="primary" onClick={onAdd}>
                   Add New
                 </Button>
               ) : null}

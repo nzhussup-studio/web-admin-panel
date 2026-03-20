@@ -37,35 +37,38 @@ const Popup = ({ closePopup, title, children, onSubmit }: PopupProps) => {
       centered
       scrollable
       animation={false}
-      backdropClassName='popup-backdrop'
+      backdropClassName="popup-backdrop"
       contentClassName={`app-modal-content${isDarkMode ? " text-light" : ""}`}
-      data-testid='popup-overlay'
+      data-testid="popup-overlay"
     >
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
-        <Modal.Body data-testid='popup-content'>
-          {children}
-        </Modal.Body>
-        <Modal.Footer className='justify-content-between'>
-          <Button type='submit' variant='primary' disabled={isLoading}>
+        <Modal.Body data-testid="popup-content">{children}</Modal.Body>
+        <Modal.Footer className="justify-content-between">
+          <Button type="submit" variant="primary" disabled={isLoading}>
             {isLoading ? "Saving..." : "Save"}
           </Button>
-          <Button type='button' variant='secondary' onClick={closePopup} disabled={isLoading}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={closePopup}
+            disabled={isLoading}
+          >
             Cancel
           </Button>
         </Modal.Footer>
       </Form>
       {isLoading && (
-        <div className='text-center my-3'>
+        <div className="text-center my-3">
           <Spinner
-            animation='border'
-            variant='primary'
-            role='status'
-            data-testid='loading-spinner'
+            animation="border"
+            variant="primary"
+            role="status"
+            data-testid="loading-spinner"
           >
-            <span className='visually-hidden'>Loading...</span>
+            <span className="visually-hidden">Loading...</span>
           </Spinner>
         </div>
       )}

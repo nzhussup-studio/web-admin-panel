@@ -4,7 +4,10 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import CrudPageLayout from "@/components/pages/CrudPageLayout";
-import { ProjectControllerService, type base_service_Project } from "@/lib/api/client";
+import {
+  ProjectControllerService,
+  type base_service_Project,
+} from "@/lib/api/client";
 import { useCrudPage } from "@/hooks/crud/useCrudPage";
 import Popup from "@/components/shared/Popup";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
@@ -36,7 +39,7 @@ const ProjectsPage = () => {
       items.sort((a, b) =>
         isAscending
           ? Number(a.displayOrder) - Number(b.displayOrder)
-          : Number(b.displayOrder) - Number(a.displayOrder)
+          : Number(b.displayOrder) - Number(a.displayOrder),
       ),
     toPayload: (data) =>
       ({
@@ -51,7 +54,7 @@ const ProjectsPage = () => {
       title={isEditMode ? "Edit Project" : "Add Project"}
       onSubmit={saveItem}
     >
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Project Name</Form.Label>
         <Form.Control
           value={formData.name ?? ""}
@@ -59,10 +62,10 @@ const ProjectsPage = () => {
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Tech Stack</Form.Label>
         <Form.Control
-          as='textarea'
+          as="textarea"
           rows={3}
           value={formData.techStack ?? ""}
           onChange={(e) =>
@@ -71,7 +74,7 @@ const ProjectsPage = () => {
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>URL</Form.Label>
         <Form.Control
           value={formData.url ?? ""}
@@ -79,10 +82,10 @@ const ProjectsPage = () => {
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Order Display</Form.Label>
         <Form.Control
-          type='number'
+          type="number"
           value={formData.displayOrder ?? ""}
           onChange={(e) =>
             setFormData({
@@ -97,32 +100,32 @@ const ProjectsPage = () => {
   );
 
   const projectPage = (
-    <div className='d-grid gap-3'>
+    <div className="d-grid gap-3">
       {projects.map((project) => (
         <Card
           key={project.id}
-          className='rounded-4 app-interactive-card app-resource-card'
+          className="rounded-4 app-interactive-card app-resource-card"
           onClick={() => openPopup(project)}
         >
-          <Card.Body className='p-4 app-card-body'>
-            <div className='d-flex justify-content-between align-items-start gap-3'>
+          <Card.Body className="p-4 app-card-body">
+            <div className="d-flex justify-content-between align-items-start gap-3">
               <div>
-                <Card.Title className='fw-semibold mb-3 app-card-title'>
+                <Card.Title className="fw-semibold mb-3 app-card-title">
                   {project.name}
                 </Card.Title>
-                <div className='d-flex flex-wrap gap-2 mb-3'>
+                <div className="d-flex flex-wrap gap-2 mb-3">
                   {project.techStack &&
                     project.techStack.split(",").map((tech, index) => (
-                      <Badge key={index} bg='primary-subtle' text='primary'>
+                      <Badge key={index} bg="primary-subtle" text="primary">
                         {tech.trim()}
                       </Badge>
                     ))}
                 </div>
               </div>
-              <div className='app-card-actions'>
+              <div className="app-card-actions">
                 <Button
-                  variant='outline-danger'
-                  size='sm'
+                  variant="outline-danger"
+                  size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     confirmDelete(project.id ?? null);
@@ -132,20 +135,22 @@ const ProjectsPage = () => {
                 </Button>
               </div>
             </div>
-            <div className='d-flex flex-wrap align-items-center gap-3'>
+            <div className="d-flex flex-wrap align-items-center gap-3">
               {project.url && (
                 <Button
-                  variant='link'
-                  className='p-0'
+                  variant="link"
+                  className="p-0"
                   href={project.url}
-                  target='_blank'
-                  rel='noopener noreferrer'
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
                 >
                   View Project
                 </Button>
               )}
-              <span className='text-secondary'>Order: {project.displayOrder}</span>
+              <span className="text-secondary">
+                Order: {project.displayOrder}
+              </span>
             </div>
           </Card.Body>
         </Card>
@@ -155,7 +160,7 @@ const ProjectsPage = () => {
 
   return (
     <CrudPageLayout
-      title='Project Management'
+      title="Project Management"
       toggleSort={toggleSort}
       loading={loading}
       error={error}
@@ -166,8 +171,8 @@ const ProjectsPage = () => {
       deleteDialog={
         <ConfirmDialog
           isOpen={isDeleteModalOpen}
-          title='Delete Project'
-          message='Are you sure you want to delete this project?'
+          title="Delete Project"
+          message="Are you sure you want to delete this project?"
           onClose={closeDeleteModal}
           onConfirm={handleDelete}
         />

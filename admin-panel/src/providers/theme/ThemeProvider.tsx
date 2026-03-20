@@ -19,7 +19,7 @@ export const ThemeProvider = ({ children }: ProviderProps) => {
   useEffect(() => {
     document.documentElement.setAttribute(
       "data-bs-theme",
-      isDarkMode ? "dark" : "light"
+      isDarkMode ? "dark" : "light",
     );
 
     if (isDarkMode) {
