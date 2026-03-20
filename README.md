@@ -9,6 +9,25 @@
 [![GitHub_Actions](https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/features/actions)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-client%20generation-6BA539?style=for-the-badge&logo=openapiinitiative&logoColor=white)](https://www.openapis.org/)
 
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <h2>Admin Panel Screenshots</h2>
+        <p>
+          This link opens a public album with screenshots of the admin panel so you can quickly review the interface and overall flow.
+        </p>
+        <p>
+          <a href="https://admin.nzhussup.com/public/albums/f5c727a5-32d3-4587-aa9b-2fa23bd3a44f"><strong>Open the public screenshot album</strong></a>
+        </p>
+        <p>
+          Want to see how it is implemented? Browse the screenshots first, then use this README to understand the project structure, runtime setup, and local development commands.
+        </p>
+      </td>
+    </tr>
+  </table>
+</div>
+
 ## Overview
 
 This repository contains the web-based administration interface for managing the content behind `nzhussup.dev`. It is intended for authenticated internal use and provides a single place to create, update, organize, and remove structured data that is later consumed by the public-facing website and related services.
