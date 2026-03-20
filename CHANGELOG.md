@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.5.0...v3.6.0) (2026-03-20)
+
+
+### Features
+
+* add new envvars to build ([3b70069](https://github.com/nzhussup/admin-panel-personal-website/commit/3b70069837a03d47f9dd657d09f99a5959aa8a75))
+* integrate keycloak login page ([88cc1aa](https://github.com/nzhussup/admin-panel-personal-website/commit/88cc1aa6b4cd120756723330775ee6c0360f48a8))
+
+
+### Bug Fixes
+
+* accessing envvar ([c4ae35f](https://github.com/nzhussup/admin-panel-personal-website/commit/c4ae35fc9efdbc7bdb10cd5a20d89b349f31c732))
+* add envvar ([45b683f](https://github.com/nzhussup/admin-panel-personal-website/commit/45b683fe695b4858c4696fdf423010fb8ce60edc))
+* auth process for admins and users ([64632be](https://github.com/nzhussup/admin-panel-personal-website/commit/64632be54a715fbee7c5250934b27f61f00b269e))
+* cleanup auth providers and protected routes ([eb4137d](https://github.com/nzhussup/admin-panel-personal-website/commit/eb4137d08509c17544b22bdee2262a362772f496))
+* replace url ([c7c5eb5](https://github.com/nzhussup/admin-panel-personal-website/commit/c7c5eb562ea29bfd3d4b1ac9498d5931be95ba07))
+
 ## [3.5.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.4.0...v3.5.0) (2026-03-19)
 
 
