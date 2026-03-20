@@ -1,13 +1,19 @@
 import Header from "@/components/layout/Header";
 
-const UnauthorizedPage = () => {
+interface UnauthorizedPageProps {
+  showHeader?: boolean;
+}
+
+const UnauthorizedPage = ({ showHeader = true }: UnauthorizedPageProps) => {
   return (
     <>
-      <Header
-        text='Unauthorized'
-        showClearCacheButton={false}
-        authActionLabel='Login'
-      />
+      {showHeader ? (
+        <Header
+          text='Unauthorized'
+          showClearCacheButton={false}
+          authActionLabel='Login'
+        />
+      ) : null}
       <div className='container my-5'>
         <div style={{ textAlign: "center", marginTop: "50px" }}>
           <h1>403 - Unauthorized</h1>

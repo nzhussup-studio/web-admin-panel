@@ -38,7 +38,7 @@ const PageState = ({
     const normalizedError = error as { status?: number; response?: string };
 
     if (normalizedError.status === 401) {
-      return <UnauthorizedPage />;
+      return <UnauthorizedPage showHeader={false} />;
     }
 
     if (normalizedError.status === 404) {

@@ -11,7 +11,8 @@ jest.mock("@/components/states/LoadingState", () => ({
 }));
 jest.mock("@/pages/errors/UnauthorizedPage", () => ({
   __esModule: true,
-  default: () => mockCreateElement("div", null, "Unauthorized page"),
+  default: ({ showHeader }: { showHeader?: boolean }) =>
+    mockCreateElement("div", null, `Unauthorized page ${String(showHeader)}`),
 }));
 
 describe("components/pages/PageState.tsx", () => {
@@ -38,6 +39,7 @@ describe("components/pages/PageState.tsx", () => {
       })
     );
     expect(screen.getByText("Unauthorized page")).toBeInTheDocument();
+    expect(screen.getByText("Unauthorized page false")).toBeInTheDocument();
 
     rerender(
       mockCreateElement(PageState, {

@@ -23,7 +23,7 @@ jest.mock("@/components/layout/Header", () => ({
 }));
 
 describe("pages/errors/UnauthorizedPage.tsx", () => {
-  test("renders the unauthorized copy", () => {
+  test("renders the unauthorized copy with header by default", () => {
     render(React.createElement(UnauthorizedPage));
 
     expect(
@@ -33,5 +33,14 @@ describe("pages/errors/UnauthorizedPage.tsx", () => {
     expect(
       screen.getByText("Your account does not have administrator access to this panel.")
     ).toBeInTheDocument();
+  });
+
+  test("can render without the standalone header", () => {
+    render(React.createElement(UnauthorizedPage, { showHeader: false }));
+
+    expect(
+      screen.queryByText("Header: Unauthorized | Login | false")
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("403 - Unauthorized")).toBeInTheDocument();
   });
 });
