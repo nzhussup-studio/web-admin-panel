@@ -2,11 +2,18 @@
   position: relative;
   overflow: hidden;
   border: 1px solid var(--app-border) !important;
-  background: linear-gradient(180deg, var(--app-surface-strong), var(--app-surface));
+  background: linear-gradient(
+    180deg,
+    var(--app-surface-strong),
+    var(--app-surface)
+  );
   box-shadow: var(--app-shadow);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
 }
 
 .app-interactive-card::before {
@@ -14,7 +21,11 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at top right, rgba(13, 110, 253, 0.14), transparent 30%),
+    radial-gradient(
+      circle at top right,
+      rgba(13, 110, 253, 0.14),
+      transparent 30%
+    ),
     linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 45%);
   opacity: 0.9;
   pointer-events: none;
@@ -60,7 +71,11 @@
 
 .app-image-frame {
   border: 1px solid var(--app-border);
-  background: linear-gradient(180deg, var(--app-surface-strong), var(--app-surface));
+  background: linear-gradient(
+    180deg,
+    var(--app-surface-strong),
+    var(--app-surface)
+  );
   box-shadow: var(--app-shadow);
 }
 
@@ -76,7 +91,11 @@
 .app-login-card {
   border: 1px solid var(--app-border);
   border-radius: 1.5rem;
-  background: linear-gradient(160deg, var(--app-surface-strong), var(--app-surface));
+  background: linear-gradient(
+    160deg,
+    var(--app-surface-strong),
+    var(--app-surface)
+  );
   box-shadow: var(--app-shadow-hover);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -112,7 +131,11 @@
   height: 2rem;
   padding: 0.2rem;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(255, 193, 7, 0.18), rgba(13, 110, 253, 0.18));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 193, 7, 0.18),
+    rgba(13, 110, 253, 0.18)
+  );
   border: 1px solid rgba(13, 110, 253, 0.14);
 }
 
@@ -137,7 +160,10 @@
   background: linear-gradient(135deg, #ffffff, #eef4ff);
   color: #0d6efd;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
-  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), background 0.24s ease, color 0.24s ease;
+  transition:
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.24s ease,
+    color 0.24s ease;
 }
 
 .app-theme-toggle-thumb.is-dark {
@@ -178,7 +204,9 @@
 .app-alert-toast .btn-close {
   margin-top: 0.125rem;
   opacity: 0.8;
-  transition: opacity 0.18s ease, transform 0.18s ease;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }
 
 .app-alert-toast .btn-close:hover,

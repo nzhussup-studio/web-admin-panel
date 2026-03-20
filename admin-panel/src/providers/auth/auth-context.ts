@@ -2,5 +2,5 @@ import { createContext } from "react";
 import type { AuthContextValue } from "@/types/common";
 
 export const AuthContext = createContext<AuthContextValue | undefined>(
-  undefined
+  undefined,
 );

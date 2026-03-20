@@ -151,42 +151,41 @@ const renderItemLabel = (
   const metadata = getMetadataEntries(item);
 
   return (
-    <div className='d-block w-100'>
-      <div className='d-flex flex-column gap-2 w-100 pe-5'>
+    <div className="d-block w-100">
+      <div className="d-flex flex-column gap-2 w-100 pe-5">
         <Badge
           bg={isChecked ? "primary" : "secondary"}
           pill
-          className='position-absolute top-0 end-0 mt-2 me-3'
+          className="position-absolute top-0 end-0 mt-2 me-3"
         >
           {isChecked ? "Selected" : "Available"}
         </Badge>
 
-        <div className='d-flex align-items-start gap-3 w-100'>
-          <div className='pe-2 flex-grow-1 min-w-0'>
-            <div className='fw-semibold'>{title}</div>
+        <div className="d-flex align-items-start gap-3 w-100">
+          <div className="pe-2 flex-grow-1 min-w-0">
+            <div className="fw-semibold">{title}</div>
             {subtitle ? (
-              <div className='text-body-secondary small mt-1'>{subtitle}</div>
+              <div className="text-body-secondary small mt-1">{subtitle}</div>
             ) : null}
           </div>
         </div>
 
         {metadata.length > 0 ? (
-          <div className='d-flex flex-wrap gap-2'>
+          <div className="d-flex flex-wrap gap-2">
             {metadata.map((entry) => (
               <Badge
                 key={entry.label}
-                bg='secondary'
-                className='fw-normal px-2 py-1 text-wrap'
+                bg="secondary"
+                className="fw-normal px-2 py-1 text-wrap"
               >
-                <span className='opacity-75'>{entry.label}:</span>{" "}
-                {entry.value}
+                <span className="opacity-75">{entry.label}:</span> {entry.value}
               </Badge>
             ))}
           </div>
         ) : null}
 
         {description ? (
-          <div className='small text-body-secondary'>{description}</div>
+          <div className="small text-body-secondary">{description}</div>
         ) : null}
       </div>
     </div>
@@ -355,22 +354,22 @@ const CvGeneratorPage = () => {
   };
   const generatorPage = (
     <div>
-      <Card className='rounded-4 app-interactive-card mt-4'>
-        <Card.Body className='p-4 app-card-body'>
-          <Card.Title className='fw-semibold mb-4 app-card-title'>
+      <Card className="rounded-4 app-interactive-card mt-4">
+        <Card.Body className="p-4 app-card-body">
+          <Card.Title className="fw-semibold mb-4 app-card-title">
             Basic Information
           </Card.Title>
           <Form onSubmit={(e) => e.preventDefault()}>
-            <Row className='g-3'>
+            <Row className="g-3">
               {Object.entries(basicInfo).map(([key, value]) => (
                 <Col key={key} md={key === "about" ? 12 : 6}>
                   <Form.Group controlId={`basic-info-${key}`}>
-                    <Form.Label className='text-capitalize fw-semibold'>
+                    <Form.Label className="text-capitalize fw-semibold">
                       {key.replace(/_/g, " ")}
                     </Form.Label>
                     {key === "about" ? (
                       <Form.Control
-                        as='textarea'
+                        as="textarea"
                         rows={4}
                         value={String(value ?? "")}
                         onChange={(e) =>
@@ -382,7 +381,7 @@ const CvGeneratorPage = () => {
                       />
                     ) : (
                       <Form.Control
-                        type='text'
+                        type="text"
                         value={String(value ?? "")}
                         onChange={(e) =>
                           setBasicInfo((prev) => ({
@@ -421,22 +420,22 @@ const CvGeneratorPage = () => {
         };
 
         return (
-          <Card key={index} className='rounded-4 app-interactive-card mt-4'>
-            <Card.Body className='p-4 app-card-body'>
-              <div className='d-flex justify-content-between align-items-center gap-3 mb-3'>
+          <Card key={index} className="rounded-4 app-interactive-card mt-4">
+            <Card.Body className="p-4 app-card-body">
+              <div className="d-flex justify-content-between align-items-center gap-3 mb-3">
                 <div>
-                  <Card.Title className='mb-1 text-capitalize fw-semibold app-card-title'>
+                  <Card.Title className="mb-1 text-capitalize fw-semibold app-card-title">
                     {sectionName.replace(/_/g, " ")}
                   </Card.Title>
-                  <div className='text-body-secondary small'>
+                  <div className="text-body-secondary small">
                     {selectedItems[sectionName]?.size || 0} selected
                   </div>
                 </div>
                 <Button
                   onClick={handleToggleAll}
-                  type='button'
-                  variant='outline-secondary'
-                  size='sm'
+                  type="button"
+                  variant="outline-secondary"
+                  size="sm"
                 >
                   {allSelected ? "Deselect All" : "Select All"}
                 </Button>
@@ -450,7 +449,7 @@ const CvGeneratorPage = () => {
                   return (
                     <Form.Check
                       key={itemId}
-                      type='checkbox'
+                      type="checkbox"
                       className={`position-relative rounded-4 border px-3 py-2 mb-2 shadow-sm ${
                         isChecked
                           ? "bg-primary-subtle border-primary-subtle"
@@ -463,7 +462,7 @@ const CvGeneratorPage = () => {
                   );
                 })
               ) : (
-                <div className='text-secondary'>No items</div>
+                <div className="text-secondary">No items</div>
               )}
             </Card.Body>
           </Card>
@@ -479,26 +478,26 @@ const CvGeneratorPage = () => {
         message={alertMessage}
         show={alertVisible}
         onClose={() => setAlertVisible(false)}
-        type='danger'
+        type="danger"
       />
-      <Container className='my-5'>
+      <Container className="my-5">
         <Stack
-          direction='horizontal'
+          direction="horizontal"
           gap={3}
-          className='align-items-center justify-content-between flex-wrap mb-4'
+          className="align-items-center justify-content-between flex-wrap mb-4"
         >
           <Button
-            variant='outline-secondary'
-            className='d-inline-flex align-items-center gap-2'
+            variant="outline-secondary"
+            className="d-inline-flex align-items-center gap-2"
             onClick={() => navigate(-1)}
           >
             <BackCircleIcon width={16} height={16} />
             Back
           </Button>
-          <div className='d-flex align-items-center gap-2 flex-wrap ms-auto'>
+          <div className="d-flex align-items-center gap-2 flex-wrap ms-auto">
             <Button
-              variant='outline-primary'
-              className='d-inline-flex align-items-center gap-2'
+              variant="outline-primary"
+              className="d-inline-flex align-items-center gap-2"
               onClick={toggleSort}
             >
               <FunnelIcon width={16} height={16} />
@@ -506,16 +505,16 @@ const CvGeneratorPage = () => {
             </Button>
             <ButtonGroup>
               <Button
-                variant='outline-primary'
-                className='d-inline-flex align-items-center gap-2'
+                variant="outline-primary"
+                className="d-inline-flex align-items-center gap-2"
                 onClick={() => handleGenerateCV("pdf")}
               >
                 <DownloadIcon width={16} height={16} />
                 Export to PDF
               </Button>
               <Button
-                variant='primary'
-                className='d-inline-flex align-items-center gap-2'
+                variant="primary"
+                className="d-inline-flex align-items-center gap-2"
                 onClick={() => handleGenerateCV("word")}
               >
                 <DownloadIcon width={16} height={16} />

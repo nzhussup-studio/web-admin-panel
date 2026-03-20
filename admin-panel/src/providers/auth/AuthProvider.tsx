@@ -22,9 +22,9 @@ const initialState: AuthState = {
 
 const getRoles = () => {
   const realmRoles = keycloak.tokenParsed?.realm_access?.roles ?? [];
-  const clientRoles = Object.values(keycloak.tokenParsed?.resource_access ?? {}).flatMap(
-    (access) => access.roles ?? []
-  );
+  const clientRoles = Object.values(
+    keycloak.tokenParsed?.resource_access ?? {},
+  ).flatMap((access) => access.roles ?? []);
 
   return Array.from(new Set([...realmRoles, ...clientRoles]));
 };
@@ -81,9 +81,12 @@ export const AuthProvider = ({ children }: ProviderProps) => {
           setState({ ...initialState, loading: false });
         };
         keycloak.onTokenExpired = () => {
-          void keycloak.updateToken(30).then(syncState).catch(() => {
-            void keycloak.login(buildLoginOptions());
-          });
+          void keycloak
+            .updateToken(30)
+            .then(syncState)
+            .catch(() => {
+              void keycloak.login(buildLoginOptions());
+            });
         };
 
         if (!getKeycloakInitPromise()) {
@@ -92,7 +95,7 @@ export const AuthProvider = ({ children }: ProviderProps) => {
               onLoad: "login-required",
               pkceMethod: "S256",
               checkLoginIframe: false,
-            })
+            }),
           );
         }
 

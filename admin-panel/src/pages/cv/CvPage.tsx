@@ -23,8 +23,7 @@ const cvSections = [
   },
   {
     title: "Skills",
-    description:
-      "Group and order your skill sets for export and display.",
+    description: "Group and order your skill sets for export and display.",
     path: "/cv/skills",
   },
   {
@@ -40,25 +39,27 @@ const CvPage = () => {
   return (
     <>
       <Header text={"CV Management"} />
-      <Container className='my-5'>
+      <Container className="my-5">
         <Button
-          variant='outline-secondary'
-          className='d-inline-flex align-items-center gap-2 mb-4'
+          variant="outline-secondary"
+          className="d-inline-flex align-items-center gap-2 mb-4"
           onClick={() => navigate(-1)}
         >
           <BackCircleIcon width={16} height={16} />
           Back
         </Button>
-        <Row xs={1} md={2} className='g-4'>
+        <Row xs={1} md={2} className="g-4">
           {cvSections.map((section) => (
             <Col key={section.path}>
               <Card
-                className='h-100 rounded-4 app-interactive-card app-navigation-card'
+                className="h-100 rounded-4 app-interactive-card app-navigation-card"
                 onClick={() => navigate(section.path)}
               >
-                <Card.Body className='d-flex flex-column p-4 app-card-body'>
-                  <Card.Title className='fw-semibold app-card-title'>{section.title}</Card.Title>
-                  <Card.Text className='text-secondary flex-grow-1'>
+                <Card.Body className="d-flex flex-column p-4 app-card-body">
+                  <Card.Title className="fw-semibold app-card-title">
+                    {section.title}
+                  </Card.Title>
+                  <Card.Text className="text-secondary flex-grow-1">
                     {section.description}
                   </Card.Text>
                 </Card.Body>

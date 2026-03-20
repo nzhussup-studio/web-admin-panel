@@ -47,9 +47,9 @@ const PageState = ({
     }
 
     return (
-      <div className='py-5 text-center'>
-        <h1 className='display-6 mb-3'>500 - Internal Server Error</h1>
-        <p className='text-secondary mb-0'>
+      <div className="py-5 text-center">
+        <h1 className="display-6 mb-3">500 - Internal Server Error</h1>
+        <p className="text-secondary mb-0">
           {normalizedError.response || "Something went wrong."}
         </p>
       </div>
@@ -58,8 +58,8 @@ const PageState = ({
 
   if (isEmpty && showEmptyState) {
     return (
-      <div className='py-5 text-center'>
-        <h1 className='h3 mb-0'>No information found.</h1>
+      <div className="py-5 text-center">
+        <h1 className="h3 mb-0">No information found.</h1>
       </div>
     );
   }

@@ -85,43 +85,43 @@ const Header = ({
   };
 
   return (
-    <Navbar bg='body' expand='md' className='py-3 mb-4 app-header-shell'>
+    <Navbar bg="body" expand="md" className="py-3 mb-4 app-header-shell">
       <Container>
-        <Row className='w-100 align-items-center gy-3'>
+        <Row className="w-100 align-items-center gy-3">
           <Col
             xs={12}
             md={4}
-            className='d-flex justify-content-center justify-content-md-start'
+            className="d-flex justify-content-center justify-content-md-start"
           >
             <Navbar.Brand
-              href='/'
-              className='d-inline-flex align-items-center mb-0'
+              href="/"
+              className="d-inline-flex align-items-center mb-0"
               onClick={handleLogoClick}
             >
-              <span className='visually-hidden'>Home</span>
+              <span className="visually-hidden">Home</span>
               <CodeSlashIcon width={40} height={40} />
             </Navbar.Brand>
           </Col>
 
-          <Col xs={12} md={4} className='text-center'>
+          <Col xs={12} md={4} className="text-center">
             {titleContent ? (
-              <div className='d-flex justify-content-center text-body'>
+              <div className="d-flex justify-content-center text-body">
                 {titleContent}
               </div>
             ) : (
-              <Navbar.Text className='fw-semibold fs-4 text-body m-0 d-block'>
+              <Navbar.Text className="fw-semibold fs-4 text-body m-0 d-block">
                 {text}
               </Navbar.Text>
             )}
           </Col>
 
           <Col xs={12} md={4}>
-            <div className='d-flex flex-wrap align-items-center justify-content-center justify-content-md-end gap-2'>
+            <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-end gap-2">
               {showClearCacheButton && (
                 <Button
-                  type='button'
-                  variant='link'
-                  className='app-icon-action app-icon-action-danger'
+                  type="button"
+                  variant="link"
+                  className="app-icon-action app-icon-action-danger"
                   onClick={() =>
                     setConfirmDialog({
                       title: "Clear Cache",
@@ -131,28 +131,28 @@ const Header = ({
                       onConfirm: onClearCache,
                     })
                   }
-                  data-testid='clear-cache-button'
-                  aria-label='Clear cache'
+                  data-testid="clear-cache-button"
+                  aria-label="Clear cache"
                 >
                   <DatabaseZapIcon width={25} height={25} />
                 </Button>
               )}
               <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleDarkMode} />
               <Button
-                type='button'
-                variant='link'
-                className='app-profile-action'
+                type="button"
+                variant="link"
+                className="app-profile-action"
                 onClick={handleProfileClick}
-                aria-label='Profile'
+                aria-label="Profile"
               >
                 {extractInitialsFromState(state)}
               </Button>
               <Button
-                type='button'
-                variant='link'
-                className='app-icon-action'
+                type="button"
+                variant="link"
+                className="app-icon-action"
                 onClick={handleAuthAction}
-                aria-label='Logout'
+                aria-label="Logout"
               >
                 <LogoutIcon width={25} height={25} />
               </Button>

@@ -8,7 +8,7 @@ export interface NormalizedApiError {
 
 export const getApiErrorMessage = (
   error: unknown,
-  prefix = "Request failed"
+  prefix = "Request failed",
 ) => {
   const normalizedError = normalizeApiError(error);
   return `${prefix}: ${normalizedError.response}`;

@@ -1,5 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom";
-import React, { useCallback, useEffect, useState, type ChangeEvent } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+  type ChangeEvent,
+} from "react";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Container from "react-bootstrap/Container";
@@ -52,14 +57,17 @@ const AlbumPage = () => {
         fetchedAlbum.images = [...fetchedAlbum.images].sort((a, b) =>
           isAscending
             ? String(a.id || "").localeCompare(String(b.id || ""))
-            : String(b.id || "").localeCompare(String(a.id || ""))
+            : String(b.id || "").localeCompare(String(a.id || "")),
         );
       }
       setAlbum(fetchedAlbum);
     } catch (fetchError) {
       const normalizedError = normalizeApiError(fetchError);
       setError(normalizedError);
-      triggerAlert(getApiErrorMessage(fetchError, "Failed to load album"), "danger");
+      triggerAlert(
+        getApiErrorMessage(fetchError, "Failed to load album"),
+        "danger",
+      );
     } finally {
       setShowLoading(false);
     }
@@ -113,7 +121,10 @@ const AlbumPage = () => {
       await fetchItem();
       closePopup();
     } catch (saveError) {
-      triggerAlert(getApiErrorMessage(saveError, "Failed to upload image"), "danger");
+      triggerAlert(
+        getApiErrorMessage(saveError, "Failed to upload image"),
+        "danger",
+      );
     }
   };
 
@@ -123,20 +134,20 @@ const AlbumPage = () => {
       title={isEditMode ? "Edit Image" : "Add Image"}
       onSubmit={saveImage}
     >
-      <Form.Group className='mb-4'>
+      <Form.Group className="mb-4">
         <Form.Label>Upload Images</Form.Label>
         <Form.Control
-          type='file'
-          accept='image/*'
+          type="file"
+          accept="image/*"
           multiple
           onChange={handleFileInputChange}
           required
-          aria-label='Choose files'
+          aria-label="Choose files"
         />
       </Form.Group>
 
       {(formData.file || []).length > 0 ? (
-        <div className='d-flex flex-wrap gap-2 mt-3'>
+        <div className="d-flex flex-wrap gap-2 mt-3">
           {(formData.file || []).map((image, index) => (
             <div
               key={index}
@@ -158,11 +169,11 @@ const AlbumPage = () => {
                 }}
               />
               <Button
-                type='button'
+                type="button"
                 onClick={() => removeImagePreview(index)}
-                aria-label='Remove image'
-                variant='danger'
-                size='sm'
+                aria-label="Remove image"
+                variant="danger"
+                size="sm"
                 style={{
                   position: "absolute",
                   top: "-6px",
@@ -193,31 +204,36 @@ const AlbumPage = () => {
           await ImageService.patchV1AlbumRename(
             id,
             String(formData.id),
-            String(formData.newId)
+            String(formData.newId),
           );
           triggerAlert(
             `Successfully changed id to ${formData.newId}`,
-            "success"
+            "success",
           );
           closePopup();
         } catch (err) {
-          triggerAlert(getApiErrorMessage(err, "Failed to rename image"), "danger");
+          triggerAlert(
+            getApiErrorMessage(err, "Failed to rename image"),
+            "danger",
+          );
         } finally {
           await fetchItem();
         }
       }}
     >
       {formData.id}
-      <Form.Group className='mt-3'>
+      <Form.Group className="mt-3">
         <Form.Label>New Image ID</Form.Label>
         <InputGroup>
           <Form.Control
             value={formData.newId ?? ""}
-            onChange={(e) => setFormData({ ...formData, newId: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, newId: e.target.value })
+            }
             required
           />
           <Button
-            variant='outline-secondary'
+            variant="outline-secondary"
             onClick={() => setFormData({ ...formData, newId: "" })}
             disabled={!formData.newId}
           >
@@ -243,7 +259,10 @@ const AlbumPage = () => {
     } catch (deleteError) {
       const normalizedError = normalizeApiError(deleteError);
       setError(normalizedError);
-      triggerAlert(getApiErrorMessage(deleteError, "Failed to delete image"), "danger");
+      triggerAlert(
+        getApiErrorMessage(deleteError, "Failed to delete image"),
+        "danger",
+      );
     }
   };
 
@@ -252,9 +271,9 @@ const AlbumPage = () => {
   };
 
   const albumImagesSection = (
-    <div className='row row-cols-2 row-cols-sm-2 row-cols-md-3 g-4'>
+    <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-4">
       {album?.images?.map((image) => (
-        <div key={image.id} className='col'>
+        <div key={image.id} className="col">
           <FramedImageCard
             imageUrl={`${config.apiBase}${image?.url || ""}`}
             alt={image?.id}
@@ -272,31 +291,31 @@ const AlbumPage = () => {
     <>
       <Header text={album ? "Album " + album.title : "Album"} />
 
-      <Container className='my-5'>
+      <Container className="my-5">
         <Stack
-          direction='horizontal'
+          direction="horizontal"
           gap={3}
-          className='align-items-center justify-content-between flex-wrap mb-4'
+          className="align-items-center justify-content-between flex-wrap mb-4"
         >
           <Button
-            variant='outline-secondary'
-            className='d-inline-flex align-items-center gap-2'
+            variant="outline-secondary"
+            className="d-inline-flex align-items-center gap-2"
             onClick={() => navigate(-1)}
           >
             <BackCircleIcon width={16} height={16} />
             Back
           </Button>
-          <ButtonGroup className='ms-auto'>
+          <ButtonGroup className="ms-auto">
             <Button
-              variant='outline-primary'
-              className='d-inline-flex align-items-center gap-2'
+              variant="outline-primary"
+              className="d-inline-flex align-items-center gap-2"
               onClick={toggleSort}
             >
               <FunnelIcon width={16} height={16} />
               Sort
             </Button>
             {!error && !showPopup ? (
-              <Button variant='primary' onClick={() => openPopup()}>
+              <Button variant="primary" onClick={() => openPopup()}>
                 Add Image
               </Button>
             ) : null}
@@ -313,8 +332,8 @@ const AlbumPage = () => {
 
       <ConfirmDialog
         isOpen={isDeleteModalOpen}
-        title='Delete Image'
-        message='Are you sure you want to delete this image?'
+        title="Delete Image"
+        message="Are you sure you want to delete this image?"
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleDelete}
       />

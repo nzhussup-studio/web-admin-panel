@@ -3,8 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type image_service_model_SuccessResponse = {
-    data?: any;
-    message?: string;
-    status?: number;
+  data?: any;
+  message?: string;
+  status?: number;
 };
-

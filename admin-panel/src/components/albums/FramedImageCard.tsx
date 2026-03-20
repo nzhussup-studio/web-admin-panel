@@ -45,7 +45,7 @@ const FramedImageCard = ({
   return (
     <>
       <div
-        data-testid='image-frame'
+        data-testid="image-frame"
         className={`position-relative rounded-3 overflow-hidden image-frame app-image-frame ${
           isDarkMode ? "dark-mode" : ""
         }`}
@@ -60,14 +60,14 @@ const FramedImageCard = ({
         }}
       >
         <div
-          className='position-absolute top-0 start-0 w-100 h-100'
+          className="position-absolute top-0 start-0 w-100 h-100"
           style={{ overflow: "hidden", borderRadius: "12px" }}
         >
           <img
             src={imageUrl}
             alt={alt || "Framed image"}
-            className='w-100 h-100 object-fit-cover image-frame-img app-image-frame-img'
-            loading='lazy'
+            className="w-100 h-100 object-fit-cover image-frame-img app-image-frame-img"
+            loading="lazy"
             style={{
               transition: "transform 0.3s ease, filter 0.3s ease",
             }}
@@ -79,8 +79,8 @@ const FramedImageCard = ({
               e.stopPropagation();
               onDelete?.();
             }}
-            aria-label='Delete image'
-            variant='danger'
+            aria-label="Delete image"
+            variant="danger"
             style={{
               position: "absolute",
               top: "8px",
@@ -106,9 +106,9 @@ const FramedImageCard = ({
               e.stopPropagation();
               onEdit?.();
             }}
-            aria-label='Edit image'
-            variant='success'
-            size='sm'
+            aria-label="Edit image"
+            variant="success"
+            size="sm"
             style={{
               position: "absolute",
               top: "8px",
@@ -130,7 +130,7 @@ const FramedImageCard = ({
 
           {imageId && (
             <Badge
-              bg='dark'
+              bg="dark"
               style={{
                 position: "absolute",
                 bottom: "8px",

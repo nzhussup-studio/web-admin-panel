@@ -22,6 +22,32 @@ permissions:
   contents: read
 
 jobs:
+  quality:
+    name: Run Code Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: admin-panel/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+        working-directory: admin-panel
+
+      - name: Run ESLint
+        run: npm run lint
+        working-directory: admin-panel
+
+      - name: Run Prettier Check
+        run: npm run prettier-check
+        working-directory: admin-panel
   test:
     name: Run Web Admin Panel Tests
     runs-on: ubuntu-latest

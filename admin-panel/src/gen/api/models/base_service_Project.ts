@@ -3,10 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type base_service_Project = {
-    id?: number;
-    name?: string;
-    url?: string;
-    techStack?: string;
-    displayOrder?: number;
+  id?: number;
+  name?: string;
+  url?: string;
+  techStack?: string;
+  displayOrder?: number;
 };
-

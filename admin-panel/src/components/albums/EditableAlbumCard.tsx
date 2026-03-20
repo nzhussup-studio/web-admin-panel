@@ -49,72 +49,74 @@ const EditableAlbumCard = ({
       <div style={{ width: "100%", height: "180px", overflow: "hidden" }}>
         {album.preview_image ? (
           <Card.Img
-            className='app-card-cover'
+            className="app-card-cover"
             src={album.preview_image}
             alt={album.title}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
           <div
-            className='d-flex align-items-center justify-content-center'
+            className="d-flex align-items-center justify-content-center"
             style={{
               width: "100%",
               height: "100%",
               backgroundColor: isDarkMode ? "#2c2c2c" : "#eaeaea",
             }}
           >
-            <ImagesIcon width={48} height={48} className='text-secondary' />
+            <ImagesIcon width={48} height={48} className="text-secondary" />
           </div>
         )}
       </div>
 
-      <Card.Body className='p-3 d-flex flex-column flex-grow-1 app-card-body'>
-        <Card.Title className='fw-semibold mb-1 app-card-title' style={{ fontSize: "1.1rem" }}>
+      <Card.Body className="p-3 d-flex flex-column flex-grow-1 app-card-body">
+        <Card.Title
+          className="fw-semibold mb-1 app-card-title"
+          style={{ fontSize: "1.1rem" }}
+        >
           {album.title}
         </Card.Title>
         <Card.Text
-          className='text-secondary small mb-2'
+          className="text-secondary small mb-2"
           style={{ opacity: 0.85, minHeight: "3em" }}
         >
           {album.description ? (
             album.description
           ) : (
-            <span className='text-muted'>No description</span>
+            <span className="text-muted">No description</span>
           )}
         </Card.Text>
-        <Card.Text className='text-muted small mt-auto'>
+        <Card.Text className="text-muted small mt-auto">
           📸 {album.images_count} images
         </Card.Text>
-        <div className='app-card-actions mt-3'>
+        <div className="app-card-actions mt-3">
           {onEdit ? (
             <Button
-              variant='outline-secondary'
-              size='sm'
+              variant="outline-secondary"
+              size="sm"
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit(album);
               }}
-              aria-label='Edit album'
+              aria-label="Edit album"
             >
               Edit
             </Button>
           ) : null}
           {onDelete ? (
             <Button
-              variant='outline-danger'
-              size='sm'
+              variant="outline-danger"
+              size="sm"
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(album);
               }}
-              aria-label='Delete album'
+              aria-label="Delete album"
             >
               Delete
             </Button>
           ) : null}
         </div>
       </Card.Body>
-
     </Card>
   );
 };

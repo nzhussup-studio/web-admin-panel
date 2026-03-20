@@ -15,9 +15,9 @@ const LlmConfigPage = () => {
     <>
       <Header text={"LLM Configuration"} />
 
-      <div className='container my-5'>
+      <div className="container my-5">
         <form
-          className='p-4 rounded shadow-sm border'
+          className="p-4 rounded shadow-sm border"
           onSubmit={handleSubmit}
           style={{
             backgroundColor: document.body.classList.contains("dark-mode")
@@ -28,17 +28,17 @@ const LlmConfigPage = () => {
               : "#000",
           }}
         >
-          <div className='mb-3'>
-            <label htmlFor='modelName' className='form-label'>
+          <div className="mb-3">
+            <label htmlFor="modelName" className="form-label">
               Model Name
             </label>
             <input
-              type='text'
-              id='modelName'
-              className='form-control'
+              type="text"
+              id="modelName"
+              className="form-control"
               value={modelName}
               onChange={(e) => setModelName(e.target.value)}
-              placeholder='Enter model name'
+              placeholder="Enter model name"
               style={{
                 backgroundColor: document.body.classList.contains("dark-mode")
                   ? "#000"
@@ -53,17 +53,17 @@ const LlmConfigPage = () => {
             />
           </div>
 
-          <div className='form-check mb-3'>
+          <div className="form-check mb-3">
             <input
-              type='checkbox'
-              id='enableBackgroundGen'
-              className='form-check-input'
+              type="checkbox"
+              id="enableBackgroundGen"
+              className="form-check-input"
               checked={enableBackgroundGen}
               onChange={(e) => setEnableBackgroundGen(e.target.checked)}
             />
             <label
-              htmlFor='enableBackgroundGen'
-              className='form-check-label'
+              htmlFor="enableBackgroundGen"
+              className="form-check-label"
               style={{
                 color: document.body.classList.contains("dark-mode")
                   ? "#fff"
@@ -74,7 +74,7 @@ const LlmConfigPage = () => {
             </label>
           </div>
 
-          <button type='submit' className='btn btn-primary'>
+          <button type="submit" className="btn btn-primary">
             Save Configuration
           </button>
         </form>

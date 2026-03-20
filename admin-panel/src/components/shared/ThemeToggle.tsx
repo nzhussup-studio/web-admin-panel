@@ -16,18 +16,18 @@ const ThemeToggle = ({
 
   return (
     <Button
-      type='button'
-      variant='light'
+      type="button"
+      variant="light"
       className={`app-theme-toggle ${className}`.trim()}
       onClick={onToggle}
       aria-label={`Activate ${nextModeLabel} mode`}
       aria-pressed={isDarkMode}
     >
-      <span className='app-theme-toggle-track' aria-hidden='true'>
-        <span className='app-theme-toggle-option'>
+      <span className="app-theme-toggle-track" aria-hidden="true">
+        <span className="app-theme-toggle-option">
           <BrightnessHighIcon width={14} height={14} />
         </span>
-        <span className='app-theme-toggle-option'>
+        <span className="app-theme-toggle-option">
           <MoonStarsIcon width={14} height={14} />
         </span>
         <span

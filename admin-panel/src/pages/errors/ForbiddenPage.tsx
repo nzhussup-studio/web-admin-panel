@@ -11,10 +11,12 @@ const ForbiddenPage = ({ showHeader = true }: ForbiddenPageProps) => {
       {showHeader ? (
         <Header
           showClearCacheButton={false}
-          titleContent={<ForbiddenIcon width={36} height={36} aria-label='Forbidden' />}
+          titleContent={
+            <ForbiddenIcon width={36} height={36} aria-label="Forbidden" />
+          }
         />
       ) : null}
-      <div className='container my-5'>
+      <div className="container my-5">
         <div style={{ textAlign: "center", marginTop: "50px" }}>
           <h1>403 - Forbidden</h1>
           <p>Your account does not have administrator access to this panel.</p>

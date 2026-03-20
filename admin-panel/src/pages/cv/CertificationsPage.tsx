@@ -30,15 +30,17 @@ const CertificationsPage = () => {
     handleDelete,
   } = useCrudPage<base_service_Certificate, base_service_Certificate, number>({
     loadItems: () => CertificateControllerService.listCertificate(),
-    createItem: (payload) => CertificateControllerService.createCertificate(payload),
-    updateItem: (payload) => CertificateControllerService.updateCertificate(payload),
+    createItem: (payload) =>
+      CertificateControllerService.createCertificate(payload),
+    updateItem: (payload) =>
+      CertificateControllerService.updateCertificate(payload),
     deleteItem: (id) => CertificateControllerService.deleteCertificate({ id }),
     getItemId: (item) => item.id ?? null,
     sortItems: (items, isAscending) =>
       items.sort((a, b) =>
         isAscending
           ? Number(a.displayOrder) - Number(b.displayOrder)
-          : Number(b.displayOrder) - Number(a.displayOrder)
+          : Number(b.displayOrder) - Number(a.displayOrder),
       ),
     toPayload: (data) =>
       ({
@@ -53,7 +55,7 @@ const CertificationsPage = () => {
       title={isEditMode ? "Edit Certificate" : "Add Certificate"}
       onSubmit={saveItem}
     >
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Certificate Name</Form.Label>
         <Form.Control
           value={formData.name ?? ""}
@@ -61,7 +63,7 @@ const CertificationsPage = () => {
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Certificate URL</Form.Label>
         <Form.Control
           value={formData.url ?? ""}
@@ -69,10 +71,10 @@ const CertificationsPage = () => {
           required
         />
       </Form.Group>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Label>Order Display</Form.Label>
         <Form.Control
-          type='number'
+          type="number"
           value={formData.displayOrder ?? ""}
           onChange={(e) =>
             setFormData({
@@ -87,41 +89,41 @@ const CertificationsPage = () => {
   );
 
   const certPage = (
-    <div className='d-grid gap-3'>
+    <div className="d-grid gap-3">
       {certificates.map((certificate) => (
         <Card
           key={certificate.id}
-          className='rounded-4 app-interactive-card app-resource-card'
+          className="rounded-4 app-interactive-card app-resource-card"
           onClick={() => openPopup(certificate)}
         >
-          <Card.Body className='p-4 app-card-body'>
-            <div className='d-flex justify-content-between align-items-start gap-3'>
+          <Card.Body className="p-4 app-card-body">
+            <div className="d-flex justify-content-between align-items-start gap-3">
               <div>
-                <Card.Title className='fw-semibold mb-3 app-card-title'>
+                <Card.Title className="fw-semibold mb-3 app-card-title">
                   {certificate.name}
                 </Card.Title>
-                <div className='d-flex flex-wrap align-items-center gap-3'>
+                <div className="d-flex flex-wrap align-items-center gap-3">
                   {certificate.url && (
                     <Button
-                      variant='link'
-                      className='p-0'
+                      variant="link"
+                      className="p-0"
                       href={certificate.url}
-                      target='_blank'
-                      rel='noopener noreferrer'
+                      target="_blank"
+                      rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
                     >
                       View Certificate
                     </Button>
                   )}
-                  <span className='text-secondary'>
+                  <span className="text-secondary">
                     Order: {certificate.displayOrder}
                   </span>
                 </div>
               </div>
-              <div className='app-card-actions'>
+              <div className="app-card-actions">
                 <Button
-                  variant='outline-danger'
-                  size='sm'
+                  variant="outline-danger"
+                  size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     confirmDelete(certificate.id ?? null);
@@ -139,7 +141,7 @@ const CertificationsPage = () => {
 
   return (
     <CrudPageLayout
-      title='Certifications'
+      title="Certifications"
       toggleSort={toggleSort}
       loading={loading}
       error={error}
@@ -150,8 +152,8 @@ const CertificationsPage = () => {
       deleteDialog={
         <ConfirmDialog
           isOpen={isDeleteModalOpen}
-          title='Delete Certificate'
-          message='Are you sure you want to delete this certificate?'
+          title="Delete Certificate"
+          message="Are you sure you want to delete this certificate?"
           onClose={closeDeleteModal}
           onConfirm={handleDelete}
         />
