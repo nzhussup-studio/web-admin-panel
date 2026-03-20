@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
 import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
-import { CacheService } from "@/lib/api/client";
+import { AccountService, CacheService } from "@/lib/api/client";
 
 const mockNavigate = jest.fn();
 const mockLogout = jest.fn();
@@ -21,6 +21,7 @@ jest.mock("@/hooks/auth/useAuth", () => ({ useAuth: jest.fn() }));
 jest.mock("@/hooks/theme/useDarkMode", () => ({ useDarkMode: jest.fn() }));
 jest.mock("@/hooks/alerts/useOptionalGlobalAlert", () => ({ useOptionalGlobalAlert: jest.fn() }));
 jest.mock("@/lib/api/client", () => ({
+  AccountService: { deleteV1Account: jest.fn() },
   CacheService: { deleteV1AlbumCache: jest.fn() },
 }));
 jest.mock("@/components/shared/ThemeToggle", () => ({
@@ -80,6 +81,7 @@ describe("components/layout/Header.tsx", () => {
     (useOptionalGlobalAlert as jest.Mock).mockReturnValue({
       triggerAlert: mockTriggerAlert,
     });
+    (AccountService.deleteV1Account as jest.Mock).mockResolvedValue(undefined);
     (CacheService.deleteV1AlbumCache as jest.Mock).mockResolvedValue(undefined);
   });
 
@@ -157,6 +159,26 @@ describe("components/layout/Header.tsx", () => {
     expect(mockTriggerAlert).toHaveBeenCalledWith(
       "Cache cleared successfully",
       "success"
+    );
+  });
+
+  test("deletes the current account and logs out after confirmation", async () => {
+    render(mockCreateElement(Header, { text: "Admin Dashboard" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete account" }));
+    expect(
+      screen.getByText(
+        "Are you sure you want to permanently delete your account? This action cannot be undone."
+      )
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Confirm"));
+
+    await waitFor(() =>
+      expect(AccountService.deleteV1Account).toHaveBeenCalled()
+    );
+    await waitFor(() =>
+      expect(mockLogout).toHaveBeenCalledWith(window.location.origin)
     );
   });
 });

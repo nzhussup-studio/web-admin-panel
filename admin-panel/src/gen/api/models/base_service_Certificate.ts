@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type base_service_Certificate = {
-  id?: number;
-  name?: string;
-  url?: string;
-  displayOrder?: number;
+    id?: number;
+    name?: string;
+    url?: string;
+    displayOrder?: number;
 };
+

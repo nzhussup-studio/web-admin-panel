@@ -12,13 +12,16 @@ jest.mock("@/lib/auth/keycloak", () => ({
     token: undefined,
     tokenParsed: undefined,
     onAuthSuccess: undefined,
+    onAuthError: undefined,
     onAuthRefreshSuccess: undefined,
+    onAuthRefreshError: undefined,
     onAuthLogout: undefined,
     onTokenExpired: undefined,
     init: jest.fn(),
     login: jest.fn().mockResolvedValue(undefined),
     logout: jest.fn().mockResolvedValue(undefined),
     updateToken: jest.fn().mockResolvedValue(true),
+    clearToken: jest.fn(),
   },
 }));
 
@@ -71,6 +74,8 @@ describe("providers/auth/AuthProvider.tsx", () => {
     mockKeycloak.login.mockResolvedValue(undefined);
     mockKeycloak.logout.mockResolvedValue(undefined);
     mockKeycloak.updateToken.mockResolvedValue(true);
+    mockKeycloak.clearToken.mockImplementation(() => undefined);
+    window.sessionStorage.clear();
     window.history.pushState({}, "", "/projects");
   });
 
@@ -217,5 +222,35 @@ describe("providers/auth/AuthProvider.tsx", () => {
     expect(mockKeycloak.login).toHaveBeenCalledWith({
       redirectUri: window.location.href,
     });
+  });
+
+  test("clears stale callback state and retries login when init fails", async () => {
+    window.localStorage.setItem(
+      "kc-callback-stale",
+      JSON.stringify({ state: "stale", expires: Date.now() + 60_000 }),
+    );
+    window.history.pushState(
+      {},
+      "",
+      "/projects?code=test-code&state=test-state&session_state=test-session",
+    );
+    mockKeycloak.init.mockRejectedValue(new Error("broken callback state"));
+
+    render(
+      React.createElement(AuthProvider, null, React.createElement(Consumer)),
+    );
+
+    await waitFor(() => expect(mockKeycloak.clearToken).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(mockKeycloak.login).toHaveBeenCalledWith({
+        redirectUri: "http://localhost/projects",
+        prompt: "login",
+      }),
+    );
+    expect(window.localStorage.getItem("kc-callback-stale")).toBeNull();
+    expect(window.location.search).toBe("");
+    expect(window.sessionStorage.getItem("kc-auth-recovery-attempted")).toBe(
+      "true",
+    );
   });
 });

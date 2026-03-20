@@ -11,6 +11,7 @@ import {
   SearchX,
   SunMedium,
   LogOut,
+  Trash2,
 } from "lucide-react";
 
 type IconProps = SVGProps<SVGSVGElement>;
@@ -40,3 +41,5 @@ export const BrightnessHighIcon = (props: IconProps) => (
 );
 
 export const LogoutIcon = (props: IconProps) => <LogOut {...props} />;
+
+export const TrashIcon = (props: IconProps) => <Trash2 {...props} />;

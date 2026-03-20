@@ -2,22 +2,24 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { image_service_model_SuccessResponse } from '../models/image_service_model_SuccessResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-export class CacheService {
+export class AccountService {
     /**
-     * Clear the image cache
-     * This endpoint clears the server-side cache for images.
-     * @returns image_service_model_SuccessResponse Cache cleared successfully
+     * Delete the currently authenticated account
+     * Logs out and deletes the current Keycloak user identified by the bearer token subject.
+     * @returns void
      * @throws ApiError
      */
-    public static deleteV1AlbumCache(): CancelablePromise<image_service_model_SuccessResponse> {
+    public static deleteV1Account(): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/v1/album/cache',
+            url: '/v1/account',
             errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
                 500: `Internal Server Error`,
             },
         });

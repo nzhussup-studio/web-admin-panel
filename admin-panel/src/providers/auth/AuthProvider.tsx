@@ -3,6 +3,7 @@ import LoadingState from "@/components/states/LoadingState";
 import { AuthContext } from "@/providers/auth/auth-context";
 import {
   getKeycloakInitPromise,
+  resetKeycloakInitPromise,
   setKeycloakInitPromise,
 } from "@/providers/auth/keycloak-init";
 import type { AuthState, ProviderProps } from "@/types/common";
@@ -36,12 +37,77 @@ const buildLoginOptions = () => {
 };
 
 const isPublicPath = (pathname: string) => pathname.startsWith("/public/");
+const keycloakCallbackStoragePrefix = "kc-callback-";
+const authRecoveryFlag = "kc-auth-recovery-attempted";
+const authCallbackParams = [
+  "code",
+  "state",
+  "session_state",
+  "kc_action_status",
+  "kc_action",
+  "iss",
+  "error",
+  "error_description",
+];
+
+const clearKeycloakCallbackStorage = () => {
+  for (let index = window.localStorage.length - 1; index >= 0; index -= 1) {
+    const key = window.localStorage.key(index);
+
+    if (key?.startsWith(keycloakCallbackStoragePrefix)) {
+      window.localStorage.removeItem(key);
+    }
+  }
+};
+
+const stripAuthCallbackParams = () => {
+  const url = new URL(window.location.href);
+  let changed = false;
+
+  authCallbackParams.forEach((param) => {
+    if (url.searchParams.has(param)) {
+      url.searchParams.delete(param);
+      changed = true;
+    }
+  });
+
+  if (!changed) {
+    return;
+  }
+
+  const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+  window.history.replaceState(window.history.state, "", nextUrl);
+};
+
+const resetLocalAuthState = () => {
+  keycloak.clearToken();
+  resetKeycloakInitPromise();
+  clearKeycloakCallbackStorage();
+  stripAuthCallbackParams();
+};
 
 export const AuthProvider = ({ children }: ProviderProps) => {
   const [state, setState] = useState<AuthState>(initialState);
 
   useEffect(() => {
     let mounted = true;
+
+    const recoverAuthentication = async () => {
+      resetLocalAuthState();
+
+      if (window.sessionStorage.getItem(authRecoveryFlag) === "true") {
+        return false;
+      }
+
+      window.sessionStorage.setItem(authRecoveryFlag, "true");
+
+      await keycloak.login({
+        redirectUri: window.location.href,
+        prompt: "login",
+      });
+
+      return true;
+    };
 
     const syncState = async () => {
       const isAuthenticated = !!keycloak.authenticated;
@@ -66,6 +132,10 @@ export const AuthProvider = ({ children }: ProviderProps) => {
         lastName,
         email,
       });
+
+      if (isAuthenticated) {
+        window.sessionStorage.removeItem(authRecoveryFlag);
+      }
     };
 
     const initialize = async () => {
@@ -80,7 +150,24 @@ export const AuthProvider = ({ children }: ProviderProps) => {
         keycloak.onAuthRefreshSuccess = () => {
           void syncState();
         };
+        keycloak.onAuthError = () => {
+          void recoverAuthentication().catch(() => {
+            if (!mounted) {
+              return;
+            }
+            setState({ ...initialState, loading: false });
+          });
+        };
+        keycloak.onAuthRefreshError = () => {
+          void recoverAuthentication().catch(() => {
+            if (!mounted) {
+              return;
+            }
+            setState({ ...initialState, loading: false });
+          });
+        };
         keycloak.onAuthLogout = () => {
+          window.sessionStorage.removeItem(authRecoveryFlag);
           if (!mounted) {
             return;
           }
@@ -91,7 +178,12 @@ export const AuthProvider = ({ children }: ProviderProps) => {
             .updateToken(30)
             .then(syncState)
             .catch(() => {
-              void keycloak.login(buildLoginOptions());
+              void recoverAuthentication().catch(() => {
+                if (!mounted) {
+                  return;
+                }
+                setState({ ...initialState, loading: false });
+              });
             });
         };
 
@@ -109,6 +201,10 @@ export const AuthProvider = ({ children }: ProviderProps) => {
 
         await syncState();
       } catch {
+        const recovered = await recoverAuthentication().catch(() => false);
+        if (recovered) {
+          return;
+        }
         if (!mounted) {
           return;
         }
@@ -124,10 +220,12 @@ export const AuthProvider = ({ children }: ProviderProps) => {
   }, []);
 
   const login = async () => {
+    resetLocalAuthState();
     await keycloak.login(buildLoginOptions());
   };
 
   const logout = async (redirectUri?: string) => {
+    window.sessionStorage.removeItem(authRecoveryFlag);
     await keycloak.logout({
       redirectUri: redirectUri ?? window.location.origin,
     });

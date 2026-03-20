@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type image_service_model_SuccessResponse = {
-    data?: any;
-    message?: string;
-    status?: number;
+export type account_service_model_ErrorResponse = {
+    error?: string;
 };
 

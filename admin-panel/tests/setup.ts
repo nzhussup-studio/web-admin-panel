@@ -7,13 +7,16 @@ jest.mock("keycloak-js", () =>
     token: undefined,
     tokenParsed: undefined,
     onAuthSuccess: undefined,
+    onAuthError: undefined,
     onAuthRefreshSuccess: undefined,
+    onAuthRefreshError: undefined,
     onAuthLogout: undefined,
     onTokenExpired: undefined,
     init: jest.fn().mockResolvedValue(false),
     login: jest.fn().mockResolvedValue(undefined),
     logout: jest.fn().mockResolvedValue(undefined),
     updateToken: jest.fn().mockResolvedValue(true),
+    clearToken: jest.fn(),
   }))
 );
 

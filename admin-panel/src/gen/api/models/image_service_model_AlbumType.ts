@@ -2,7 +2,4 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type image_service_model_AlbumType =
-  | "private"
-  | "semi-public"
-  | "public";
+export type image_service_model_AlbumType = 'private' | 'semi-public' | 'public';

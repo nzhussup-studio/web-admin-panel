@@ -8,10 +8,15 @@ import Row from "react-bootstrap/Row";
 import config from "@/config/app-config";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
-import { CacheService } from "@/lib/api/client";
+import { AccountService, CacheService } from "@/lib/api/client";
 import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
 import { getApiErrorMessage } from "@/lib/api/errors";
-import { CodeSlashIcon, DatabaseZapIcon, LogoutIcon } from "@/assets/icons";
+import {
+  CodeSlashIcon,
+  DatabaseZapIcon,
+  LogoutIcon,
+  TrashIcon,
+} from "@/assets/icons";
 import { navigateExternal } from "@/lib/navigation/external";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import ThemeToggle from "@/components/shared/ThemeToggle";
@@ -91,6 +96,18 @@ const Header = ({
     }
   };
 
+  const onDeleteAccount = async () => {
+    try {
+      await AccountService.deleteV1Account();
+      await logout(window.location.origin);
+    } catch (error) {
+      triggerAlert(
+        getApiErrorMessage(error, "Failed to delete account"),
+        "danger",
+      );
+    }
+  };
+
   return (
     <Navbar bg="body" expand="md" className="py-3 mb-4 app-header-shell">
       <Container>
@@ -154,6 +171,26 @@ const Header = ({
                   aria-label="Profile"
                 >
                   {extractInitialsFromState(state)}
+                </Button>
+              ) : null}
+              {state.isAuthenticated ? (
+                <Button
+                  type="button"
+                  variant="link"
+                  className="app-icon-action app-icon-action-danger"
+                  onClick={() =>
+                    setConfirmDialog({
+                      title: "Delete Account",
+                      message:
+                        "Are you sure you want to permanently delete your account? This action cannot be undone.",
+                      confirmLabel: "Delete Account",
+                      confirmVariant: "danger",
+                      onConfirm: onDeleteAccount,
+                    })
+                  }
+                  aria-label="Delete account"
+                >
+                  <TrashIcon width={22} height={22} />
                 </Button>
               ) : null}
               {state.isAuthenticated || allowUnauthenticatedLogin ? (

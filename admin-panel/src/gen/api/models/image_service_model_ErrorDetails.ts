@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type image_service_model_ErrorDetails = {
-  message?: string;
-  status?: number;
+    message?: string;
+    status?: number;
 };
+
