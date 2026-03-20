@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.7.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.6.0...v3.7.0) (2026-03-20)
+
+
+### Bug Fixes
+
+* ui for cv generator ([e93aaf8](https://github.com/nzhussup/admin-panel-personal-website/commit/e93aaf8e5bc8c65cb532bc5c235246c5e70bf512))
+* unauthorized view ([95dff58](https://github.com/nzhussup/admin-panel-personal-website/commit/95dff58664eef53605350dfc387445b33c902429))
+* unit test ([1ca1baf](https://github.com/nzhussup/admin-panel-personal-website/commit/1ca1bafe7c5a084cb491dbcee41dac6cbb572a14))
+
 ## [3.6.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.5.0...v3.6.0) (2026-03-20)
 
 
