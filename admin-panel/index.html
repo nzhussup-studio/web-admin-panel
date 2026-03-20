@@ -5,6 +5,44 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg?v=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>nzhussup admin panel</title>
+    <script>
+      (() => {
+        let isDarkMode = false;
+
+        try {
+          const savedTheme = window.localStorage.getItem("isDarkMode");
+          isDarkMode = savedTheme ? JSON.parse(savedTheme) === true : false;
+        } catch {
+          isDarkMode = false;
+        }
+
+        document.documentElement.setAttribute(
+          "data-bs-theme",
+          isDarkMode ? "dark" : "light",
+        );
+        document.documentElement.style.colorScheme = isDarkMode
+          ? "dark"
+          : "light";
+      })();
+    </script>
+    <style>
+      html,
+      body,
+      #root {
+        min-height: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: #eef3f8;
+        color: #212529;
+      }
+
+      html[data-bs-theme="dark"] body {
+        background: #0f172a;
+        color: #f8f9fa;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

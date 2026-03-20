@@ -5,10 +5,10 @@ import { GlobalAlertProvider } from "@/providers/alerts/GlobalAlertProvider";
 
 export const AppProviders = ({ children }: ProviderProps) => {
   return (
-    <AuthProvider>
-      <ThemeProvider>
+    <ThemeProvider>
+      <AuthProvider>
         <GlobalAlertProvider>{children}</GlobalAlertProvider>
-      </ThemeProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };

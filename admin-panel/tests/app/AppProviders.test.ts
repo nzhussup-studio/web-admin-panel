@@ -33,8 +33,8 @@ describe("app/AppProviders.tsx", () => {
     const theme = screen.getByTestId("theme-provider");
     const alert = screen.getByTestId("alert-provider");
 
-    expect(auth).toContainElement(theme);
-    expect(theme).toContainElement(alert);
+    expect(theme).toContainElement(auth);
+    expect(auth).toContainElement(alert);
     expect(alert).toHaveTextContent("Inner app");
   });
 });
