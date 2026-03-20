@@ -1,4 +1,6 @@
 import Header from "@/components/layout/Header";
+import config from "@/config/app-config";
+import { navigateExternal } from "@/lib/navigation/external";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
@@ -22,7 +24,7 @@ const dashboardSections = [
     title: "Users",
     description:
       "Review accounts, adjust roles, and manage admin access safely.",
-    path: "/users",
+    externalUrl: `${config.keycloakUrl}/admin/master/console/#/${config.keycloakRealm}/users`,
   },
   {
     title: "Albums",
@@ -47,16 +49,27 @@ const dashboardSections = [
 const HomePage = () => {
   const navigate = useNavigate();
 
+  const handleSectionClick = (path?: string, externalUrl?: string) => {
+    if (externalUrl) {
+      navigateExternal(externalUrl);
+      return;
+    }
+
+    if (path) {
+      navigate(path);
+    }
+  };
+
   return (
     <>
       <Header text={"Welcome to the Admin Panel"} />
       <Container className='my-5'>
         <Row xs={1} md={2} className='g-4'>
           {dashboardSections.map((section) => (
-            <Col key={section.path}>
+            <Col key={section.path || section.externalUrl}>
               <Card
                 className='h-100 rounded-4 app-interactive-card app-navigation-card'
-                onClick={() => navigate(section.path)}
+                onClick={() => handleSectionClick(section.path, section.externalUrl)}
               >
                 <Card.Body className='d-flex flex-column p-4 app-card-body'>
                   <Card.Title className='fw-semibold fs-4 app-card-title'>

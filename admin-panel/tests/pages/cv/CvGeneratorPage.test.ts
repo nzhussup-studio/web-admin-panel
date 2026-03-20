@@ -76,6 +76,31 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
     expect(screen.getByText("education")).toBeInTheDocument();
   });
 
+  test("renders structured item content instead of raw json", async () => {
+    (WorkExperienceControllerService.listWorkExperience as jest.Mock).mockResolvedValue([
+      {
+        id: 1,
+        displayOrder: 1,
+        position: "Senior Backend Engineer",
+        company: "Nzhussup Studio",
+        location: "Passau, Germany",
+        responsibilities: "Built auth and infrastructure services.",
+      },
+    ]);
+
+    render(React.createElement(CvGeneratorPage));
+
+    expect(
+      await screen.findByText("Senior Backend Engineer", { selector: ".fw-semibold" })
+    ).toBeInTheDocument();
+    expect(screen.getByText("Nzhussup Studio • Passau, Germany")).toBeInTheDocument();
+    expect(
+      screen.getByText("Built auth and infrastructure services.")
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Available").length).toBeGreaterThan(0);
+    expect(screen.queryByText(/"position":/)).not.toBeInTheDocument();
+  });
+
   test("navigates back and refetches on sort", async () => {
     render(React.createElement(CvGeneratorPage));
     await waitFor(() =>
@@ -119,5 +144,14 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
       );
       expect(saved.selectedItems.work_experience).toEqual([1]);
     });
+  });
+
+  test("updates the availability badge after selecting an item", async () => {
+    render(React.createElement(CvGeneratorPage));
+    await waitFor(() => expect(screen.getAllByRole("checkbox")[0]).toBeInTheDocument());
+
+    fireEvent.click(screen.getAllByRole("checkbox")[0]);
+
+    expect(screen.getAllByText("Selected").length).toBeGreaterThan(0);
   });
 });

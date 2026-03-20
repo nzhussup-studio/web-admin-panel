@@ -1,13 +1,20 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import HomePage from "@/pages/home/HomePage";
+import { navigateExternal } from "@/lib/navigation/external";
 import { useNavigate } from "react-router-dom";
 
 const mockNavigate = jest.fn();
+const mockNavigateExternal = navigateExternal as jest.MockedFunction<typeof navigateExternal>;
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useNavigate: jest.fn(),
+}));
+
+jest.mock("@/lib/navigation/external", () => ({
+  __esModule: true,
+  navigateExternal: jest.fn(),
 }));
 
 jest.mock("@/components/layout/Header", () => ({
@@ -43,6 +50,11 @@ describe("pages/home/HomePage.tsx", () => {
 
     fireEvent.click(screen.getByText("Projects"));
     expect(mockNavigate).toHaveBeenCalledWith("/projects");
+
+    fireEvent.click(screen.getByText("Users"));
+    expect(mockNavigateExternal).toHaveBeenCalledWith(
+      "http://localhost:8081/admin/master/console/#/backend-auth-dev/users"
+    );
 
     fireEvent.click(screen.getByText("LLM Config"));
     expect(mockNavigate).toHaveBeenCalledWith("/llm");

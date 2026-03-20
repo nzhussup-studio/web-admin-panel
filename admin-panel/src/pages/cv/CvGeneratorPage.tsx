@@ -4,6 +4,7 @@ import GlobalAlert from "@/components/layout/GlobalAlert";
 import { useCallback, useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Badge from "react-bootstrap/Badge";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
@@ -26,6 +27,171 @@ import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
 
 type BasicInfo = Record<string, string>;
 type SelectedItems = Record<string, Set<string | number>>;
+
+const IGNORED_ITEM_FIELDS = new Set([
+  "id",
+  "createdAt",
+  "updatedAt",
+  "displayOrder",
+]);
+
+const LONG_TEXT_FIELDS = [
+  "description",
+  "summary",
+  "about",
+  "responsibilities",
+  "achievement",
+  "achievements",
+  "details",
+];
+
+const TITLE_FIELDS = [
+  "title",
+  "name",
+  "position",
+  "role",
+  "company",
+  "school",
+  "institution",
+  "organization",
+  "issuer",
+];
+
+const SUBTITLE_FIELDS = [
+  "company",
+  "organization",
+  "school",
+  "institution",
+  "location",
+  "type",
+  "level",
+];
+
+const formatLabel = (value: string) =>
+  value
+    .replace(/_/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+
+const formatScalar = (value: unknown): string => {
+  if (value == null) {
+    return "";
+  }
+
+  if (Array.isArray(value)) {
+    return value
+      .map((entry) => formatScalar(entry))
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  if (typeof value === "object") {
+    return "";
+  }
+
+  return String(value);
+};
+
+const pickFirstValue = (item: Record<string, unknown>, keys: string[]) => {
+  for (const key of keys) {
+    const value = formatScalar(item[key]);
+    if (value) {
+      return value;
+    }
+  }
+
+  return "";
+};
+
+const getItemTitle = (item: Record<string, unknown>, fallback: string) =>
+  pickFirstValue(item, TITLE_FIELDS) || fallback;
+
+const getItemSubtitle = (item: Record<string, unknown>) => {
+  const values = SUBTITLE_FIELDS.map((key) => formatScalar(item[key])).filter(
+    Boolean,
+  );
+
+  return [...new Set(values)].slice(0, 2).join(" • ");
+};
+
+const getLongDescription = (item: Record<string, unknown>) => {
+  for (const key of LONG_TEXT_FIELDS) {
+    const value = formatScalar(item[key]);
+    if (value) {
+      return value;
+    }
+  }
+
+  return "";
+};
+
+const getMetadataEntries = (item: Record<string, unknown>) =>
+  Object.entries(item)
+    .filter(([key, value]) => {
+      if (IGNORED_ITEM_FIELDS.has(key) || LONG_TEXT_FIELDS.includes(key)) {
+        return false;
+      }
+
+      return Boolean(formatScalar(value));
+    })
+    .slice(0, 6)
+    .map(([key, value]) => ({
+      label: formatLabel(key),
+      value: formatScalar(value),
+    }));
+
+const renderItemLabel = (
+  sectionName: string,
+  item: Record<string, unknown>,
+  isChecked: boolean,
+) => {
+  const title = getItemTitle(item, `${formatLabel(sectionName)} entry`);
+  const subtitle = getItemSubtitle(item);
+  const description = getLongDescription(item);
+  const metadata = getMetadataEntries(item);
+
+  return (
+    <div className='d-block w-100'>
+      <div className='d-flex flex-column gap-2 w-100 pe-5'>
+        <Badge
+          bg={isChecked ? "primary" : "secondary"}
+          pill
+          className='position-absolute top-0 end-0 mt-2 me-3'
+        >
+          {isChecked ? "Selected" : "Available"}
+        </Badge>
+
+        <div className='d-flex align-items-start gap-3 w-100'>
+          <div className='pe-2 flex-grow-1 min-w-0'>
+            <div className='fw-semibold'>{title}</div>
+            {subtitle ? (
+              <div className='text-body-secondary small mt-1'>{subtitle}</div>
+            ) : null}
+          </div>
+        </div>
+
+        {metadata.length > 0 ? (
+          <div className='d-flex flex-wrap gap-2'>
+            {metadata.map((entry) => (
+              <Badge
+                key={entry.label}
+                bg='secondary'
+                className='fw-normal px-2 py-1 text-wrap'
+              >
+                <span className='opacity-75'>{entry.label}:</span>{" "}
+                {entry.value}
+              </Badge>
+            ))}
+          </div>
+        ) : null}
+
+        {description ? (
+          <div className='small text-body-secondary'>{description}</div>
+        ) : null}
+      </div>
+    </div>
+  );
+};
 
 const CvGeneratorPage = () => {
   const navigate = useNavigate();
@@ -180,7 +346,6 @@ const CvGeneratorPage = () => {
     } else {
       setAlertMessage("CV generated successfully (mock)!");
       setAlertVisible(true);
-      console.log("Selected data for CV:", selectedData);
     }
     generateCV(selectedData, output);
   };
@@ -259,9 +424,14 @@ const CvGeneratorPage = () => {
           <Card key={index} className='rounded-4 app-interactive-card mt-4'>
             <Card.Body className='p-4 app-card-body'>
               <div className='d-flex justify-content-between align-items-center gap-3 mb-3'>
-                <Card.Title className='mb-0 text-capitalize fw-semibold app-card-title'>
-                  {sectionName.replace(/_/g, " ")}
-                </Card.Title>
+                <div>
+                  <Card.Title className='mb-1 text-capitalize fw-semibold app-card-title'>
+                    {sectionName.replace(/_/g, " ")}
+                  </Card.Title>
+                  <div className='text-body-secondary small'>
+                    {selectedItems[sectionName]?.size || 0} selected
+                  </div>
+                </div>
                 <Button
                   onClick={handleToggleAll}
                   type='button'
@@ -281,17 +451,14 @@ const CvGeneratorPage = () => {
                     <Form.Check
                       key={itemId}
                       type='checkbox'
-                      className={`rounded-3 border p-3 mb-2 ${isChecked ? "bg-primary-subtle" : "bg-body-tertiary"}`}
+                      className={`position-relative rounded-4 border px-3 py-2 mb-2 shadow-sm ${
+                        isChecked
+                          ? "bg-primary-subtle border-primary-subtle"
+                          : "bg-body-tertiary border-secondary-subtle"
+                      }`}
                       checked={isChecked}
                       onChange={() => toggleSelect(sectionName, itemId)}
-                      label={
-                        <pre
-                          className='mb-0 text-wrap'
-                          style={{ whiteSpace: "pre-wrap" }}
-                        >
-                          {JSON.stringify(item, null, 2)}
-                        </pre>
-                      }
+                      label={renderItemLabel(sectionName, item, isChecked)}
                     />
                   );
                 })

@@ -8,7 +8,6 @@ import WorkExperiencePage from "@/pages/cv/WorkExperiencePage";
 import SkillsPage from "@/pages/cv/SkillsPage";
 import NotFoundPage from "@/pages/errors/NotFoundPage";
 import UnauthorizedPage from "@/pages/errors/UnauthorizedPage";
-import UsersPage from "@/pages/users/UsersPage";
 import AlbumsPage from "@/pages/albums/AlbumsPage";
 import AlbumPage from "@/pages/albums/AlbumPage";
 import CvGeneratorPage from "@/pages/cv/CvGeneratorPage";
@@ -47,11 +46,6 @@ const routes: AppRoute[] = [
   {
     path: "/cv/education",
     component: EducationPage,
-    isProtected: true,
-  },
-  {
-    path: "/users",
-    component: UsersPage,
     isProtected: true,
   },
   {
