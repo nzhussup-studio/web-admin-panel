@@ -15,6 +15,8 @@ describe("providers/auth/auth-context.ts", () => {
         loading: false,
         roles: ["ROLE_ADMIN"],
         username: "admin",
+        firstName: "Admin",
+        lastName: "User",
         email: "admin@example.com",
       },
       login: jest.fn().mockResolvedValue(undefined),

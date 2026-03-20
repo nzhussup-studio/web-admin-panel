@@ -6,6 +6,7 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/auth/useAuth";
 
 const dashboardSections = [
   {
@@ -21,10 +22,10 @@ const dashboardSections = [
     path: "/cv",
   },
   {
-    title: "Users",
+    title: `Manage ${config.keycloakRealm} Realm`,
     description:
       "Review accounts, adjust roles, and manage admin access safely.",
-    externalUrl: `${config.keycloakUrl}/admin/master/console/#/${config.keycloakRealm}/users`,
+    externalUrl: `${config.keycloakUrl}/admin/${config.keycloakRealm}/console`,
   },
   {
     title: "Albums",
@@ -48,6 +49,7 @@ const dashboardSections = [
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const { state } = useAuth();
 
   const handleSectionClick = (path?: string, externalUrl?: string) => {
     if (externalUrl) {
@@ -62,14 +64,18 @@ const HomePage = () => {
 
   return (
     <>
-      <Header text={"Welcome to the Admin Panel"} />
+      <Header
+        text={`Welcome to the Admin Panel, ${state.firstName || "User"}!`}
+      />
       <Container className='my-5'>
         <Row xs={1} md={2} className='g-4'>
           {dashboardSections.map((section) => (
             <Col key={section.path || section.externalUrl}>
               <Card
                 className='h-100 rounded-4 app-interactive-card app-navigation-card'
-                onClick={() => handleSectionClick(section.path, section.externalUrl)}
+                onClick={() =>
+                  handleSectionClick(section.path, section.externalUrl)
+                }
               >
                 <Card.Body className='d-flex flex-column p-4 app-card-body'>
                   <Card.Title className='fw-semibold fs-4 app-card-title'>

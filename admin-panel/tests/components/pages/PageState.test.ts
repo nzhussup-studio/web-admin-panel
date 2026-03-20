@@ -9,10 +9,15 @@ jest.mock("@/components/states/LoadingState", () => ({
   __esModule: true,
   default: () => mockCreateElement("div", null, "Loading state"),
 }));
-jest.mock("@/pages/errors/UnauthorizedPage", () => ({
+jest.mock("@/pages/errors/ForbiddenPage", () => ({
   __esModule: true,
   default: ({ showHeader }: { showHeader?: boolean }) =>
-    mockCreateElement("div", null, `Unauthorized page ${String(showHeader)}`),
+    mockCreateElement("div", null, `Forbidden page ${String(showHeader)}`),
+}));
+jest.mock("@/pages/errors/NotFoundPage", () => ({
+  __esModule: true,
+  default: ({ showHeader }: { showHeader?: boolean }) =>
+    mockCreateElement("div", null, `Not found page ${String(showHeader)}`),
 }));
 
 describe("components/pages/PageState.tsx", () => {
@@ -38,7 +43,7 @@ describe("components/pages/PageState.tsx", () => {
         children: mockCreateElement("div", null, "Children"),
       }),
     );
-    expect(screen.getByText("Unauthorized page false")).toBeInTheDocument();
+    expect(screen.getByText("Forbidden page false")).toBeInTheDocument();
 
     rerender(
       mockCreateElement(PageState, {
@@ -48,7 +53,7 @@ describe("components/pages/PageState.tsx", () => {
         children: mockCreateElement("div", null, "Children"),
       }),
     );
-    expect(screen.getByText("404")).toBeInTheDocument();
+    expect(screen.getByText("Not found page false")).toBeInTheDocument();
 
     rerender(
       mockCreateElement(PageState, {

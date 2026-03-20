@@ -14,16 +14,16 @@ describe("router/routes.ts", () => {
       "/albums",
       "/albums/:id",
       "/cv-generator",
-      "/unauthorized",
+      "/forbidden",
       "*",
     ]);
   });
 
-  test("marks only unauthorized and not-found as public routes", () => {
+  test("marks only forbidden and not-found as public routes", () => {
     const publicRoutes = routes.filter((route) => !route.isProtected);
 
     expect(publicRoutes).toHaveLength(2);
-    expect(publicRoutes.map((route) => route.path)).toEqual(["/unauthorized", "*"]);
+    expect(publicRoutes.map((route) => route.path)).toEqual(["/forbidden", "*"]);
   });
 
   test("assigns a component to every route", () => {

@@ -104,6 +104,8 @@ describe("providers/auth/AuthProvider.tsx", () => {
     mockKeycloak.tokenParsed = {
       exp: Math.floor(Date.now() / 1000) + 3600,
       preferred_username: "admin",
+      given_name: "Admin",
+      family_name: "User",
       email: "admin@example.com",
       realm_access: {
         roles: ["ROLE_ADMIN", "ROLE_USER"],
@@ -128,6 +130,12 @@ describe("providers/auth/AuthProvider.tsx", () => {
     expect(screen.getByTestId("auth-state")).toHaveTextContent(
       '"username":"admin"',
     );
+    expect(screen.getByTestId("auth-state")).toHaveTextContent(
+      '"firstName":"Admin"',
+    );
+    expect(screen.getByTestId("auth-state")).toHaveTextContent(
+      '"lastName":"User"',
+    );
     expect(screen.getByTestId("auth-state")).toHaveTextContent('"ROLE_ADMIN"');
     expect(screen.getByTestId("auth-state")).toHaveTextContent('"ui-access"');
   });
@@ -138,6 +146,8 @@ describe("providers/auth/AuthProvider.tsx", () => {
     mockKeycloak.tokenParsed = {
       exp: Math.floor(Date.now() / 1000) + 3600,
       preferred_username: "jane.user",
+      given_name: "Jane",
+      family_name: "User",
       email: "jane.user@example.com",
       realm_access: {
         roles: ["ROLE_USER"],
@@ -155,11 +165,11 @@ describe("providers/auth/AuthProvider.tsx", () => {
     );
 
     await waitFor(() =>
-      expect(mockKeycloak.logout).toHaveBeenCalledWith({
-        redirectUri: `${window.location.origin}/unauthorized`,
-      }),
+      expect(screen.getByTestId("auth-state")).toHaveTextContent(
+        '"isAuthenticated":true',
+      ),
     );
-    expect(screen.queryByTestId("auth-state")).not.toBeInTheDocument();
+    expect(mockKeycloak.logout).not.toHaveBeenCalled();
   });
 
   test("login and logout delegate to keycloak", async () => {
@@ -186,8 +196,8 @@ describe("providers/auth/AuthProvider.tsx", () => {
     expect(mockKeycloak.logout).toHaveBeenCalled();
   });
 
-  test("forces a fresh login prompt from the unauthorized page", async () => {
-    window.history.pushState({}, "", "/unauthorized");
+  test("uses the current location as the login redirect target", async () => {
+    window.history.pushState({}, "", "/forbidden");
 
     render(
       React.createElement(AuthProvider, null, React.createElement(Consumer)),
@@ -204,9 +214,7 @@ describe("providers/auth/AuthProvider.tsx", () => {
     });
 
     expect(mockKeycloak.login).toHaveBeenCalledWith({
-      redirectUri: window.location.origin,
-      prompt: "login",
-      maxAge: 0,
+      redirectUri: window.location.href,
     });
   });
 });

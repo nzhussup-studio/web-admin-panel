@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import config from "@/config/app-config";
 import LoadingState from "@/components/states/LoadingState";
-import UnauthorizedPage from "@/pages/errors/UnauthorizedPage";
+import ForbiddenPage from "@/pages/errors/ForbiddenPage";
+import NotFoundPage from "@/pages/errors/NotFoundPage";
 
 interface PageStateProps {
   children: ReactNode;
@@ -38,16 +39,11 @@ const PageState = ({
     const normalizedError = error as { status?: number; response?: string };
 
     if (normalizedError.status === 401) {
-      return <UnauthorizedPage showHeader={false} />;
+      return <ForbiddenPage showHeader={false} />;
     }
 
     if (normalizedError.status === 404) {
-      return (
-        <div className='py-5 text-center'>
-          <h1 className='display-6 mb-3'>404</h1>
-          <p className='text-secondary mb-0'>The requested resource was not found.</p>
-        </div>
-      );
+      return <NotFoundPage showHeader={false} />;
     }
 
     return (

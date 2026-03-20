@@ -11,6 +11,8 @@ const initialState: AuthState = {
   loading: true,
   roles: [],
   username: null,
+  firstName: null,
+  lastName: null,
   email: null,
 };
 
@@ -26,17 +28,8 @@ const getRoles = () => {
 };
 
 const buildLoginOptions = () => {
-  const isUnauthorizedRoute = window.location.pathname === "/unauthorized";
-  const redirectUri = isUnauthorizedRoute ? window.location.origin : window.location.href;
-
   return {
-    redirectUri,
-    ...(isUnauthorizedRoute
-      ? {
-          prompt: "login" as const,
-          maxAge: 0,
-        }
-      : {}),
+    redirectUri: window.location.href,
   };
 };
 
@@ -45,22 +38,14 @@ export const AuthProvider = ({ children }: ProviderProps) => {
 
   useEffect(() => {
     let mounted = true;
-    const isUnauthorizedRoute = window.location.pathname === "/unauthorized";
 
     const syncState = async () => {
       const isAuthenticated = !!keycloak.authenticated;
       const roles = getRoles();
       const username = keycloak.tokenParsed?.preferred_username ?? null;
+      const firstName = keycloak.tokenParsed?.given_name ?? null;
+      const lastName = keycloak.tokenParsed?.family_name ?? null;
       const email = keycloak.tokenParsed?.email ?? null;
-      const isUnauthorizedAdminUser = isAuthenticated && !isUnauthorizedRoute && !roles.includes("ROLE_ADMIN");
-
-      if (isUnauthorizedAdminUser) {
-        setState(initialState);
-        await keycloak.logout({
-          redirectUri: `${window.location.origin}/unauthorized`,
-        });
-        return;
-      }
 
       if (!mounted) {
         return;
@@ -73,6 +58,8 @@ export const AuthProvider = ({ children }: ProviderProps) => {
         loading: false,
         roles,
         username,
+        firstName,
+        lastName,
         email,
       });
     };
@@ -99,7 +86,7 @@ export const AuthProvider = ({ children }: ProviderProps) => {
 
         if (!keycloakInitPromise) {
           keycloakInitPromise = keycloak.init({
-            onLoad: isUnauthorizedRoute ? "check-sso" : "login-required",
+            onLoad: "login-required",
             pkceMethod: "S256",
             checkLoginIframe: false,
           });

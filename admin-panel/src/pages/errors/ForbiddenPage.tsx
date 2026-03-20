@@ -1,22 +1,22 @@
+import { ForbiddenIcon } from "@/assets/icons";
 import Header from "@/components/layout/Header";
 
-interface UnauthorizedPageProps {
+interface ForbiddenPageProps {
   showHeader?: boolean;
 }
 
-const UnauthorizedPage = ({ showHeader = true }: UnauthorizedPageProps) => {
+const ForbiddenPage = ({ showHeader = true }: ForbiddenPageProps) => {
   return (
     <>
       {showHeader ? (
         <Header
-          text='Unauthorized'
           showClearCacheButton={false}
-          authActionLabel='Login'
+          titleContent={<ForbiddenIcon width={36} height={36} aria-label='Forbidden' />}
         />
       ) : null}
       <div className='container my-5'>
         <div style={{ textAlign: "center", marginTop: "50px" }}>
-          <h1>403 - Unauthorized</h1>
+          <h1>403 - Forbidden</h1>
           <p>Your account does not have administrator access to this panel.</p>
         </div>
       </div>
@@ -24,4 +24,4 @@ const UnauthorizedPage = ({ showHeader = true }: UnauthorizedPageProps) => {
   );
 };
 
-export default UnauthorizedPage;
+export default ForbiddenPage;
