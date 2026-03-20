@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import LoadingState from "@/components/states/LoadingState";
 import { AuthContext } from "@/providers/auth/auth-context";
+import {
+  getKeycloakInitPromise,
+  setKeycloakInitPromise,
+} from "@/providers/auth/keycloak-init";
 import type { AuthState, ProviderProps } from "@/types/common";
 import keycloak from "@/lib/auth/keycloak";
 
@@ -15,8 +19,6 @@ const initialState: AuthState = {
   lastName: null,
   email: null,
 };
-
-let keycloakInitPromise: Promise<boolean> | null = null;
 
 const getRoles = () => {
   const realmRoles = keycloak.tokenParsed?.realm_access?.roles ?? [];
@@ -84,15 +86,17 @@ export const AuthProvider = ({ children }: ProviderProps) => {
           });
         };
 
-        if (!keycloakInitPromise) {
-          keycloakInitPromise = keycloak.init({
-            onLoad: "login-required",
-            pkceMethod: "S256",
-            checkLoginIframe: false,
-          });
+        if (!getKeycloakInitPromise()) {
+          setKeycloakInitPromise(
+            keycloak.init({
+              onLoad: "login-required",
+              pkceMethod: "S256",
+              checkLoginIframe: false,
+            })
+          );
         }
 
-        await keycloakInitPromise;
+        await getKeycloakInitPromise();
 
         await syncState();
       } catch {
@@ -129,8 +133,4 @@ export const AuthProvider = ({ children }: ProviderProps) => {
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const resetKeycloakInitPromiseForTests = () => {
-  keycloakInitPromise = null;
 };

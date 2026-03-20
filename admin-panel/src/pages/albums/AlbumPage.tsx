@@ -63,7 +63,7 @@ const AlbumPage = () => {
     } finally {
       setShowLoading(false);
     }
-  }, [id, isAscending]);
+  }, [id, isAscending, triggerAlert]);
 
   useEffect(() => {
     fetchItem();

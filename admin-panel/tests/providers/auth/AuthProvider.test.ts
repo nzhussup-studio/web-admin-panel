@@ -1,7 +1,8 @@
 import React, { useContext } from "react";
 import { act, render, screen, waitFor } from "@testing-library/react";
-import { AuthProvider, resetKeycloakInitPromiseForTests } from "@/providers/auth/AuthProvider";
+import { AuthProvider } from "@/providers/auth/AuthProvider";
 import { AuthContext } from "@/providers/auth/auth-context";
+import { resetKeycloakInitPromise } from "@/providers/auth/keycloak-init";
 import keycloak from "@/lib/auth/keycloak";
 
 jest.mock("@/lib/auth/keycloak", () => ({
@@ -61,7 +62,7 @@ const Consumer = () => {
 
 describe("providers/auth/AuthProvider.tsx", () => {
   beforeEach(() => {
-    resetKeycloakInitPromiseForTests();
+    resetKeycloakInitPromise();
     jest.clearAllMocks();
     mockKeycloak.authenticated = false;
     mockKeycloak.token = undefined;
