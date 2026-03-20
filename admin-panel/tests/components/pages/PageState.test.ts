@@ -34,12 +34,22 @@ describe("components/pages/PageState.tsx", () => {
     expect(screen.getByText("Loading state")).toBeInTheDocument();
   });
 
-  test("renders 401, 404 and generic error states", () => {
+  test("renders 401/403, 404 and generic error states", () => {
     const { rerender } = render(
       mockCreateElement(PageState, {
         isEmpty: false,
         loading: false,
         error: { status: 401 },
+        children: mockCreateElement("div", null, "Children"),
+      }),
+    );
+    expect(screen.getByText("Forbidden page false")).toBeInTheDocument();
+
+    rerender(
+      mockCreateElement(PageState, {
+        isEmpty: false,
+        loading: false,
+        error: { status: 403 },
         children: mockCreateElement("div", null, "Children"),
       }),
     );

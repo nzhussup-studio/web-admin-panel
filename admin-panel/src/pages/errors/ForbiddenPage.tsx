@@ -11,6 +11,7 @@ const ForbiddenPage = ({ showHeader = true }: ForbiddenPageProps) => {
       {showHeader ? (
         <Header
           showClearCacheButton={false}
+          allowUnauthenticatedLogin
           titleContent={
             <ForbiddenIcon width={36} height={36} aria-label="Forbidden" />
           }

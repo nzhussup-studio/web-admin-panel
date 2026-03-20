@@ -35,6 +35,8 @@ const buildLoginOptions = () => {
   };
 };
 
+const isPublicPath = (pathname: string) => pathname.startsWith("/public/");
+
 export const AuthProvider = ({ children }: ProviderProps) => {
   const [state, setState] = useState<AuthState>(initialState);
 
@@ -68,6 +70,10 @@ export const AuthProvider = ({ children }: ProviderProps) => {
 
     const initialize = async () => {
       try {
+        const onLoad = isPublicPath(window.location.pathname)
+          ? "check-sso"
+          : "login-required";
+
         keycloak.onAuthSuccess = () => {
           void syncState();
         };
@@ -92,7 +98,7 @@ export const AuthProvider = ({ children }: ProviderProps) => {
         if (!getKeycloakInitPromise()) {
           setKeycloakInitPromise(
             keycloak.init({
-              onLoad: "login-required",
+              onLoad,
               pkceMethod: "S256",
               checkLoginIframe: false,
             }),

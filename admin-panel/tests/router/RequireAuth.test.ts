@@ -43,7 +43,7 @@ describe("router/RequireAuth.tsx", () => {
     expect(screen.getByText("Private content")).toBeInTheDocument();
   });
 
-  test("shows loading when the user is not authenticated", () => {
+  test("redirects to forbidden when the user is not authenticated", () => {
     mockUseAuth.mockReturnValue({
       state: {
         isAuthenticated: false,
@@ -73,5 +73,6 @@ describe("router/RequireAuth.tsx", () => {
     );
 
     expect(screen.queryByText("Hidden content")).not.toBeInTheDocument();
+    expect(window.location.pathname).not.toBe("/projects");
   });
 });

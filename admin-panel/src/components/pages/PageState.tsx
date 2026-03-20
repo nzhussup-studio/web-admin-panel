@@ -38,7 +38,7 @@ const PageState = ({
   if (error) {
     const normalizedError = error as { status?: number; response?: string };
 
-    if (normalizedError.status === 401) {
+    if (normalizedError.status === 401 || normalizedError.status === 403) {
       return <ForbiddenPage showHeader={false} />;
     }
 

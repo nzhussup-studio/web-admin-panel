@@ -2,7 +2,7 @@ import routes from "@/router/routes";
 
 describe("router/routes.ts", () => {
   test("defines the expected public and protected paths", () => {
-    expect(routes).toHaveLength(12);
+    expect(routes).toHaveLength(13);
     expect(routes.map((route) => route.path)).toEqual([
       "/",
       "/projects",
@@ -13,17 +13,22 @@ describe("router/routes.ts", () => {
       "/cv/education",
       "/albums",
       "/albums/:id",
+      "/public/albums/:id",
       "/cv-generator",
       "/forbidden",
       "*",
     ]);
   });
 
-  test("marks only forbidden and not-found as public routes", () => {
+  test("marks public album, forbidden, and not-found as public routes", () => {
     const publicRoutes = routes.filter((route) => !route.isProtected);
 
-    expect(publicRoutes).toHaveLength(2);
-    expect(publicRoutes.map((route) => route.path)).toEqual(["/forbidden", "*"]);
+    expect(publicRoutes).toHaveLength(3);
+    expect(publicRoutes.map((route) => route.path)).toEqual([
+      "/public/albums/:id",
+      "/forbidden",
+      "*",
+    ]);
   });
 
   test("assigns a component to every route", () => {

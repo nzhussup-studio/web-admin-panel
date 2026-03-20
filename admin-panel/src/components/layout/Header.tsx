@@ -29,14 +29,16 @@ interface HeaderProps {
   text?: string;
   showClearCacheButton?: boolean;
   titleContent?: ReactNode;
+  allowUnauthenticatedLogin?: boolean;
 }
 
 const Header = ({
   text,
   showClearCacheButton = true,
   titleContent,
+  allowUnauthenticatedLogin = false,
 }: HeaderProps) => {
-  const { state, logout } = useAuth();
+  const { state, login, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
   const { triggerAlert } = useOptionalGlobalAlert();
@@ -53,6 +55,11 @@ const Header = ({
   };
 
   const handleAuthAction = () => {
+    if (!state.isAuthenticated) {
+      void login();
+      return;
+    }
+
     setConfirmDialog({
       title: "Logout",
       message: "Are you sure you want to logout?",
@@ -138,24 +145,34 @@ const Header = ({
                 </Button>
               )}
               <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleDarkMode} />
-              <Button
-                type="button"
-                variant="link"
-                className="app-profile-action"
-                onClick={handleProfileClick}
-                aria-label="Profile"
-              >
-                {extractInitialsFromState(state)}
-              </Button>
-              <Button
-                type="button"
-                variant="link"
-                className="app-icon-action"
-                onClick={handleAuthAction}
-                aria-label="Logout"
-              >
-                <LogoutIcon width={25} height={25} />
-              </Button>
+              {state.isAuthenticated ? (
+                <Button
+                  type="button"
+                  variant="link"
+                  className="app-profile-action"
+                  onClick={handleProfileClick}
+                  aria-label="Profile"
+                >
+                  {extractInitialsFromState(state)}
+                </Button>
+              ) : null}
+              {state.isAuthenticated || allowUnauthenticatedLogin ? (
+                <Button
+                  type="button"
+                  variant={state.isAuthenticated ? "link" : "outline-primary"}
+                  className={
+                    state.isAuthenticated ? "app-icon-action" : undefined
+                  }
+                  onClick={handleAuthAction}
+                  aria-label={state.isAuthenticated ? "Logout" : "Login"}
+                >
+                  {state.isAuthenticated ? (
+                    <LogoutIcon width={25} height={25} />
+                  ) : (
+                    "Login"
+                  )}
+                </Button>
+              ) : null}
             </div>
           </Col>
         </Row>

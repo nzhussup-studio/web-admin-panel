@@ -10,6 +10,7 @@ import NotFoundPage from "@/pages/errors/NotFoundPage";
 import ForbiddenPage from "@/pages/errors/ForbiddenPage";
 import AlbumsPage from "@/pages/albums/AlbumsPage";
 import AlbumPage from "@/pages/albums/AlbumPage";
+import PublicAlbumPage from "@/pages/albums/PublicAlbumPage";
 import CvGeneratorPage from "@/pages/cv/CvGeneratorPage";
 
 const routes: AppRoute[] = [
@@ -57,6 +58,11 @@ const routes: AppRoute[] = [
     path: "/albums/:id",
     component: AlbumPage,
     isProtected: true,
+  },
+  {
+    path: "/public/albums/:id",
+    component: PublicAlbumPage,
+    isProtected: false,
   },
   {
     path: "/cv-generator",

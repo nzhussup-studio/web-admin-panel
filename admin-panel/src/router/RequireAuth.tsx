@@ -6,8 +6,12 @@ import LoadingState from "@/components/states/LoadingState";
 const RequireAuth = ({ children }: { children: ReactNode }) => {
   const { state } = useAuth();
 
-  if (state.loading || !state.isAuthenticated) {
+  if (state.loading) {
     return <LoadingState />;
+  }
+
+  if (!state.isAuthenticated) {
+    return <Navigate to="/forbidden" replace />;
   }
 
   if (!state.roles.includes("ROLE_ADMIN")) {

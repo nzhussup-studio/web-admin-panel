@@ -73,60 +73,62 @@ const FramedImageCard = ({
             }}
           />
 
-          {/* Delete Button - Top Right */}
-          <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete?.();
-            }}
-            aria-label="Delete image"
-            variant="danger"
-            style={{
-              position: "absolute",
-              top: "8px",
-              right: "8px",
-              width: "36px",
-              height: "36px",
-              borderRadius: "50%",
-              zIndex: 10,
-              boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              padding: 0,
-            }}
-          >
-            <X size={18} />
-          </Button>
+          {onDelete ? (
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              aria-label="Delete image"
+              variant="danger"
+              style={{
+                position: "absolute",
+                top: "8px",
+                right: "8px",
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                zIndex: 10,
+                boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                padding: 0,
+              }}
+            >
+              <X size={18} />
+            </Button>
+          ) : null}
 
-          {/* Edit Button - Top Left */}
-          <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit?.();
-            }}
-            aria-label="Edit image"
-            variant="success"
-            size="sm"
-            style={{
-              position: "absolute",
-              top: "8px",
-              left: "8px",
-              width: "36px",
-              height: "36px",
-              borderRadius: "50%",
-              zIndex: 10,
-              boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              padding: 0,
-            }}
-          >
-            Edit
-          </Button>
+          {onEdit ? (
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit();
+              }}
+              aria-label="Edit image"
+              variant="success"
+              size="sm"
+              style={{
+                position: "absolute",
+                top: "8px",
+                left: "8px",
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                zIndex: 10,
+                boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                padding: 0,
+              }}
+            >
+              Edit
+            </Button>
+          ) : null}
 
           {imageId && (
             <Badge

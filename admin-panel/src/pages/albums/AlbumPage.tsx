@@ -270,6 +270,40 @@ const AlbumPage = () => {
     setIsAscending((prev) => !prev);
   };
 
+  const handleCopyPublicLink = async () => {
+    if (!album?.id) return;
+
+    if (!["public", "semi-public"].includes(album.type)) {
+      triggerAlert(
+        "Public links are only available for public or semi-public albums.",
+        "warning",
+      );
+      return;
+    }
+
+    const publicUrl = `${window.location.origin}/public/albums/${album.id}`;
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(publicUrl);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = publicUrl;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+
+      triggerAlert("Public album link copied to clipboard!", "success");
+    } catch (copyError) {
+      triggerAlert(
+        getApiErrorMessage(copyError, "Failed to copy public album link"),
+        "danger",
+      );
+    }
+  };
+
   const albumImagesSection = (
     <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-4">
       {album?.images?.map((image) => (
@@ -306,6 +340,11 @@ const AlbumPage = () => {
             Back
           </Button>
           <ButtonGroup className="ms-auto">
+            {album && ["public", "semi-public"].includes(album.type) ? (
+              <Button variant="outline-success" onClick={handleCopyPublicLink}>
+                Copy Public Link
+              </Button>
+            ) : null}
             <Button
               variant="outline-primary"
               className="d-inline-flex align-items-center gap-2"

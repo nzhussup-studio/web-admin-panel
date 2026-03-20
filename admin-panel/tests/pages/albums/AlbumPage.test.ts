@@ -2,15 +2,15 @@ import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import AlbumPage from "@/pages/albums/AlbumPage";
 import { AlbumService, ImageService } from "@/lib/api/client";
-import { useGlobalAlert } from "@/hooks/alerts/useGlobalAlert";
+import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
 import { useNavigate, useParams } from "react-router-dom";
 
 const mockNavigate = jest.fn();
 const mockTriggerAlert = jest.fn();
 const mockUseParams = useParams as jest.MockedFunction<typeof useParams>;
 const mockUseNavigate = useNavigate as jest.MockedFunction<typeof useNavigate>;
-const mockUseGlobalAlert = useGlobalAlert as jest.MockedFunction<
-  typeof useGlobalAlert
+const mockUseOptionalGlobalAlert = useOptionalGlobalAlert as jest.MockedFunction<
+  typeof useOptionalGlobalAlert
 >;
 const mockGetAlbum = AlbumService.getV1Album1 as jest.Mock;
 const mockUploadImage = ImageService.postV1AlbumUpload as jest.Mock;
@@ -23,8 +23,8 @@ jest.mock("react-router-dom", () => ({
   useNavigate: jest.fn(),
 }));
 
-jest.mock("@/hooks/alerts/useGlobalAlert", () => ({
-  useGlobalAlert: jest.fn(),
+jest.mock("@/hooks/alerts/useOptionalGlobalAlert", () => ({
+  useOptionalGlobalAlert: jest.fn(),
 }));
 
 jest.mock("@/lib/api/client", () => ({
@@ -188,6 +188,7 @@ const createAlbumResponse = () => ({
   data: {
     id: "album-1",
     title: "Summer Album",
+    type: "public",
     images: [
       { id: "img-1", url: "/images/1.jpg" },
       { id: "img-2", url: "/images/2.jpg" },
@@ -201,7 +202,7 @@ describe("pages/albums/AlbumPage.tsx", () => {
     createFileReaderMock();
     mockUseParams.mockReturnValue({ id: "album-1" });
     mockUseNavigate.mockReturnValue(mockNavigate);
-    mockUseGlobalAlert.mockReturnValue({
+    mockUseOptionalGlobalAlert.mockReturnValue({
       alert: { show: false, message: "", type: "success" },
       triggerAlert: mockTriggerAlert,
       closeAlert: jest.fn(),
@@ -305,5 +306,44 @@ describe("pages/albums/AlbumPage.tsx", () => {
       expect(mockDeleteImage).toHaveBeenCalledWith("album-1", "img-2"),
     );
     await waitFor(() => expect(mockGetAlbum).toHaveBeenCalledTimes(2));
+  });
+
+  test("copies a public link for shareable albums", async () => {
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: jest.fn().mockResolvedValue(undefined),
+      },
+    });
+
+    render(React.createElement(AlbumPage));
+    await waitFor(() => expect(mockGetAlbum).toHaveBeenCalledTimes(1));
+
+    fireEvent.click(screen.getByText("Copy Public Link"));
+
+    await waitFor(() =>
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+        "http://localhost/public/albums/album-1",
+      ),
+    );
+    expect(mockTriggerAlert).toHaveBeenCalledWith(
+      "Public album link copied to clipboard!",
+      "success",
+    );
+  });
+
+  test("does not render a public link action for private albums", async () => {
+    mockGetAlbum.mockResolvedValue({
+      data: {
+        id: "album-1",
+        title: "Private Album",
+        type: "private",
+        images: [{ id: "img-1", url: "/images/1.jpg" }],
+      },
+    });
+
+    render(React.createElement(AlbumPage));
+    await waitFor(() => expect(mockGetAlbum).toHaveBeenCalledTimes(1));
+
+    expect(screen.queryByText("Copy Public Link")).not.toBeInTheDocument();
   });
 });
