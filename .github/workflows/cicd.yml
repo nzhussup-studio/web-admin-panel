@@ -64,19 +64,37 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Validate API base
+      - name: Validate frontend runtime variables
         run: |
           if [ -z "${{ vars.API_BASE }}" ]; then
             echo "vars.API_BASE is empty"
             exit 1
           fi
+          if [ -z "${{ vars.KEYCLOAK_URL }}" ]; then
+            echo "vars.KEYCLOAK_URL is empty"
+            exit 1
+          fi
+          if [ -z "${{ vars.KEYCLOAK_REALM }}" ]; then
+            echo "vars.KEYCLOAK_REALM is empty"
+            exit 1
+          fi
+          if [ -z "${{ vars.KEYCLOAK_CLIENT_ID }}" ]; then
+            echo "vars.KEYCLOAK_CLIENT_ID is empty"
+            exit 1
+          fi
           echo "Using API base: ${{ vars.API_BASE }}"
+          echo "Using Keycloak URL: ${{ vars.KEYCLOAK_URL }}"
+          echo "Using Keycloak realm: ${{ vars.KEYCLOAK_REALM }}"
+          echo "Using Keycloak client id: ${{ vars.KEYCLOAK_CLIENT_ID }}"
 
       - name: Build and Push Docker Image
         run: |
           docker buildx build \
             --platform linux/amd64 \
             --build-arg VITE_API_BASE=${{ vars.API_BASE }} \
+            --build-arg VITE_KEYCLOAK_URL=${{ vars.KEYCLOAK_URL }} \
+            --build-arg VITE_KEYCLOAK_REALM=${{ vars.KEYCLOAK_REALM }} \
+            --build-arg VITE_KEYCLOAK_CLIENT_ID=${{ vars.KEYCLOAK_CLIENT_ID }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/web-admin-panel:latest \
             --push .
         working-directory: admin-panel
