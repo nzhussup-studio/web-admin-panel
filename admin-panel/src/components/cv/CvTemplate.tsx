@@ -35,7 +35,14 @@ const Section = ({ title, children }) => (
   </section>
 );
 
-const Item = ({ title, subtitle, date, description, techStack = "" }) => (
+const Item = ({
+  title,
+  subtitle,
+  date,
+  description,
+  additionalInfo = "",
+  techStack = "",
+}) => (
   <div
     style={{
       marginBottom: "8px",
@@ -70,8 +77,21 @@ const Item = ({ title, subtitle, date, description, techStack = "" }) => (
     )}
 
     {description && (
-      <div style={{ marginTop: "3px", lineHeight: 1.35, textAlign: "justify" }}>
+      <div
+        style={{
+          marginTop: "3px",
+          lineHeight: 1.35,
+          textAlign: "justify",
+          whiteSpace: "pre-line",
+        }}
+      >
         {description}
+      </div>
+    )}
+
+    {additionalInfo && (
+      <div style={{ marginTop: "2px", lineHeight: 1.25, color: THEME.muted }}>
+        {additionalInfo}
       </div>
     )}
 
@@ -283,9 +303,6 @@ const CvTemplate = ({ data }) => {
               if (edu.description) {
                 descriptionParts.push(edu.description);
               }
-              if (edu.thesis) {
-                descriptionParts.push(`Thesis: ${edu.thesis}`);
-              }
 
               return (
                 <div key={edu.id} style={{ marginBottom: "2px" }}>
@@ -294,6 +311,7 @@ const CvTemplate = ({ data }) => {
                     subtitle={`${edu.institution}, ${edu.location}`}
                     date={date}
                     description={descriptionParts.join(". ")}
+                    additionalInfo={edu.thesis ? `Thesis: ${edu.thesis}` : ""}
                   />
                 </div>
               );
@@ -333,7 +351,13 @@ const CvTemplate = ({ data }) => {
                     </a>
                   )}
                   {project.description && (
-                    <div style={{ marginTop: "1px", lineHeight: 1.2 }}>
+                    <div
+                      style={{
+                        marginTop: "1px",
+                        lineHeight: 1.2,
+                        whiteSpace: "pre-line",
+                      }}
+                    >
                       {project.description}
                     </div>
                   )}
