@@ -8,7 +8,7 @@ import {
   SkillControllerService,
   WorkExperienceControllerService,
 } from "@/lib/api/client";
-import { generateCV } from "@/lib/cv/generateCv";
+import { generateCV, previewCV } from "@/lib/cv/generateCv";
 import { useNavigate } from "react-router-dom";
 
 const mockNavigate = jest.fn();
@@ -17,7 +17,10 @@ jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useNavigate: jest.fn(),
 }));
-jest.mock("@/lib/cv/generateCv", () => ({ generateCV: jest.fn() }));
+jest.mock("@/lib/cv/generateCv", () => ({
+  generateCV: jest.fn(),
+  previewCV: jest.fn(),
+}));
 jest.mock("@/lib/api/client", () => ({
   WorkExperienceControllerService: { listWorkExperience: jest.fn() },
   EducationControllerService: { listEducation: jest.fn() },
@@ -153,5 +156,115 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
     fireEvent.click(screen.getAllByRole("checkbox")[0]);
 
     expect(screen.getAllByText("Selected").length).toBeGreaterThan(0);
+  });
+
+  test("previews selected CV data", async () => {
+    render(React.createElement(CvGeneratorPage));
+    await waitFor(() => expect(screen.getByText("work experience")).toBeInTheDocument());
+
+    fireEvent.click(screen.getAllByRole("checkbox")[0]);
+    fireEvent.click(screen.getByText("Preview"));
+
+    expect(previewCV).toHaveBeenCalledWith(
+      expect.objectContaining({
+        basic_info: expect.objectContaining({ name: "Nurzhanat Zhussup" }),
+        work_experience: [expect.objectContaining({ id: 1 })],
+      })
+    );
+  });
+
+  test("uses custom description override in export payload without backend writes", async () => {
+    (WorkExperienceControllerService.listWorkExperience as jest.Mock).mockResolvedValue([
+      {
+        id: 1,
+        displayOrder: 1,
+        position: "Engineer",
+        description: "Original backend description",
+      },
+    ]);
+
+    render(React.createElement(CvGeneratorPage));
+    await waitFor(() => expect(screen.getByText("work experience")).toBeInTheDocument());
+
+    fireEvent.click(screen.getAllByRole("checkbox")[0]);
+    fireEvent.change(
+      screen.getByPlaceholderText(/Current:/),
+      { target: { value: "Compressed custom version" } }
+    );
+    fireEvent.click(screen.getByText("Export to PDF"));
+
+    expect(generateCV).toHaveBeenCalledWith(
+      expect.objectContaining({
+        work_experience: [
+          expect.objectContaining({
+            id: 1,
+            description: "Compressed custom version",
+          }),
+        ],
+      }),
+      "pdf"
+    );
+    expect(WorkExperienceControllerService.listWorkExperience).toHaveBeenCalledTimes(1);
+  });
+
+  test("clear overrides button is disabled with no overrides and enabled when overrides exist", async () => {
+    (WorkExperienceControllerService.listWorkExperience as jest.Mock).mockResolvedValue([
+      {
+        id: 1,
+        displayOrder: 1,
+        position: "Engineer",
+        description: "Backend description exists",
+      },
+    ]);
+
+    render(React.createElement(CvGeneratorPage));
+    await waitFor(() => expect(screen.getByText("work experience")).toBeInTheDocument());
+
+    expect(screen.getByText("Clear Overrides")).toBeDisabled();
+
+    fireEvent.click(screen.getAllByRole("checkbox")[0]);
+    fireEvent.change(await screen.findByPlaceholderText(/Current:/), {
+      target: { value: "Short custom text" },
+    });
+
+    await waitFor(() => expect(screen.getByText("Clear Overrides")).toBeEnabled());
+
+    fireEvent.click(screen.getByText("Clear Overrides"));
+    await waitFor(() => expect(screen.getByText("Clear Overrides")).toBeDisabled());
+  });
+
+  test("persists description overrides in localStorage and restores after remount", async () => {
+    (WorkExperienceControllerService.listWorkExperience as jest.Mock).mockResolvedValue([
+      {
+        id: 1,
+        displayOrder: 1,
+        position: "Engineer",
+        description: "Backend description exists",
+      },
+    ]);
+
+    const { unmount } = render(React.createElement(CvGeneratorPage));
+    await waitFor(() => expect(screen.getByText("work experience")).toBeInTheDocument());
+
+    fireEvent.click(screen.getAllByRole("checkbox")[0]);
+    fireEvent.change(await screen.findByPlaceholderText(/Current:/), {
+      target: { value: "Persistent override text" },
+    });
+
+    await waitFor(() => {
+      const saved = JSON.parse(
+        localStorage.getItem("cvGeneratorSelectedItems") || "{}"
+      );
+      expect(saved.descriptionOverrides["work_experience:1"]).toBe(
+        "Persistent override text"
+      );
+    });
+
+    unmount();
+    render(React.createElement(CvGeneratorPage));
+    await waitFor(() => expect(screen.getByText("work experience")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Persistent override text")).toBeInTheDocument()
+    );
   });
 });

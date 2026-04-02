@@ -1,5 +1,5 @@
 import { act } from "@testing-library/react";
-import { generateCV } from "@/lib/cv/generateCv";
+import { generateCV, previewCV } from "@/lib/cv/generateCv";
 
 jest.mock("html2pdf.js", () => ({
   __esModule: true,
@@ -26,7 +26,7 @@ const mockedHtml2PdfModule = jest.requireMock("html2pdf.js") as {
   mockHtml2Pdf: jest.Mock;
 };
 
-describe("lib/cv/generateCv.tsx", () => {
+describe("lib/cv/generateCv.ts", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -52,42 +52,48 @@ describe("lib/cv/generateCv.tsx", () => {
     expect(removeSpy).toHaveBeenCalled();
   });
 
-  test("generates a word document download link", () => {
-    jest.useFakeTimers();
-    const createObjectURLSpy = jest.fn(() => "blob:test");
-    const revokeObjectURLSpy = jest.fn();
-    Object.defineProperty(URL, "createObjectURL", {
-      configurable: true,
-      writable: true,
-      value: createObjectURLSpy,
-    });
-    Object.defineProperty(URL, "revokeObjectURL", {
-      configurable: true,
-      writable: true,
-      value: revokeObjectURLSpy,
-    });
-    const clickSpy = jest
-      .spyOn(HTMLAnchorElement.prototype, "click")
-      .mockImplementation(() => undefined);
-
-    generateCV({ basic_info: { name: "User" } }, "word");
-
-    expect(createObjectURLSpy).toHaveBeenCalled();
-    expect(clickSpy).toHaveBeenCalled();
-
-    act(() => {
-      jest.advanceTimersByTime(100);
-    });
-
-    expect(revokeObjectURLSpy).toHaveBeenCalledWith("blob:test");
-    jest.useRealTimers();
-  });
-
   test("alerts on unsupported output formats", () => {
     const alertSpy = jest.spyOn(window, "alert").mockImplementation(() => undefined);
 
     generateCV({ basic_info: { name: "User" } }, "txt");
 
     expect(alertSpy).toHaveBeenCalledWith("Unsupported output format: txt");
+  });
+
+  test("opens preview window and writes html content", () => {
+    const documentOpen = jest.fn();
+    const documentWrite = jest.fn();
+    const documentClose = jest.fn();
+    const openSpy = jest
+      .spyOn(window, "open")
+      .mockImplementation(
+        () =>
+          ({
+            document: {
+              open: documentOpen,
+              write: documentWrite,
+              close: documentClose,
+            },
+          }) as unknown as Window
+      );
+
+    previewCV({ basic_info: { name: "Preview User" } });
+
+    expect(openSpy).toHaveBeenCalledWith("", "_blank");
+    expect(documentOpen).toHaveBeenCalled();
+    expect(documentWrite).toHaveBeenCalledWith(expect.stringContaining("CV Preview"));
+    expect(documentWrite).toHaveBeenCalledWith(expect.stringContaining("Preview User"));
+    expect(documentClose).toHaveBeenCalled();
+  });
+
+  test("alerts when preview window is blocked", () => {
+    jest.spyOn(window, "open").mockImplementation(() => null);
+    const alertSpy = jest.spyOn(window, "alert").mockImplementation(() => undefined);
+
+    previewCV({ basic_info: { name: "Preview User" } });
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      "Preview window was blocked. Please allow pop-ups for this site."
+    );
   });
 });

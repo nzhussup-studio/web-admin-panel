@@ -3,7 +3,6 @@ import PageState from "@/components/pages/PageState";
 import GlobalAlert from "@/components/layout/GlobalAlert";
 import { useCallback, useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Badge from "react-bootstrap/Badge";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
@@ -20,13 +19,14 @@ import {
 } from "@/lib/api/client";
 import { getApiErrorMessage, normalizeApiError } from "@/lib/api/errors";
 import config from "@/config/app-config";
-import { generateCV } from "@/lib/cv/generateCv";
+import { generateCV, previewCV } from "@/lib/cv/generateCv";
 import { BackCircleIcon, DownloadIcon, FunnelIcon } from "@/assets/icons";
 import { useNavigate } from "react-router-dom";
 import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
 
 type BasicInfo = Record<string, string>;
 type SelectedItems = Record<string, Set<string | number>>;
+type DescriptionOverrides = Record<string, string>;
 
 const IGNORED_ITEM_FIELDS = new Set([
   "id",
@@ -72,6 +72,19 @@ const formatLabel = (value: string) =>
     .replace(/_/g, " ")
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
+
+const DEFAULT_BASIC_INFO: BasicInfo = {
+  name: "Nurzhanat Zhussup",
+  address: "123 Main St, Vienna, Austria",
+  email: "john.doe@example.com",
+  phone: "+7 777 777 7777",
+  website: "https://nzhussup.dev",
+  linkedin: "https://www.linkedin.com/in/nurzhanat-zhussup/",
+  github: "https://github.com/nzhussup",
+  image_url: "",
+  about:
+    "A passionate software engineer with a focus on backend and infrastructure.",
+};
 
 const formatScalar = (value: unknown): string => {
   if (value == null) {
@@ -124,6 +137,36 @@ const getLongDescription = (item: Record<string, unknown>) => {
 
   return "";
 };
+
+const buildOverrideKey = (sectionName: string, itemId: string | number) =>
+  `${sectionName}:${itemId}`;
+
+const applyDescriptionOverride = (
+  item: Record<string, unknown>,
+  overrideText: string,
+) => {
+  const trimmedOverride = overrideText.trim();
+  if (!trimmedOverride) {
+    return item;
+  }
+
+  const updatedItem = { ...item };
+  const existingField = LONG_TEXT_FIELDS.find((field) => {
+    const value = updatedItem[field];
+    return typeof value === "string";
+  });
+
+  if (existingField) {
+    updatedItem[existingField] = trimmedOverride;
+  } else {
+    updatedItem.description = trimmedOverride;
+  }
+
+  return updatedItem;
+};
+
+const canOverrideDescription = (item: Record<string, unknown>) =>
+  Boolean(getLongDescription(item));
 
 const getMetadataEntries = (item: Record<string, unknown>) =>
   Object.entries(item)
@@ -203,40 +246,34 @@ const CvGeneratorPage = () => {
       const saved = localStorage.getItem(config.cvGeneratorLocalStorageKey);
       if (saved) {
         const parsed = JSON.parse(saved);
-        return (
-          parsed.basicInfo || {
-            name: "Nurzhanat Zhussup",
-            address: "123 Main St, Vienna, Austria",
-            email: "john.doe@example.com",
-            phone: "+7 777 777 7777",
-            website: "https://nzhussup.dev",
-            linkedin: "https://www.linkedin.com/in/nurzhanat-zhussup/",
-            github: "https://github.com/nzhussup",
-            about:
-              "A passionate software engineer with a focus on cloud and ML.",
-          }
-        );
+        return {
+          ...DEFAULT_BASIC_INFO,
+          ...(parsed.basicInfo || {}),
+        };
       }
     } catch (e) {
       console.error("Failed to parse basic info from localStorage", e);
     }
-    return {
-      name: "Nurzhanat Zhussup",
-      address: "123 Main St, Vienna, Austria",
-      email: "john.doe@example.com",
-      phone: "+7 777 777 7777",
-      website: "https://nzhussup.dev",
-      linkedin: "https://www.linkedin.com/in/nurzhanat-zhussup/",
-      github: "https://github.com/nzhussup",
-      about:
-        "A passionate software engineer with a focus on backend and infrastructure.",
-    };
+    return DEFAULT_BASIC_INFO;
   });
 
   const [data, setData] = useState<any[]>([]);
   const [isAscending, setIsAscending] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
   const [error, setError] = useState<any>(null);
+  const [descriptionOverrides, setDescriptionOverrides] =
+    useState<DescriptionOverrides>(() => {
+      try {
+        const saved = localStorage.getItem(config.cvGeneratorLocalStorageKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          return parsed.descriptionOverrides || {};
+        }
+      } catch (e) {
+        console.error("Failed to parse description overrides from localStorage", e);
+      }
+      return {};
+    });
 
   const fetchData = useCallback(async () => {
     setShowLoading(true);
@@ -307,13 +344,18 @@ const CvGeneratorPage = () => {
     const fullState = {
       basicInfo,
       selectedItems: serializableSelected,
+      descriptionOverrides,
     };
 
     localStorage.setItem(
       config.cvGeneratorLocalStorageKey,
       JSON.stringify(fullState),
     );
-  }, [selectedItems, basicInfo]);
+  }, [selectedItems, basicInfo, descriptionOverrides]);
+
+  const hasOverrides = Object.values(descriptionOverrides).some((value) =>
+    String(value || "").trim().length > 0,
+  );
 
   const toggleSelect = (sectionName: string, itemId: string | number) => {
     setSelectedItems((prev) => {
@@ -327,18 +369,31 @@ const CvGeneratorPage = () => {
     });
   };
 
-  const handleGenerateCV = (output) => {
+  const buildSelectedData = () => {
     const selectedData = { basic_info: basicInfo };
     for (const sectionObj of data) {
       const sectionName = Object.keys(sectionObj)[0];
       const items = sectionObj[sectionName];
       const selectedIndices = selectedItems[sectionName];
       if (selectedIndices && selectedIndices.size > 0) {
-        selectedData[sectionName] = items.filter((item) =>
-          selectedIndices.has(item.id),
-        );
+        selectedData[sectionName] = items
+          .filter((item) => selectedIndices.has(item.id))
+          .map((item) => {
+            if (!canOverrideDescription(item)) {
+              return item;
+            }
+            return applyDescriptionOverride(
+              item,
+              descriptionOverrides[buildOverrideKey(sectionName, item.id)] || "",
+            );
+          });
       }
     }
+    return selectedData;
+  };
+
+  const handleGenerateCV = (output) => {
+    const selectedData = buildSelectedData();
     if (Object.keys(selectedData).length === 0) {
       setAlertMessage("Please select at least one item to generate CV.");
       setAlertVisible(true);
@@ -347,6 +402,11 @@ const CvGeneratorPage = () => {
       setAlertVisible(true);
     }
     generateCV(selectedData, output);
+  };
+
+  const handlePreviewCV = () => {
+    const selectedData = buildSelectedData();
+    previewCV(selectedData);
   };
 
   const toggleSort = () => {
@@ -445,20 +505,58 @@ const CvGeneratorPage = () => {
                   const itemId = item.id;
                   const isChecked =
                     selectedItems[sectionName]?.has(itemId) || false;
+                  const overrideKey = buildOverrideKey(sectionName, itemId);
+                  const overrideValue = descriptionOverrides[overrideKey] || "";
+                  const defaultDescription = getLongDescription(item);
+                  const showOverrideInput =
+                    isChecked && canOverrideDescription(item);
 
                   return (
-                    <Form.Check
-                      key={itemId}
-                      type="checkbox"
-                      className={`position-relative rounded-4 border px-3 py-2 mb-2 shadow-sm ${
-                        isChecked
-                          ? "bg-primary-subtle border-primary-subtle"
-                          : "bg-body-tertiary border-secondary-subtle"
-                      }`}
-                      checked={isChecked}
-                      onChange={() => toggleSelect(sectionName, itemId)}
-                      label={renderItemLabel(sectionName, item, isChecked)}
-                    />
+                    <div key={itemId} className="mb-2">
+                      <Form.Check
+                        type="checkbox"
+                        className={`position-relative rounded-4 border px-3 py-2 shadow-sm ${
+                          isChecked
+                            ? "bg-primary-subtle border-primary-subtle"
+                            : "bg-body-tertiary border-secondary-subtle"
+                        }`}
+                        checked={isChecked}
+                        onChange={() => toggleSelect(sectionName, itemId)}
+                        label={renderItemLabel(sectionName, item, isChecked)}
+                      />
+                      {showOverrideInput ? (
+                        <Form.Group className="mt-2">
+                          <Form.Label className="small text-body-secondary mb-1">
+                            Custom description override (optional)
+                          </Form.Label>
+                          <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={overrideValue}
+                            placeholder={
+                              defaultDescription
+                                ? `Current: ${defaultDescription.slice(0, 140)}${
+                                    defaultDescription.length > 140 ? "..." : ""
+                                  }`
+                                : "Type a custom compressed description..."
+                            }
+                            onChange={(e) =>
+                              setDescriptionOverrides((prev) => {
+                                const nextValue = e.target.value;
+                                if (!nextValue.trim()) {
+                                  const { [overrideKey]: _removed, ...rest } = prev;
+                                  return rest;
+                                }
+                                return {
+                                  ...prev,
+                                  [overrideKey]: nextValue,
+                                };
+                              })
+                            }
+                          />
+                        </Form.Group>
+                      ) : null}
+                    </div>
                   );
                 })
               ) : (
@@ -503,24 +601,29 @@ const CvGeneratorPage = () => {
               <FunnelIcon width={16} height={16} />
               Sort
             </Button>
-            <ButtonGroup>
-              <Button
-                variant="outline-primary"
-                className="d-inline-flex align-items-center gap-2"
-                onClick={() => handleGenerateCV("pdf")}
-              >
-                <DownloadIcon width={16} height={16} />
-                Export to PDF
-              </Button>
-              <Button
-                variant="primary"
-                className="d-inline-flex align-items-center gap-2"
-                onClick={() => handleGenerateCV("word")}
-              >
-                <DownloadIcon width={16} height={16} />
-                Export to Word
-              </Button>
-            </ButtonGroup>
+            <Button
+              variant="outline-secondary"
+              className="d-inline-flex align-items-center gap-2"
+              onClick={handlePreviewCV}
+            >
+              Preview
+            </Button>
+            <Button
+              variant="outline-danger"
+              className="d-inline-flex align-items-center gap-2"
+              onClick={() => setDescriptionOverrides({})}
+              disabled={!hasOverrides}
+            >
+              Clear Overrides
+            </Button>
+            <Button
+              variant="outline-primary"
+              className="d-inline-flex align-items-center gap-2"
+              onClick={() => handleGenerateCV("pdf")}
+            >
+              <DownloadIcon width={16} height={16} />
+              Export to PDF
+            </Button>
           </div>
         </Stack>
 
