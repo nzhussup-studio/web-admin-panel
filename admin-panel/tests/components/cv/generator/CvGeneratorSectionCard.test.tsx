@@ -45,7 +45,7 @@ describe("components/cv/generator/CvGeneratorSectionCard.tsx", () => {
     expect(baseCallbacks.onToggleItem).toHaveBeenCalledWith("work_experience", 1);
   });
 
-  test("shows override input for selected overridable item", () => {
+  test("shows project description input for selected project", () => {
     render(
       <CvGeneratorSectionCard
         sectionName="projects"
@@ -63,9 +63,8 @@ describe("components/cv/generator/CvGeneratorSectionCard.tsx", () => {
       />, 
     );
 
-    expect(
-      screen.getByPlaceholderText("Current: Old description"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Project description (optional)")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Current: Old description")).toBeInTheDocument();
 
     fireEvent.change(screen.getByDisplayValue("Custom text"), {
       target: { value: "Updated custom" },

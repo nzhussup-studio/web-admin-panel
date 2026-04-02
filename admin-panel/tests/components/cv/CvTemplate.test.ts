@@ -57,6 +57,7 @@ describe("components/cv/CvTemplate.tsx", () => {
               displayOrder: 1,
               name: "Portfolio",
               url: "https://project.test",
+              purpose: "Showcase product engineering skills.",
               techStack: "React",
             },
           ],
@@ -78,6 +79,9 @@ describe("components/cv/CvTemplate.tsx", () => {
     expect(screen.getByText("Skills")).toBeInTheDocument();
     expect(screen.getByText("Projects")).toBeInTheDocument();
     expect(screen.getByText("Certificates")).toBeInTheDocument();
+    expect(
+      screen.getByText("Showcase product engineering skills."),
+    ).toBeInTheDocument();
     expect(screen.getAllByText(/Tech Stack:/)).toHaveLength(2);
   });
 

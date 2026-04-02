@@ -361,6 +361,18 @@ const CvTemplate = ({ data }) => {
                       {project.description}
                     </div>
                   )}
+                  {project.purpose && (
+                    <div
+                      style={{
+                        marginTop: "1px",
+                        lineHeight: 1.2,
+                        color: THEME.muted,
+                        whiteSpace: "pre-line",
+                      }}
+                    >
+                      {project.purpose}
+                    </div>
+                  )}
                   {project.techStack && (
                     <div
                       style={{

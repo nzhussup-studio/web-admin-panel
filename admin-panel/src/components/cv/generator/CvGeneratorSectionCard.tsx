@@ -48,6 +48,8 @@ const entryClassName = (isChecked: boolean) =>
       : "bg-body-tertiary border-secondary-subtle"
   }`;
 
+const PROJECTS_SECTION_NAME = "projects";
+
 const CvGeneratorSectionCard = ({
   sectionName,
   items,
@@ -169,7 +171,9 @@ const CvGeneratorSectionCard = ({
             const overrideKey = buildOverrideKey(sectionName, itemId);
             const overrideValue = descriptionOverrides[overrideKey] || "";
             const defaultDescription = getLongDescription(item);
-            const showOverrideInput = isChecked && canOverrideDescription(item);
+            const isProjectsSection = sectionName === PROJECTS_SECTION_NAME;
+            const showOverrideInput =
+              isChecked && (canOverrideDescription(item) || isProjectsSection);
 
             return (
               <div key={itemId} className="mb-2">
@@ -191,7 +195,9 @@ const CvGeneratorSectionCard = ({
                 {showOverrideInput ? (
                   <Form.Group className="mt-2">
                     <Form.Label className="small text-body-secondary mb-1">
-                      Custom description override (optional)
+                      {isProjectsSection
+                        ? "Project description (optional)"
+                        : "Custom description override (optional)"}
                     </Form.Label>
                     <Form.Control
                       as="textarea"
@@ -202,7 +208,9 @@ const CvGeneratorSectionCard = ({
                           ? `Current: ${defaultDescription.slice(0, 140)}${
                               defaultDescription.length > 140 ? "..." : ""
                             }`
-                          : `Type a custom ${formatLabel(sectionName)} description...`
+                          : isProjectsSection
+                            ? "Type additional project description (optional)..."
+                            : `Type a custom ${formatLabel(sectionName)} description...`
                       }
                       onChange={(e) =>
                         onSetDescriptionOverride(

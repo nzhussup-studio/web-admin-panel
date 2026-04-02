@@ -9,6 +9,7 @@ const IGNORED_ITEM_FIELDS = new Set([
 
 const LONG_TEXT_FIELDS = [
   "description",
+  "purpose",
   "summary",
   "about",
   "responsibilities",

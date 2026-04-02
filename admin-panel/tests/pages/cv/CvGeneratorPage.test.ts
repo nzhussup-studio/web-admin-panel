@@ -202,6 +202,39 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
     );
   });
 
+  test("exports project override as project purpose", async () => {
+    (ProjectControllerService.listProject as jest.Mock).mockResolvedValue([
+      { id: 4, displayOrder: 1, name: "Portfolio", techStack: "React" },
+    ]);
+
+    render(React.createElement(CvGeneratorPage));
+    await waitFor(() => expect(screen.getByText("projects")).toBeInTheDocument());
+
+    const projectsCard = screen.getByText("projects").closest(".card");
+    expect(projectsCard).not.toBeNull();
+    fireEvent.click(within(projectsCard as HTMLElement).getByRole("checkbox"));
+    fireEvent.change(
+      screen.getByPlaceholderText(
+        "Type additional project description (optional)...",
+      ),
+      { target: { value: "Validate cloud platform concept quickly." } },
+    );
+
+    fireEvent.click(screen.getByText("Export to PDF"));
+
+    expect(generateCV).toHaveBeenCalledWith(
+      expect.objectContaining({
+        projects: [
+          expect.objectContaining({
+            id: 4,
+            purpose: "Validate cloud platform concept quickly.",
+          }),
+        ],
+      }),
+      "pdf",
+    );
+  });
+
   test("uses custom description override in export payload without backend writes", async () => {
     (WorkExperienceControllerService.listWorkExperience as jest.Mock).mockResolvedValue([
       {

@@ -386,7 +386,34 @@ const CvGeneratorPage = () => {
           }
 
           if (!canOverrideDescription(item)) {
+            if (sectionName === "projects") {
+              const projectOverride =
+                descriptionOverrides[buildOverrideKey(sectionName, item.id)] || "";
+
+              if (!projectOverride.trim()) {
+                return item;
+              }
+
+              return {
+                ...item,
+                purpose: projectOverride.trim(),
+              };
+            }
+
             return item;
+          }
+
+          if (sectionName === "projects") {
+            const projectOverride =
+              descriptionOverrides[buildOverrideKey(sectionName, item.id)] || "";
+            if (!projectOverride.trim()) {
+              return item;
+            }
+
+            return {
+              ...item,
+              purpose: projectOverride.trim(),
+            };
           }
 
           return applyDescriptionOverride(
