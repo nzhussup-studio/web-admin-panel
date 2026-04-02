@@ -129,7 +129,10 @@ const CvGeneratorPage = () => {
           return parseSavedSetMap(parsed.selectedSkillEntries);
         }
       } catch (e) {
-        console.error("Failed to parse selected skill entries from localStorage", e);
+        console.error(
+          "Failed to parse selected skill entries from localStorage",
+          e,
+        );
       }
 
       return {};
@@ -180,9 +183,14 @@ const CvGeneratorPage = () => {
   }, [fetchData]);
 
   useEffect(() => {
-    const serializableSelectedItems: Record<string, Array<string | number>> = {};
+    const serializableSelectedItems: Record<
+      string,
+      Array<string | number>
+    > = {};
     for (const sectionName in selectedItems) {
-      serializableSelectedItems[sectionName] = Array.from(selectedItems[sectionName]);
+      serializableSelectedItems[sectionName] = Array.from(
+        selectedItems[sectionName],
+      );
     }
 
     const serializableSelectedSkillEntries: Record<string, string[]> = {};
@@ -228,9 +236,13 @@ const CvGeneratorPage = () => {
     });
   };
 
-  const toggleSectionAll = (sectionName: string, items: Record<string, any>[]) => {
+  const toggleSectionAll = (
+    sectionName: string,
+    items: Record<string, any>[],
+  ) => {
     const allSelected =
-      items.length > 0 && items.every((item) => selectedItems[sectionName]?.has(item.id));
+      items.length > 0 &&
+      items.every((item) => selectedItems[sectionName]?.has(item.id));
 
     setSelectedItems((prev) => {
       const nextSectionSet = new Set<string | number>();
@@ -358,7 +370,9 @@ const CvGeneratorPage = () => {
 
             const selectedForItem = selectedSkillEntries[String(item.id)];
             const activeSkillNames = selectedForItem?.size
-              ? allSkillNames.filter((skillName) => selectedForItem.has(skillName))
+              ? allSkillNames.filter((skillName) =>
+                  selectedForItem.has(skillName),
+                )
               : allSkillNames;
 
             if (activeSkillNames.length === 0) {
@@ -469,7 +483,11 @@ const CvGeneratorPage = () => {
           </div>
         </Stack>
 
-        <PageState isEmpty={sections.length === 0} loading={showLoading} error={error}>
+        <PageState
+          isEmpty={sections.length === 0}
+          loading={showLoading}
+          error={error}
+        >
           <CvGeneratorBasicInfoCard
             basicInfo={basicInfo}
             onBasicInfoChange={handleBasicInfoChange}
@@ -483,7 +501,9 @@ const CvGeneratorPage = () => {
               selectedItems={selectedItems[section.sectionName] || new Set()}
               descriptionOverrides={descriptionOverrides}
               selectedSkillEntries={selectedSkillEntries}
-              onToggleAll={() => toggleSectionAll(section.sectionName, section.items)}
+              onToggleAll={() =>
+                toggleSectionAll(section.sectionName, section.items)
+              }
               onToggleItem={toggleSelect}
               onSetDescriptionOverride={setDescriptionOverride}
               onToggleSkillCategory={toggleSkillCategory}

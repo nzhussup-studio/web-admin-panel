@@ -60,7 +60,8 @@ const CvGeneratorSectionCard = ({
   onToggleSkillCategory,
   onToggleSkillEntry,
 }: Props) => {
-  const allSelected = items.length > 0 && items.every((item) => selectedItems.has(item.id));
+  const allSelected =
+    items.length > 0 && items.every((item) => selectedItems.has(item.id));
   const isSkillsSection = sectionName === SKILLS_SECTION_NAME;
 
   return (
@@ -71,9 +72,16 @@ const CvGeneratorSectionCard = ({
             <Card.Title className="mb-1 text-capitalize fw-semibold app-card-title">
               {sectionName.replace(/_/g, " ")}
             </Card.Title>
-            <div className="text-body-secondary small">{selectedItems.size} selected</div>
+            <div className="text-body-secondary small">
+              {selectedItems.size} selected
+            </div>
           </div>
-          <Button onClick={onToggleAll} type="button" variant="outline-secondary" size="sm">
+          <Button
+            onClick={onToggleAll}
+            type="button"
+            variant="outline-secondary"
+            size="sm"
+          >
             {allSelected ? "Deselect All" : "Select All"}
           </Button>
         </div>
@@ -84,11 +92,14 @@ const CvGeneratorSectionCard = ({
             const isChecked = selectedItems.has(itemId);
 
             if (isSkillsSection) {
-              const categoryName = formatScalar(item.category) || "Skill category";
+              const categoryName =
+                formatScalar(item.category) || "Skill category";
               const allSkillNames = parseSkillNames(item.skillNames);
               const selectedSkillSet = selectedSkillEntries[String(itemId)];
               const savedSkillSelection = selectedSkillSet?.size
-                ? allSkillNames.filter((skillName) => selectedSkillSet.has(skillName))
+                ? allSkillNames.filter((skillName) =>
+                    selectedSkillSet.has(skillName),
+                  )
                 : allSkillNames;
               const selectedSkillNames = isChecked ? savedSkillSelection : [];
 
@@ -100,13 +111,18 @@ const CvGeneratorSectionCard = ({
                         type="checkbox"
                         checked={isChecked}
                         onChange={() =>
-                          onToggleSkillCategory(itemId, allSkillNames, isChecked)
+                          onToggleSkillCategory(
+                            itemId,
+                            allSkillNames,
+                            isChecked,
+                          )
                         }
                         label={
                           <div>
                             <div className="fw-semibold">{categoryName}</div>
                             <div className="small text-body-secondary">
-                              {selectedSkillNames.length} of {allSkillNames.length} selected
+                              {selectedSkillNames.length} of{" "}
+                              {allSkillNames.length} selected
                             </div>
                           </div>
                         }
@@ -127,10 +143,16 @@ const CvGeneratorSectionCard = ({
                               key={skillName}
                               type="button"
                               size="sm"
-                              variant={skillChecked ? "primary" : "outline-secondary"}
+                              variant={
+                                skillChecked ? "primary" : "outline-secondary"
+                              }
                               className="rounded-pill"
                               onClick={() =>
-                                onToggleSkillEntry(itemId, skillName, selectedSkillNames)
+                                onToggleSkillEntry(
+                                  itemId,
+                                  skillName,
+                                  selectedSkillNames,
+                                )
                               }
                             >
                               {skillName}

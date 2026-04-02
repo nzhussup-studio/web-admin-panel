@@ -104,8 +104,10 @@ export const parseSkillNames = (value: unknown): string[] =>
     .filter(Boolean)
     .filter((entry, index, all) => all.indexOf(entry) === index);
 
-export const buildOverrideKey = (sectionName: string, itemId: string | number) =>
-  `${sectionName}:${itemId}`;
+export const buildOverrideKey = (
+  sectionName: string,
+  itemId: string | number,
+) => `${sectionName}:${itemId}`;
 
 export const applyDescriptionOverride = (
   item: Record<string, unknown>,
