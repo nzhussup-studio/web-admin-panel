@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.7.0...v3.8.0) (2026-04-02)
+
+
+### Features
+
+* add additional optional description field for projects ([2ad92de](https://github.com/nzhussup/admin-panel-personal-website/commit/2ad92de7fb02af7815bef79622073c6bda3ec675))
+* add custom delete account button ([c05ea76](https://github.com/nzhussup/admin-panel-personal-website/commit/c05ea7635cc464d414bfce104a3a3e13e7feae20))
+* add more coverage in test ([7cd16d3](https://github.com/nzhussup/admin-panel-personal-website/commit/7cd16d348a90ac3f43e34e55084f37ad0cbfeb65))
+* add profile button and add more personalization ([3b04d6a](https://github.com/nzhussup/admin-panel-personal-website/commit/3b04d6afdb8e938492f5a758bb5ce67edfb214c5))
+* add public album links ([2215c2b](https://github.com/nzhussup/admin-panel-personal-website/commit/2215c2b90694d27998b31a28673e45fd508e5bae))
+* add quality cicd and prettier ([cc40ff4](https://github.com/nzhussup/admin-panel-personal-website/commit/cc40ff47f18e84bd259e00ccee676ce248101375))
+* add quality cicd and prettier ([58b88a5](https://github.com/nzhussup/admin-panel-personal-website/commit/58b88a5af009c2c99a9d39419b4b34aaf6f0ed16))
+* add success alerts ([81a52b6](https://github.com/nzhussup/admin-panel-personal-website/commit/81a52b678406a994be73ae5f88ad600f1916c47d))
+* confirmation modal for risky actions ([9b9ffba](https://github.com/nzhussup/admin-panel-personal-website/commit/9b9ffbad1842ac3d031bcd59d5cbdd0af161e1b7))
+* persist cv generator preferences ([67dfb8d](https://github.com/nzhussup/admin-panel-personal-website/commit/67dfb8d74ce8d73b2a709191dc2a44179dea7c5c))
+
+
+### Bug Fixes
+
+* fix flashing white loading page ([ed28e43](https://github.com/nzhussup/admin-panel-personal-website/commit/ed28e43456fb31c9c2780a8ce057f42729f8ee00))
+* linter problems ([04b9a9a](https://github.com/nzhussup/admin-panel-personal-website/commit/04b9a9abcaa7b9f208b00a6fa8c978d73843d902))
+* popup component to be scrollable ([cb295d1](https://github.com/nzhussup/admin-panel-personal-website/commit/cb295d1f0b7d26fd6da1182c65ab8f813411a294))
+* prettier formatting ([87bf65e](https://github.com/nzhussup/admin-panel-personal-website/commit/87bf65ee7b3ff84aec3a649044750d9fa3b20a84))
+* prettier formatting ([4e00971](https://github.com/nzhussup/admin-panel-personal-website/commit/4e0097132dad556fdaf1eea5bc49f563e725b572))
+* prettier formatting ([2199923](https://github.com/nzhussup/admin-panel-personal-website/commit/2199923c0fc5fa64d64f74228efe8bf83136036c))
+* prettier formatting ([856f22a](https://github.com/nzhussup/admin-panel-personal-website/commit/856f22a3c21a14084649247aa8534c2154e8b508))
+* refine cv template ([77fa37c](https://github.com/nzhussup/admin-panel-personal-website/commit/77fa37cf4c943e23c497279c5af868354381e754))
+* refine cv template ([c941b73](https://github.com/nzhussup/admin-panel-personal-website/commit/c941b737b6d0dd1d1b8af1e7192f21988d295501))
+* refine cv template ([e55ef36](https://github.com/nzhussup/admin-panel-personal-website/commit/e55ef3626f059d628c74e51c7ad08e9a33fb889a))
+* refine cv template ([e838d42](https://github.com/nzhussup/admin-panel-personal-website/commit/e838d42fbc29c8d3195928bf9671d550bdda3023))
+
 ## [3.7.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.6.0...v3.7.0) (2026-03-20)
 
 
