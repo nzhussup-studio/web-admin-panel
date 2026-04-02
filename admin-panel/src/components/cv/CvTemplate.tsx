@@ -19,12 +19,15 @@ const sectionTitleStyle: CSSProperties = {
   marginBottom: "8px",
 };
 
+const twoColumnFlowStyle: CSSProperties = {
+  columnCount: 2,
+  columnGap: "12px",
+};
+
 const Section = ({ title, children }) => (
   <section
     style={{
-      marginBottom: "12px",
-      pageBreakInside: "avoid",
-      breakInside: "avoid",
+      marginBottom: "9px",
     }}
   >
     <div style={sectionTitleStyle}>{title}</div>
@@ -35,9 +38,7 @@ const Section = ({ title, children }) => (
 const Item = ({ title, subtitle, date, description, techStack = "" }) => (
   <div
     style={{
-      marginBottom: "10px",
-      pageBreakInside: "avoid",
-      breakInside: "avoid",
+      marginBottom: "8px",
       color: THEME.text,
     }}
   >
@@ -128,10 +129,10 @@ const CvTemplate = ({ data }) => {
     <div
       style={{
         fontFamily: '"Segoe UI", Helvetica, Arial, sans-serif',
-        fontSize: "11.5px",
-        lineHeight: 1.35,
+        fontSize: "11.2px",
+        lineHeight: 1.3,
         color: THEME.text,
-        padding: "12px 18px",
+        padding: "8px 12px",
         maxWidth: "840px",
         margin: "auto",
         backgroundColor: "#fff",
@@ -141,10 +142,10 @@ const CvTemplate = ({ data }) => {
         style={{
           display: "grid",
           gridTemplateColumns: photoUrl ? "1fr auto" : "1fr",
-          gap: "14px",
-          marginBottom: "12px",
+          gap: "10px",
+          marginBottom: "8px",
           borderBottom: `2px solid ${THEME.border}`,
-          paddingBottom: "9px",
+          paddingBottom: "6px",
         }}
       >
         <div>
@@ -152,7 +153,7 @@ const CvTemplate = ({ data }) => {
             <h1
               style={{
                 margin: 0,
-                fontSize: "21px",
+                fontSize: "20px",
                 lineHeight: 1.08,
                 textTransform: "uppercase",
                 letterSpacing: "0.02em",
@@ -166,7 +167,7 @@ const CvTemplate = ({ data }) => {
             basic_info.phone ||
             basic_info.email ||
             basic_info.website) && (
-            <div style={{ marginTop: "5px", color: THEME.muted }}>
+            <div style={{ marginTop: "3px", color: THEME.muted }}>
               {basic_info.address}
               {basic_info.address && basic_info.phone && " | "}
               {basic_info.phone}
@@ -198,7 +199,7 @@ const CvTemplate = ({ data }) => {
           )}
 
           {(basic_info.linkedin || basic_info.github) && (
-            <div style={{ marginTop: "3px", color: THEME.muted }}>
+            <div style={{ marginTop: "2px", color: THEME.muted }}>
               {basic_info.linkedin && (
                 <>
                   <a
@@ -227,7 +228,7 @@ const CvTemplate = ({ data }) => {
                 marginTop: "7px",
                 marginBottom: 0,
                 textAlign: "justify",
-                lineHeight: 1.28,
+                lineHeight: 1.22,
               }}
             >
               {basic_info.about}
@@ -242,8 +243,8 @@ const CvTemplate = ({ data }) => {
             crossOrigin="anonymous"
             referrerPolicy="no-referrer"
             style={{
-              width: "88px",
-              height: "88px",
+              width: "82px",
+              height: "82px",
               objectFit: "cover",
               borderRadius: "6px",
               border: `1px solid ${THEME.border}`,
@@ -252,7 +253,7 @@ const CvTemplate = ({ data }) => {
         )}
       </header>
 
-      {work_experience && (
+      {Array.isArray(work_experience) && work_experience.length > 0 && (
         <Section title="Work Experience">
           {[...work_experience]
             .sort((a, b) => b.displayOrder - a.displayOrder)
@@ -269,49 +270,52 @@ const CvTemplate = ({ data }) => {
         </Section>
       )}
 
-      {education && (
+      {Array.isArray(education) && education.length > 0 && (
         <Section title="Education">
-          {[...education]
-            .sort((a, b) => b.displayOrder - a.displayOrder)
-            .map((edu) => {
-              const date = `${edu.startDate.slice(0, 10)} - ${
-                edu.endDate ? edu.endDate.slice(0, 10) : "Present"
-              }`;
+          <div style={twoColumnFlowStyle}>
+            {[...education]
+              .sort((a, b) => b.displayOrder - a.displayOrder)
+              .map((edu) => {
+                const date = `${edu.startDate.slice(0, 10)} - ${
+                  edu.endDate ? edu.endDate.slice(0, 10) : "Present"
+                }`;
 
-              const descriptionParts = [];
-              if (edu.description) {
-                descriptionParts.push(edu.description);
-              }
-              if (edu.thesis) {
-                descriptionParts.push(`Thesis: ${edu.thesis}`);
-              }
+                const descriptionParts = [];
+                if (edu.description) {
+                  descriptionParts.push(edu.description);
+                }
+                if (edu.thesis) {
+                  descriptionParts.push(`Thesis: ${edu.thesis}`);
+                }
 
-              return (
-                <Item
-                  key={edu.id}
-                  title={edu.degree}
-                  subtitle={`${edu.institution}, ${edu.location}`}
-                  date={date}
-                  description={descriptionParts.join(". ")}
-                />
-              );
-            })}
+                return (
+                  <div
+                    key={edu.id}
+                    style={{ breakInside: "avoid", marginBottom: "2px" }}
+                  >
+                    <Item
+                      title={edu.degree}
+                      subtitle={`${edu.institution}, ${edu.location}`}
+                      date={date}
+                      description={descriptionParts.join(". ")}
+                    />
+                  </div>
+                );
+              })}
+          </div>
         </Section>
       )}
 
-      {skills && (
+      {Array.isArray(skills) && skills.length > 0 && (
         <Section title="Skills">
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "4px 14px",
-            }}
-          >
+          <div style={twoColumnFlowStyle}>
             {[...skills]
               .sort((a, b) => b.displayOrder - a.displayOrder)
               .map((skill) => (
-                <div key={skill.id}>
+                <div
+                  key={skill.id}
+                  style={{ breakInside: "avoid", marginBottom: "4px" }}
+                >
                   <strong>{skill.category}:</strong> {skill.skillNames}
                 </div>
               ))}
@@ -319,25 +323,19 @@ const CvTemplate = ({ data }) => {
         </Section>
       )}
 
-      {projects && (
+      {Array.isArray(projects) && projects.length > 0 && (
         <Section title="Projects">
           <div
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: "8px 14px",
+              gap: "3px 10px",
             }}
           >
             {[...projects]
               .sort((a, b) => b.displayOrder - a.displayOrder)
               .map((project) => (
-                <div
-                  key={project.id}
-                  style={{
-                    pageBreakInside: "avoid",
-                    breakInside: "avoid",
-                  }}
-                >
+                <div key={project.id}>
                   <div style={{ fontWeight: 700 }}>{project.name}</div>
                   {project.url && (
                     <a
@@ -347,9 +345,9 @@ const CvTemplate = ({ data }) => {
                       title={project.url}
                       style={{
                         display: "inline-block",
-                        marginTop: "1px",
+                        marginTop: "0px",
                         color: THEME.accent,
-                        lineHeight: 1.25,
+                        lineHeight: 1.2,
                         textDecoration: "none",
                       }}
                     >
@@ -357,16 +355,16 @@ const CvTemplate = ({ data }) => {
                     </a>
                   )}
                   {project.description && (
-                    <div style={{ marginTop: "2px", lineHeight: 1.3 }}>
+                    <div style={{ marginTop: "1px", lineHeight: 1.2 }}>
                       {project.description}
                     </div>
                   )}
                   {project.techStack && (
                     <div
                       style={{
-                        marginTop: "2px",
+                        marginTop: "1px",
                         color: THEME.muted,
-                        lineHeight: 1.25,
+                        lineHeight: 1.2,
                       }}
                     >
                       Tech Stack: {project.techStack}
@@ -378,13 +376,13 @@ const CvTemplate = ({ data }) => {
         </Section>
       )}
 
-      {certificates && (
+      {Array.isArray(certificates) && certificates.length > 0 && (
         <Section title="Certificates">
           <div
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: "4px 14px",
+              gap: "3px 12px",
             }}
           >
             {[...certificates]
@@ -397,8 +395,6 @@ const CvTemplate = ({ data }) => {
                     color: THEME.accent,
                     textDecoration: "none",
                     lineHeight: 1.25,
-                    pageBreakInside: "avoid",
-                    breakInside: "avoid",
                   }}
                 >
                   {cert.name}
