@@ -243,6 +243,7 @@ const CvGeneratorPage = () => {
     setIsSyncingPreferences(true);
     try {
       await saveCvGeneratorPreferences(buildPreferencesPayload());
+      triggerAlert("Preferences synced to backend.", "success");
       setAlertMessage("Preferences synced to backend.");
       setAlertVisible(true);
     } catch (syncError) {
@@ -292,6 +293,7 @@ const CvGeneratorPage = () => {
         );
       }
 
+      triggerAlert("Preferences loaded from backend.", "success");
       setAlertMessage("Preferences loaded from backend.");
       setAlertVisible(true);
     } catch (syncError) {
@@ -540,6 +542,13 @@ const CvGeneratorPage = () => {
     previewCV(selectedData);
   };
 
+  const handleClearOverrides = () => {
+    setDescriptionOverrides({});
+    triggerAlert("Description overrides cleared.", "success");
+    setAlertMessage("Description overrides cleared.");
+    setAlertVisible(true);
+  };
+
   const toggleSort = () => {
     setIsAscending((prev) => !prev);
   };
@@ -595,7 +604,7 @@ const CvGeneratorPage = () => {
                     "Are you sure you want to clear all local description overrides?",
                   confirmLabel: "Clear",
                   confirmVariant: "danger",
-                  onConfirm: () => setDescriptionOverrides({}),
+                  onConfirm: handleClearOverrides,
                 })
               }
               disabled={!hasOverrides}
