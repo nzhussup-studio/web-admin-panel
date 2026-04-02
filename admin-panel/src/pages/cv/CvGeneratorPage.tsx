@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
 import CvGeneratorBasicInfoCard from "@/components/cv/generator/CvGeneratorBasicInfoCard";
 import CvGeneratorSectionCard from "@/components/cv/generator/CvGeneratorSectionCard";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import {
   applyDescriptionOverride,
   buildOverrideKey,
@@ -46,6 +47,13 @@ type SerializablePreferences = {
   selectedItems?: Record<string, Array<string | number>>;
   descriptionOverrides?: Record<string, string>;
   selectedSkillEntries?: Record<string, string[]>;
+};
+type ConfirmDialogState = {
+  title: string;
+  message: string;
+  confirmLabel: string;
+  confirmVariant?: string;
+  onConfirm: () => void | Promise<void>;
 };
 
 const DEFAULT_BASIC_INFO: BasicInfo = {
@@ -93,6 +101,9 @@ const CvGeneratorPage = () => {
   const [showLoading, setShowLoading] = useState(false);
   const [error, setError] = useState<any>(null);
   const [isSyncingPreferences, setIsSyncingPreferences] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(
+    null,
+  );
 
   const [basicInfo, setBasicInfo] = useState<BasicInfo>(() => {
     try {
@@ -577,7 +588,16 @@ const CvGeneratorPage = () => {
             <Button
               variant="outline-danger"
               className="d-inline-flex align-items-center gap-2"
-              onClick={() => setDescriptionOverrides({})}
+              onClick={() =>
+                setConfirmDialog({
+                  title: "Clear Overrides",
+                  message:
+                    "Are you sure you want to clear all local description overrides?",
+                  confirmLabel: "Clear",
+                  confirmVariant: "danger",
+                  onConfirm: () => setDescriptionOverrides({}),
+                })
+              }
               disabled={!hasOverrides}
             >
               Clear Overrides
@@ -591,10 +611,30 @@ const CvGeneratorPage = () => {
                 {isSyncingPreferences ? "Syncing..." : "Sync"}
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                <Dropdown.Item onClick={handleSyncPreferences}>
+                <Dropdown.Item
+                  onClick={() =>
+                    setConfirmDialog({
+                      title: "Sync To Backend",
+                      message:
+                        "Upload current local CV preferences to backend and overwrite the stored state?",
+                      confirmLabel: "Sync To Backend",
+                      onConfirm: handleSyncPreferences,
+                    })
+                  }
+                >
                   To Backend
                 </Dropdown.Item>
-                <Dropdown.Item onClick={handleLoadPreferencesFromBackend}>
+                <Dropdown.Item
+                  onClick={() =>
+                    setConfirmDialog({
+                      title: "Load From Backend",
+                      message:
+                        "Load CV preferences from backend and overwrite current local state?",
+                      confirmLabel: "Load From Backend",
+                      onConfirm: handleLoadPreferencesFromBackend,
+                    })
+                  }
+                >
                   From Backend
                 </Dropdown.Item>
               </Dropdown.Menu>
@@ -639,6 +679,21 @@ const CvGeneratorPage = () => {
           ))}
         </PageState>
       </Container>
+      <ConfirmDialog
+        isOpen={!!confirmDialog}
+        title={confirmDialog?.title}
+        message={confirmDialog?.message}
+        confirmLabel={confirmDialog?.confirmLabel}
+        confirmVariant={confirmDialog?.confirmVariant}
+        onClose={() => setConfirmDialog(null)}
+        onConfirm={() => {
+          const pendingAction = confirmDialog?.onConfirm;
+          setConfirmDialog(null);
+          if (pendingAction) {
+            void pendingAction();
+          }
+        }}
+      />
     </>
   );
 };

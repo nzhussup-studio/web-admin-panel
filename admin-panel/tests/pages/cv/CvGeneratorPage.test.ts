@@ -50,6 +50,32 @@ jest.mock("@/components/layout/GlobalAlert", () => ({
     return show ? ReactLocal.createElement("div", null, message) : null;
   },
 }));
+jest.mock("@/components/shared/ConfirmDialog", () => ({
+  __esModule: true,
+  default: ({
+    isOpen,
+    title,
+    message,
+    confirmLabel = "Confirm",
+    cancelLabel = "Cancel",
+    onClose,
+    onConfirm,
+  }: any) => {
+    if (!isOpen) {
+      return null;
+    }
+
+    const ReactLocal = require("react");
+    return ReactLocal.createElement(
+      "div",
+      { "data-testid": "confirm-dialog" },
+      ReactLocal.createElement("div", null, title),
+      ReactLocal.createElement("div", null, message),
+      ReactLocal.createElement("button", { onClick: onClose }, cancelLabel),
+      ReactLocal.createElement("button", { onClick: onConfirm }, confirmLabel),
+    );
+  },
+}));
 
 describe("pages/cv/CvGeneratorPage.tsx", () => {
   beforeEach(() => {
@@ -254,6 +280,7 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
     });
     fireEvent.click(screen.getByText("Sync"));
     fireEvent.click(screen.getByText("To Backend"));
+    fireEvent.click(screen.getByRole("button", { name: "Sync To Backend" }));
 
     await waitFor(() =>
       expect(saveCvGeneratorPreferences).toHaveBeenCalledWith(
@@ -274,6 +301,7 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
 
     fireEvent.click(screen.getByText("Sync"));
     fireEvent.click(screen.getByText("From Backend"));
+    fireEvent.click(screen.getByRole("button", { name: "Load From Backend" }));
 
     await waitFor(() =>
       expect(screen.getByDisplayValue("Remote Name")).toBeInTheDocument(),
@@ -288,6 +316,7 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
 
     fireEvent.click(screen.getByText("Sync"));
     fireEvent.click(screen.getByText("From Backend"));
+    fireEvent.click(screen.getByRole("button", { name: "Load From Backend" }));
 
     expect(await screen.findByText("No backend preferences found.")).toBeInTheDocument();
   });
@@ -303,6 +332,7 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
 
     fireEvent.click(screen.getByText("Sync"));
     fireEvent.click(screen.getByText("To Backend"));
+    fireEvent.click(screen.getByRole("button", { name: "Sync To Backend" }));
 
     expect(await screen.findByText("Failed to sync preferences.")).toBeInTheDocument();
     consoleErrorSpy.mockRestore();
@@ -319,6 +349,7 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
 
     fireEvent.click(screen.getByText("Sync"));
     fireEvent.click(screen.getByText("From Backend"));
+    fireEvent.click(screen.getByRole("button", { name: "Load From Backend" }));
 
     expect(
       await screen.findByText("Failed to load preferences from backend."),
@@ -383,6 +414,7 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
     await waitFor(() => expect(screen.getByText("Clear Overrides")).toBeEnabled());
 
     fireEvent.click(screen.getByText("Clear Overrides"));
+    fireEvent.click(screen.getByText("Clear"));
     await waitFor(() => expect(screen.getByText("Clear Overrides")).toBeDisabled());
   });
 
