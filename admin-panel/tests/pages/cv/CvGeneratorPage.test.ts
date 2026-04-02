@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import CvGeneratorPage from "@/pages/cv/CvGeneratorPage";
 import {
   CertificateControllerService,
@@ -55,7 +55,12 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
       { id: 2, displayOrder: 1, degree: "MSc" },
     ]);
     (SkillControllerService.listSkill as jest.Mock).mockResolvedValue([
-      { id: 3, displayOrder: 1, category: "Languages" },
+      {
+        id: 3,
+        displayOrder: 1,
+        category: "Languages",
+        skillNames: "React, TypeScript, Node.js",
+      },
     ]);
     (ProjectControllerService.listProject as jest.Mock).mockResolvedValue([
       { id: 4, displayOrder: 1, name: "Portfolio" },
@@ -170,6 +175,30 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
         basic_info: expect.objectContaining({ name: "Nurzhanat Zhussup" }),
         work_experience: [expect.objectContaining({ id: 1 })],
       })
+    );
+  });
+
+  test("exports only selected skill entries from a selected skills category", async () => {
+    render(React.createElement(CvGeneratorPage));
+    await waitFor(() => expect(screen.getByText("skills")).toBeInTheDocument());
+
+    const skillsCard = screen.getByText("skills").closest(".card");
+    expect(skillsCard).not.toBeNull();
+    fireEvent.click(within(skillsCard as HTMLElement).getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: "TypeScript" }));
+    fireEvent.click(screen.getByText("Export to PDF"));
+
+    expect(generateCV).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skills: [
+          expect.objectContaining({
+            id: 3,
+            category: "Languages",
+            skillNames: "React, Node.js",
+          }),
+        ],
+      }),
+      "pdf"
     );
   });
 
