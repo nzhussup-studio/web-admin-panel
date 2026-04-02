@@ -4,6 +4,7 @@ import GlobalAlert from "@/components/layout/GlobalAlert";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
+import Dropdown from "react-bootstrap/Dropdown";
 import Stack from "react-bootstrap/Stack";
 import {
   CertificateControllerService,
@@ -15,6 +16,10 @@ import {
 import { getApiErrorMessage, normalizeApiError } from "@/lib/api/errors";
 import config from "@/config/app-config";
 import { generateCV, previewCV } from "@/lib/cv/generateCv";
+import {
+  loadCvGeneratorPreferences,
+  saveCvGeneratorPreferences,
+} from "@/lib/cv/cvGeneratorPreferences";
 import { BackCircleIcon, DownloadIcon, FunnelIcon } from "@/assets/icons";
 import { useNavigate } from "react-router-dom";
 import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
@@ -35,6 +40,12 @@ type SelectedSkillEntries = Record<string, Set<string>>;
 type CvSection = {
   sectionName: string;
   items: Record<string, any>[];
+};
+type SerializablePreferences = {
+  basicInfo?: Record<string, unknown>;
+  selectedItems?: Record<string, Array<string | number>>;
+  descriptionOverrides?: Record<string, string>;
+  selectedSkillEntries?: Record<string, string[]>;
 };
 
 const DEFAULT_BASIC_INFO: BasicInfo = {
@@ -60,6 +71,17 @@ const parseSavedSetMap = <T extends string | number>(
   return withSets;
 };
 
+const serializeSetMap = <T extends string | number>(
+  value: Record<string, Set<T>>,
+): Record<string, T[]> => {
+  const serializable: Record<string, T[]> = {};
+  for (const key in value) {
+    serializable[key] = Array.from(value[key]);
+  }
+
+  return serializable;
+};
+
 const CvGeneratorPage = () => {
   const navigate = useNavigate();
   const { triggerAlert } = useOptionalGlobalAlert();
@@ -70,6 +92,7 @@ const CvGeneratorPage = () => {
   const [isAscending, setIsAscending] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
   const [error, setError] = useState<any>(null);
+  const [isSyncingPreferences, setIsSyncingPreferences] = useState(false);
 
   const [basicInfo, setBasicInfo] = useState<BasicInfo>(() => {
     try {
@@ -183,22 +206,8 @@ const CvGeneratorPage = () => {
   }, [fetchData]);
 
   useEffect(() => {
-    const serializableSelectedItems: Record<
-      string,
-      Array<string | number>
-    > = {};
-    for (const sectionName in selectedItems) {
-      serializableSelectedItems[sectionName] = Array.from(
-        selectedItems[sectionName],
-      );
-    }
-
-    const serializableSelectedSkillEntries: Record<string, string[]> = {};
-    for (const itemId in selectedSkillEntries) {
-      serializableSelectedSkillEntries[itemId] = Array.from(
-        selectedSkillEntries[itemId],
-      );
-    }
+    const serializableSelectedItems = serializeSetMap(selectedItems);
+    const serializableSelectedSkillEntries = serializeSetMap(selectedSkillEntries);
 
     localStorage.setItem(
       config.cvGeneratorLocalStorageKey,
@@ -210,6 +219,78 @@ const CvGeneratorPage = () => {
       }),
     );
   }, [basicInfo, selectedItems, descriptionOverrides, selectedSkillEntries]);
+
+  const buildPreferencesPayload = (): SerializablePreferences => ({
+    basicInfo,
+    selectedItems: serializeSetMap(selectedItems),
+    descriptionOverrides,
+    selectedSkillEntries: serializeSetMap(selectedSkillEntries),
+  });
+
+  const handleSyncPreferences = async () => {
+    setIsSyncingPreferences(true);
+    try {
+      await saveCvGeneratorPreferences(buildPreferencesPayload());
+      setAlertMessage("Preferences synced to backend.");
+      setAlertVisible(true);
+    } catch (syncError) {
+      console.error("Failed to sync CV generator preferences", syncError);
+      setAlertMessage("Failed to sync preferences.");
+      setAlertVisible(true);
+    } finally {
+      setIsSyncingPreferences(false);
+    }
+  };
+
+  const handleLoadPreferencesFromBackend = async () => {
+    setIsSyncingPreferences(true);
+    try {
+      const remotePreferences = (await loadCvGeneratorPreferences()) as
+        | SerializablePreferences
+        | null;
+
+      if (!remotePreferences) {
+        setAlertMessage("No backend preferences found.");
+        setAlertVisible(true);
+        return;
+      }
+
+      if (
+        remotePreferences.basicInfo &&
+        typeof remotePreferences.basicInfo === "object"
+      ) {
+        setBasicInfo((prev) => ({
+          ...prev,
+          ...Object.fromEntries(
+            Object.entries(remotePreferences.basicInfo || {}).map(
+              ([key, value]) => [key, String(value ?? "")] as const,
+            ),
+          ),
+        }));
+      }
+
+      if (remotePreferences.selectedItems) {
+        setSelectedItems(parseSavedSetMap(remotePreferences.selectedItems));
+      }
+      if (remotePreferences.descriptionOverrides) {
+        setDescriptionOverrides(remotePreferences.descriptionOverrides);
+      }
+      if (remotePreferences.selectedSkillEntries) {
+        setSelectedSkillEntries(
+          parseSavedSetMap(remotePreferences.selectedSkillEntries),
+        );
+      }
+
+      setAlertMessage("Preferences loaded from backend.");
+      setAlertVisible(true);
+    } catch (syncError) {
+      console.error("Failed to load CV generator preferences", syncError);
+      setAlertMessage("Failed to load preferences from backend.");
+      setAlertVisible(true);
+    } finally {
+      setIsSyncingPreferences(false);
+    }
+  };
 
   const hasOverrides = useMemo(
     () =>
@@ -501,6 +582,23 @@ const CvGeneratorPage = () => {
             >
               Clear Overrides
             </Button>
+            <Dropdown>
+              <Dropdown.Toggle
+                variant="outline-secondary"
+                className="d-inline-flex align-items-center gap-2"
+                disabled={isSyncingPreferences}
+              >
+                {isSyncingPreferences ? "Syncing..." : "Sync"}
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={handleSyncPreferences}>
+                  To Backend
+                </Dropdown.Item>
+                <Dropdown.Item onClick={handleLoadPreferencesFromBackend}>
+                  From Backend
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
             <Button
               variant="outline-primary"
               className="d-inline-flex align-items-center gap-2"

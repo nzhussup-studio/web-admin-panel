@@ -9,6 +9,10 @@ import {
   WorkExperienceControllerService,
 } from "@/lib/api/client";
 import { generateCV, previewCV } from "@/lib/cv/generateCv";
+import {
+  loadCvGeneratorPreferences,
+  saveCvGeneratorPreferences,
+} from "@/lib/cv/cvGeneratorPreferences";
 import { useNavigate } from "react-router-dom";
 
 const mockNavigate = jest.fn();
@@ -20,6 +24,10 @@ jest.mock("react-router-dom", () => ({
 jest.mock("@/lib/cv/generateCv", () => ({
   generateCV: jest.fn(),
   previewCV: jest.fn(),
+}));
+jest.mock("@/lib/cv/cvGeneratorPreferences", () => ({
+  loadCvGeneratorPreferences: jest.fn(),
+  saveCvGeneratorPreferences: jest.fn(),
 }));
 jest.mock("@/lib/api/client", () => ({
   WorkExperienceControllerService: { listWorkExperience: jest.fn() },
@@ -48,6 +56,8 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
     jest.clearAllMocks();
     localStorage.clear();
     (useNavigate as jest.Mock).mockReturnValue(mockNavigate);
+    (loadCvGeneratorPreferences as jest.Mock).mockResolvedValue(null);
+    (saveCvGeneratorPreferences as jest.Mock).mockResolvedValue(undefined);
     (WorkExperienceControllerService.listWorkExperience as jest.Mock).mockResolvedValue([
       { id: 1, displayOrder: 1, position: "Engineer" },
     ]);
@@ -232,6 +242,41 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
         ],
       }),
       "pdf",
+    );
+  });
+
+  test("syncs local preferences to backend when Sync button is clicked", async () => {
+    render(React.createElement(CvGeneratorPage));
+    await waitFor(() => expect(screen.getByText("work experience")).toBeInTheDocument());
+
+    fireEvent.change(screen.getByDisplayValue("Nurzhanat Zhussup"), {
+      target: { value: "Updated Name" },
+    });
+    fireEvent.click(screen.getByText("Sync"));
+    fireEvent.click(screen.getByText("To Backend"));
+
+    await waitFor(() =>
+      expect(saveCvGeneratorPreferences).toHaveBeenCalledWith(
+        expect.objectContaining({
+          basicInfo: expect.objectContaining({ name: "Updated Name" }),
+        }),
+      ),
+    );
+  });
+
+  test("loads preferences from backend when From Backend is clicked", async () => {
+    (loadCvGeneratorPreferences as jest.Mock).mockResolvedValue({
+      basicInfo: { name: "Remote Name" },
+    });
+
+    render(React.createElement(CvGeneratorPage));
+    await waitFor(() => expect(screen.getByText("work experience")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText("Sync"));
+    fireEvent.click(screen.getByText("From Backend"));
+
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Remote Name")).toBeInTheDocument(),
     );
   });
 
