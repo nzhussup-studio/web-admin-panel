@@ -270,7 +270,10 @@ const CvGeneratorPage = () => {
           return parsed.descriptionOverrides || {};
         }
       } catch (e) {
-        console.error("Failed to parse description overrides from localStorage", e);
+        console.error(
+          "Failed to parse description overrides from localStorage",
+          e,
+        );
       }
       return {};
     });
@@ -353,8 +356,8 @@ const CvGeneratorPage = () => {
     );
   }, [selectedItems, basicInfo, descriptionOverrides]);
 
-  const hasOverrides = Object.values(descriptionOverrides).some((value) =>
-    String(value || "").trim().length > 0,
+  const hasOverrides = Object.values(descriptionOverrides).some(
+    (value) => String(value || "").trim().length > 0,
   );
 
   const toggleSelect = (sectionName: string, itemId: string | number) => {
@@ -384,7 +387,8 @@ const CvGeneratorPage = () => {
             }
             return applyDescriptionOverride(
               item,
-              descriptionOverrides[buildOverrideKey(sectionName, item.id)] || "",
+              descriptionOverrides[buildOverrideKey(sectionName, item.id)] ||
+                "",
             );
           });
       }
@@ -544,7 +548,8 @@ const CvGeneratorPage = () => {
                               setDescriptionOverrides((prev) => {
                                 const nextValue = e.target.value;
                                 if (!nextValue.trim()) {
-                                  const { [overrideKey]: _removed, ...rest } = prev;
+                                  const { [overrideKey]: _removed, ...rest } =
+                                    prev;
                                   return rest;
                                 }
                                 return {

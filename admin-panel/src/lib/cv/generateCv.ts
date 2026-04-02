@@ -74,12 +74,7 @@ function downloadPdfWithCanvasFallback(cvMarkup: string) {
   };
 
   waitForImagesToLoad(scratchContainer)
-    .then(() =>
-      html2pdf()
-        .set(pdfOptions)
-        .from(scratchContainer)
-        .save(),
-    )
+    .then(() => html2pdf().set(pdfOptions).from(scratchContainer).save())
     .finally(() => {
       document.body.removeChild(scratchContainer);
     });
