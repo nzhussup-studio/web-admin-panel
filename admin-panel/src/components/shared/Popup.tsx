@@ -35,17 +35,20 @@ const Popup = ({ closePopup, title, children, onSubmit }: PopupProps) => {
       show
       onHide={closePopup}
       centered
-      scrollable
+      size="xl"
       animation={false}
       backdropClassName="popup-backdrop"
+      dialogClassName="app-modal-dialog"
       contentClassName={`app-modal-content${isDarkMode ? " text-light" : ""}`}
       data-testid="popup-overlay"
     >
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
-      <Form onSubmit={handleSubmit}>
-        <Modal.Body data-testid="popup-content">{children}</Modal.Body>
+      <Form onSubmit={handleSubmit} className="app-modal-form">
+        <Modal.Body className="app-modal-body" data-testid="popup-content">
+          {children}
+        </Modal.Body>
         <Modal.Footer className="justify-content-between">
           <Button type="submit" variant="primary" disabled={isLoading}>
             {isLoading ? "Saving..." : "Save"}

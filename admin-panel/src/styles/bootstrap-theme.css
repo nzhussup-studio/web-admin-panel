@@ -133,22 +133,75 @@ body.dark-mode {
   border-color: var(--app-border);
 }
 
+.app-modal-dialog {
+  max-width: min(1080px, calc(100vw - 2rem));
+  margin: 1rem auto;
+}
+
 .app-modal-content {
   border: 1px solid var(--app-border);
   border-radius: 1.25rem;
-  background: linear-gradient(
-    160deg,
-    var(--app-surface-strong),
-    var(--app-surface)
-  );
-  box-shadow: var(--app-shadow-hover);
+  background:
+    radial-gradient(
+      120% 100% at 100% 0%,
+      rgba(13, 110, 253, 0.08),
+      transparent 42%
+    ),
+    linear-gradient(165deg, var(--app-surface-strong), var(--app-surface));
+  box-shadow:
+    0 28px 50px rgba(13, 25, 41, 0.18),
+    0 8px 18px rgba(13, 25, 41, 0.12);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
+  max-height: calc(100vh - 2rem);
+  overflow: hidden;
 }
 
 .app-modal-content .modal-header,
 .app-modal-content .modal-footer {
   border-color: var(--app-border);
+  background-color: rgba(var(--bs-body-bg-rgb), 0.52);
+}
+
+.app-modal-content .modal-header {
+  padding: 1rem 1.25rem 0.9rem;
+}
+
+.app-modal-content .modal-title {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.app-modal-content .modal-footer {
+  padding: 0.9rem 1.25rem 1rem;
+}
+
+.app-modal-form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.app-modal-body {
+  padding: 1rem 1.25rem;
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+}
+
+.app-modal-body .form-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--bs-body-color);
+}
+
+.app-modal-body .form-control,
+.app-modal-body .form-select {
+  border-radius: 0.85rem;
+  min-height: 2.7rem;
+}
+
+.app-modal-body textarea.form-control {
+  min-height: 7.5rem;
 }
 
 .btn {
