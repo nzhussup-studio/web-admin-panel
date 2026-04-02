@@ -207,7 +207,8 @@ const CvGeneratorPage = () => {
 
   useEffect(() => {
     const serializableSelectedItems = serializeSetMap(selectedItems);
-    const serializableSelectedSkillEntries = serializeSetMap(selectedSkillEntries);
+    const serializableSelectedSkillEntries =
+      serializeSetMap(selectedSkillEntries);
 
     localStorage.setItem(
       config.cvGeneratorLocalStorageKey,
@@ -245,9 +246,8 @@ const CvGeneratorPage = () => {
   const handleLoadPreferencesFromBackend = async () => {
     setIsSyncingPreferences(true);
     try {
-      const remotePreferences = (await loadCvGeneratorPreferences()) as
-        | SerializablePreferences
-        | null;
+      const remotePreferences =
+        (await loadCvGeneratorPreferences()) as SerializablePreferences | null;
 
       if (!remotePreferences) {
         setAlertMessage("No backend preferences found.");

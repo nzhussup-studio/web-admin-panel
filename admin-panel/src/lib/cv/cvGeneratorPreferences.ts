@@ -16,20 +16,23 @@ const toPreferencePayload = (
   return preferencesJson as CvGeneratorPreferencesPayload;
 };
 
-export const loadCvGeneratorPreferences = async (): Promise<CvGeneratorPreferencesPayload | null> => {
-  try {
-    const list = await CvGeneratorPreferenceControllerService.listCvGeneratorPreference();
-    const first = Array.isArray(list) ? list[0] : null;
-    return toPreferencePayload(first);
-  } catch {
-    return null;
-  }
-};
+export const loadCvGeneratorPreferences =
+  async (): Promise<CvGeneratorPreferencesPayload | null> => {
+    try {
+      const list =
+        await CvGeneratorPreferenceControllerService.listCvGeneratorPreference();
+      const first = Array.isArray(list) ? list[0] : null;
+      return toPreferencePayload(first);
+    } catch {
+      return null;
+    }
+  };
 
 export const saveCvGeneratorPreferences = async (
   payload: CvGeneratorPreferencesPayload,
 ): Promise<void> => {
-  const list = await CvGeneratorPreferenceControllerService.listCvGeneratorPreference();
+  const list =
+    await CvGeneratorPreferenceControllerService.listCvGeneratorPreference();
   const first = Array.isArray(list) ? list[0] : null;
 
   const requestBody: base_service_CvGeneratorPreference = {
