@@ -280,6 +280,52 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
     );
   });
 
+  test("shows alert when backend has no saved preferences", async () => {
+    (loadCvGeneratorPreferences as jest.Mock).mockResolvedValue(null);
+
+    render(React.createElement(CvGeneratorPage));
+    await waitFor(() => expect(screen.getByText("work experience")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText("Sync"));
+    fireEvent.click(screen.getByText("From Backend"));
+
+    expect(await screen.findByText("No backend preferences found.")).toBeInTheDocument();
+  });
+
+  test("shows alert when syncing preferences to backend fails", async () => {
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    (saveCvGeneratorPreferences as jest.Mock).mockRejectedValue(new Error("sync failed"));
+
+    render(React.createElement(CvGeneratorPage));
+    await waitFor(() => expect(screen.getByText("work experience")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText("Sync"));
+    fireEvent.click(screen.getByText("To Backend"));
+
+    expect(await screen.findByText("Failed to sync preferences.")).toBeInTheDocument();
+    consoleErrorSpy.mockRestore();
+  });
+
+  test("shows alert when loading preferences from backend fails", async () => {
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    (loadCvGeneratorPreferences as jest.Mock).mockRejectedValue(new Error("load failed"));
+
+    render(React.createElement(CvGeneratorPage));
+    await waitFor(() => expect(screen.getByText("work experience")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText("Sync"));
+    fireEvent.click(screen.getByText("From Backend"));
+
+    expect(
+      await screen.findByText("Failed to load preferences from backend."),
+    ).toBeInTheDocument();
+    consoleErrorSpy.mockRestore();
+  });
+
   test("uses custom description override in export payload without backend writes", async () => {
     (WorkExperienceControllerService.listWorkExperience as jest.Mock).mockResolvedValue([
       {
