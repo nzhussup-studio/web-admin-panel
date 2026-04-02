@@ -378,27 +378,23 @@ const CvTemplate = ({ data }) => {
 
       {Array.isArray(certificates) && certificates.length > 0 && (
         <Section title="Certificates">
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "3px 12px",
-            }}
-          >
+          <div style={{ lineHeight: 1.2 }}>
             {[...certificates]
               .sort((a, b) => b.displayOrder - a.displayOrder)
-              .map((cert) => (
-                <a
-                  key={cert.id}
-                  href={cert.url}
-                  style={{
-                    color: THEME.accent,
-                    textDecoration: "none",
-                    lineHeight: 1.25,
-                  }}
-                >
-                  {cert.name}
-                </a>
+              .map((cert, index) => (
+                <span key={cert.id}>
+                  <a
+                    href={cert.url}
+                    style={{
+                      color: THEME.accent,
+                      textDecoration: "none",
+                      fontSize: "10.8px",
+                    }}
+                  >
+                    {cert.name}
+                  </a>
+                  {index < certificates.length - 1 ? " • " : ""}
+                </span>
               ))}
           </div>
         </Section>
