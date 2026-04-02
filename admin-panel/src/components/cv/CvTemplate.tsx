@@ -272,54 +272,32 @@ const CvTemplate = ({ data }) => {
 
       {Array.isArray(education) && education.length > 0 && (
         <Section title="Education">
-          <div style={twoColumnFlowStyle}>
-            {[...education]
-              .sort((a, b) => b.displayOrder - a.displayOrder)
-              .map((edu) => {
-                const date = `${edu.startDate.slice(0, 10)} - ${
-                  edu.endDate ? edu.endDate.slice(0, 10) : "Present"
-                }`;
+          {[...education]
+            .sort((a, b) => b.displayOrder - a.displayOrder)
+            .map((edu) => {
+              const date = `${edu.startDate.slice(0, 10)} - ${
+                edu.endDate ? edu.endDate.slice(0, 10) : "Present"
+              }`;
 
-                const descriptionParts = [];
-                if (edu.description) {
-                  descriptionParts.push(edu.description);
-                }
-                if (edu.thesis) {
-                  descriptionParts.push(`Thesis: ${edu.thesis}`);
-                }
+              const descriptionParts = [];
+              if (edu.description) {
+                descriptionParts.push(edu.description);
+              }
+              if (edu.thesis) {
+                descriptionParts.push(`Thesis: ${edu.thesis}`);
+              }
 
-                return (
-                  <div
-                    key={edu.id}
-                    style={{ breakInside: "avoid", marginBottom: "2px" }}
-                  >
-                    <Item
-                      title={edu.degree}
-                      subtitle={`${edu.institution}, ${edu.location}`}
-                      date={date}
-                      description={descriptionParts.join(". ")}
-                    />
-                  </div>
-                );
-              })}
-          </div>
-        </Section>
-      )}
-
-      {Array.isArray(skills) && skills.length > 0 && (
-        <Section title="Skills">
-          <div style={twoColumnFlowStyle}>
-            {[...skills]
-              .sort((a, b) => b.displayOrder - a.displayOrder)
-              .map((skill) => (
-                <div
-                  key={skill.id}
-                  style={{ breakInside: "avoid", marginBottom: "4px" }}
-                >
-                  <strong>{skill.category}:</strong> {skill.skillNames}
+              return (
+                <div key={edu.id} style={{ marginBottom: "2px" }}>
+                  <Item
+                    title={edu.degree}
+                    subtitle={`${edu.institution}, ${edu.location}`}
+                    date={date}
+                    description={descriptionParts.join(". ")}
+                  />
                 </div>
-              ))}
-          </div>
+              );
+            })}
         </Section>
       )}
 
@@ -376,29 +354,42 @@ const CvTemplate = ({ data }) => {
         </Section>
       )}
 
+      {Array.isArray(skills) && skills.length > 0 && (
+        <Section title="Skills">
+          <div style={twoColumnFlowStyle}>
+            {[...skills]
+              .sort((a, b) => b.displayOrder - a.displayOrder)
+              .map((skill) => (
+                <div
+                  key={skill.id}
+                  style={{ breakInside: "avoid", marginBottom: "4px" }}
+                >
+                  <strong>{skill.category}:</strong> {skill.skillNames}
+                </div>
+              ))}
+          </div>
+        </Section>
+      )}
+
       {Array.isArray(certificates) && certificates.length > 0 && (
         <Section title="Certificates">
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "3px 12px",
-            }}
-          >
+          <div style={{ lineHeight: 1.2 }}>
             {[...certificates]
               .sort((a, b) => b.displayOrder - a.displayOrder)
-              .map((cert) => (
-                <a
-                  key={cert.id}
-                  href={cert.url}
-                  style={{
-                    color: THEME.accent,
-                    textDecoration: "none",
-                    lineHeight: 1.25,
-                  }}
-                >
-                  {cert.name}
-                </a>
+              .map((cert, index) => (
+                <span key={cert.id}>
+                  <a
+                    href={cert.url}
+                    style={{
+                      color: THEME.accent,
+                      textDecoration: "none",
+                      fontSize: "10.8px",
+                    }}
+                  >
+                    {cert.name}
+                  </a>
+                  {index < certificates.length - 1 ? " • " : ""}
+                </span>
               ))}
           </div>
         </Section>
