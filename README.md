@@ -18,7 +18,7 @@
           This link opens a public album with screenshots of the admin panel so you can quickly review the interface and overall flow.
         </p>
         <p>
-          <a href="https://admin.nzhussup.com/public/albums/f5c727a5-32d3-4587-aa9b-2fa23bd3a44f"><strong>Open the public screenshot album</strong></a>
+          <a href="https://admin.nzhussup.dev/public/albums/f5c727a5-32d3-4587-aa9b-2fa23bd3a44f"><strong>Open the public screenshot album</strong></a>
         </p>
         <p>
           Want to see how it is implemented? Browse the screenshots first, then use this README to understand the project structure, runtime setup, and local development commands.
