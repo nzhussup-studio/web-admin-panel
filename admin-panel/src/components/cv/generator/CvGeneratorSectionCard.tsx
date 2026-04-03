@@ -244,9 +244,6 @@ const CvGeneratorSectionCard = ({
                           </div>
                         }
                       />
-                      <Badge bg={isChecked ? "primary" : "secondary"} pill>
-                        {isChecked ? "Selected" : "Available"}
-                      </Badge>
                     </div>
 
                     {allTechStackEntries.length > 0 ? (
