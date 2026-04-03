@@ -130,10 +130,9 @@ const formatUrlLabel = (value) => {
       return host;
     }
 
-    const compactPath = path.length > 26 ? `${path.slice(0, 25)}...` : path;
-    return `${host}${compactPath}`;
+    return `${host}${path}`;
   } catch {
-    return value.length > 40 ? `${value.slice(0, 39)}...` : value;
+    return value;
   }
 };
 
