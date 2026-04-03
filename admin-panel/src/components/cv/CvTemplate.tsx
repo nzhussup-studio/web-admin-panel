@@ -158,10 +158,10 @@ const CvTemplate = ({ data }) => {
     <div
       style={{
         fontFamily: '"Segoe UI", Helvetica, Arial, sans-serif',
-        fontSize: "11.2px",
-        lineHeight: 1.3,
+        fontSize: "10.8px",
+        lineHeight: 1.24,
         color: THEME.text,
-        padding: "8px 12px",
+        padding: "7px 10px",
         maxWidth: "840px",
         margin: "auto",
         backgroundColor: "#fff",
@@ -170,11 +170,12 @@ const CvTemplate = ({ data }) => {
       <header
         style={{
           display: "grid",
-          gridTemplateColumns: photoUrl ? "1fr auto" : "1fr",
-          gap: "10px",
-          marginBottom: "8px",
+          gridTemplateColumns: photoUrl ? "1fr 72px" : "1fr",
+          gap: "4px",
+          alignItems: "start",
+          marginBottom: "6px",
           borderBottom: `2px solid ${THEME.border}`,
-          paddingBottom: "6px",
+          paddingBottom: "5px",
         }}
       >
         <div>
@@ -182,8 +183,8 @@ const CvTemplate = ({ data }) => {
             <h1
               style={{
                 margin: 0,
-                fontSize: "20px",
-                lineHeight: 1.08,
+                fontSize: "18px",
+                lineHeight: 1.04,
                 textTransform: "uppercase",
                 letterSpacing: "0.02em",
               }}
@@ -196,7 +197,14 @@ const CvTemplate = ({ data }) => {
             basic_info.phone ||
             basic_info.email ||
             basic_info.website) && (
-            <div style={{ marginTop: "3px", color: THEME.muted }}>
+            <div
+              style={{
+                marginTop: "2px",
+                color: THEME.muted,
+                fontSize: "10.1px",
+                lineHeight: 1.18,
+              }}
+            >
               {basic_info.address}
               {basic_info.address && basic_info.phone && " | "}
               {basic_info.phone}
@@ -228,7 +236,14 @@ const CvTemplate = ({ data }) => {
           )}
 
           {(basic_info.linkedin || basic_info.github) && (
-            <div style={{ marginTop: "2px", color: THEME.muted }}>
+            <div
+              style={{
+                marginTop: "1px",
+                color: THEME.muted,
+                fontSize: "10px",
+                lineHeight: 1.16,
+              }}
+            >
               {basic_info.linkedin && (
                 <>
                   <a
@@ -254,10 +269,11 @@ const CvTemplate = ({ data }) => {
           {basic_info.about && (
             <p
               style={{
-                marginTop: "7px",
+                marginTop: "4px",
                 marginBottom: 0,
                 textAlign: "justify",
-                lineHeight: 1.22,
+                lineHeight: 1.16,
+                fontSize: "10.2px",
               }}
             >
               {basic_info.about}
@@ -272,11 +288,11 @@ const CvTemplate = ({ data }) => {
             crossOrigin="anonymous"
             referrerPolicy="no-referrer"
             style={{
-              width: "82px",
-              height: "82px",
+              width: "72px",
+              height: "72px",
               objectFit: "cover",
-              borderRadius: "6px",
-              border: `1px solid ${THEME.border}`,
+              borderRadius: "5px",
+              border: `1px solid ${THEME.accent}`,
             }}
           />
         )}
