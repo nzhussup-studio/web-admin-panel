@@ -243,8 +243,9 @@ const CvGeneratorPage = () => {
     const serializableSelectedItems = serializeSetMap(selectedItems);
     const serializableSelectedSkillEntries =
       serializeSetMap(selectedSkillEntries);
-    const serializableSelectedTechStackEntries =
-      serializeSetMap(selectedTechStackEntries);
+    const serializableSelectedTechStackEntries = serializeSetMap(
+      selectedTechStackEntries,
+    );
 
     localStorage.setItem(
       config.cvGeneratorLocalStorageKey,
@@ -577,7 +578,8 @@ const CvGeneratorPage = () => {
               return currentItem;
             }
 
-            const selectedForItem = selectedSkillEntries[String(currentItem.id)];
+            const selectedForItem =
+              selectedSkillEntries[String(currentItem.id)];
             const activeSkillNames = selectedForItem?.size
               ? allSkillNames.filter((skillName) =>
                   selectedForItem.has(skillName),
@@ -623,8 +625,7 @@ const CvGeneratorPage = () => {
               const projectOverride =
                 descriptionOverrides[
                   buildOverrideKey(sectionName, currentItem.id)
-                ] ||
-                "";
+                ] || "";
 
               if (!projectOverride.trim()) {
                 return currentItem;

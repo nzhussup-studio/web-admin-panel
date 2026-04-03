@@ -37,7 +37,7 @@ const Section = ({ title, children }) => (
 
 const Item = ({
   title,
-  subtitle,
+  subtitle = "",
   date,
   description,
   additionalInfo = "",

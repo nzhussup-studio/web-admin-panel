@@ -75,9 +75,7 @@ const CertificationsPage = () => {
         <Form.Label>Issuer (optional)</Form.Label>
         <Form.Control
           value={formData.issuer ?? ""}
-          onChange={(e) =>
-            setFormData({ ...formData, issuer: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, issuer: e.target.value })}
         />
       </Form.Group>
       <Form.Group className="mb-3">
@@ -112,7 +110,9 @@ const CertificationsPage = () => {
                   {certificate.name}
                 </Card.Title>
                 {certificate.issuer && (
-                  <div className="text-secondary mb-2">{certificate.issuer}</div>
+                  <div className="text-secondary mb-2">
+                    {certificate.issuer}
+                  </div>
                 )}
                 <div className="d-flex flex-wrap align-items-center gap-3">
                   {certificate.url && (

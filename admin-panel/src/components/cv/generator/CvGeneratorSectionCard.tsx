@@ -193,7 +193,9 @@ const CvGeneratorSectionCard = ({
             if (isTechStackSelectableSection) {
               const allTechStackEntries = parseTechStack(item.techStack);
               const selectedTechStackSet =
-                selectedTechStackEntries[buildScopedItemKey(sectionName, itemId)];
+                selectedTechStackEntries[
+                  buildScopedItemKey(sectionName, itemId)
+                ];
               const savedTechStackSelection = selectedTechStackSet?.size
                 ? allTechStackEntries.filter((entry) =>
                     selectedTechStackSet.has(entry),
@@ -207,7 +209,8 @@ const CvGeneratorSectionCard = ({
               const defaultDescription = getLongDescription(item);
               const isProjectsSection = sectionName === PROJECTS_SECTION_NAME;
               const showOverrideInput =
-                isChecked && (canOverrideDescription(item) || isProjectsSection);
+                isChecked &&
+                (canOverrideDescription(item) || isProjectsSection);
 
               return (
                 <div key={itemId} className="mb-2">
