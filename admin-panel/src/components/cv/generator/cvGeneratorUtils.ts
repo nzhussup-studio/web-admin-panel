@@ -1,4 +1,8 @@
 export const SKILLS_SECTION_NAME = "skills";
+export const TECH_STACK_SELECTABLE_SECTION_NAMES = new Set([
+  "work_experience",
+  "projects",
+]);
 
 const IGNORED_ITEM_FIELDS = new Set([
   "id",
@@ -98,14 +102,25 @@ export const getLongDescription = (item: Record<string, unknown>) => {
   return "";
 };
 
-export const parseSkillNames = (value: unknown): string[] =>
+const parseDelimitedValues = (value: unknown): string[] =>
   formatScalar(value)
     .split(/[\n,;]+/g)
     .map((entry) => entry.trim())
     .filter(Boolean)
     .filter((entry, index, all) => all.indexOf(entry) === index);
 
+export const parseSkillNames = (value: unknown): string[] =>
+  parseDelimitedValues(value);
+
+export const parseTechStack = (value: unknown): string[] =>
+  parseDelimitedValues(value);
+
 export const buildOverrideKey = (
+  sectionName: string,
+  itemId: string | number,
+) => `${sectionName}:${itemId}`;
+
+export const buildScopedItemKey = (
   sectionName: string,
   itemId: string | number,
 ) => `${sectionName}:${itemId}`;

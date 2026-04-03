@@ -8,6 +8,8 @@ const baseCallbacks = {
   onSetDescriptionOverride: jest.fn(),
   onToggleSkillCategory: jest.fn(),
   onToggleSkillEntry: jest.fn(),
+  onToggleTechStackCategory: jest.fn(),
+  onToggleTechStackEntry: jest.fn(),
 };
 
 describe("components/cv/generator/CvGeneratorSectionCard.tsx", () => {
@@ -15,7 +17,7 @@ describe("components/cv/generator/CvGeneratorSectionCard.tsx", () => {
     jest.clearAllMocks();
   });
 
-  test("renders generic section item and triggers checkbox toggle", () => {
+  test("renders work experience item and triggers tech stack category toggle", () => {
     render(
       <CvGeneratorSectionCard
         sectionName="work_experience"
@@ -31,6 +33,7 @@ describe("components/cv/generator/CvGeneratorSectionCard.tsx", () => {
         selectedItems={new Set()}
         descriptionOverrides={{}}
         selectedSkillEntries={{}}
+        selectedTechStackEntries={{}}
         {...baseCallbacks}
       />, 
     );
@@ -42,7 +45,12 @@ describe("components/cv/generator/CvGeneratorSectionCard.tsx", () => {
     expect(screen.getByText("ECB Project • Frankfurt")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("checkbox"));
-    expect(baseCallbacks.onToggleItem).toHaveBeenCalledWith("work_experience", 1);
+    expect(baseCallbacks.onToggleTechStackCategory).toHaveBeenCalledWith(
+      "work_experience",
+      1,
+      [],
+      false,
+    );
   });
 
   test("shows project description input for selected project", () => {
@@ -59,6 +67,7 @@ describe("components/cv/generator/CvGeneratorSectionCard.tsx", () => {
         selectedItems={new Set([4])}
         descriptionOverrides={{ "projects:4": "Custom text" }}
         selectedSkillEntries={{}}
+        selectedTechStackEntries={{}}
         {...baseCallbacks}
       />, 
     );
@@ -91,6 +100,7 @@ describe("components/cv/generator/CvGeneratorSectionCard.tsx", () => {
         selectedItems={new Set([3])}
         descriptionOverrides={{}}
         selectedSkillEntries={{ "3": new Set(["React", "Node.js"]) }}
+        selectedTechStackEntries={{}}
         {...baseCallbacks}
       />, 
     );
@@ -110,6 +120,49 @@ describe("components/cv/generator/CvGeneratorSectionCard.tsx", () => {
       3,
       "TypeScript",
       ["React", "Node.js"],
+    );
+  });
+
+  test("renders tech stack entries for work experience and triggers callbacks", () => {
+    render(
+      <CvGeneratorSectionCard
+        sectionName="work_experience"
+        items={[
+          {
+            id: 11,
+            position: "Platform Engineer",
+            company: "Acme",
+            techStack: "Go, AWS, Terraform",
+          },
+        ]}
+        selectedItems={new Set([11])}
+        descriptionOverrides={{}}
+        selectedSkillEntries={{}}
+        selectedTechStackEntries={{
+          "work_experience:11": new Set(["Go", "AWS"]),
+        }}
+        {...baseCallbacks}
+      />,
+    );
+
+    expect(
+      screen.getByText("2 of 3 tech stack entries selected"),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("checkbox"));
+    expect(baseCallbacks.onToggleTechStackCategory).toHaveBeenCalledWith(
+      "work_experience",
+      11,
+      ["Go", "AWS", "Terraform"],
+      true,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Terraform" }));
+    expect(baseCallbacks.onToggleTechStackEntry).toHaveBeenCalledWith(
+      "work_experience",
+      11,
+      "Terraform",
+      ["Go", "AWS"],
     );
   });
 });

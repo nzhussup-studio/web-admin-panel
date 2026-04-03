@@ -28,16 +28,20 @@ import CvGeneratorSectionCard from "@/components/cv/generator/CvGeneratorSection
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import {
   applyDescriptionOverride,
+  buildScopedItemKey,
   buildOverrideKey,
   canOverrideDescription,
+  parseTechStack,
   parseSkillNames,
   SKILLS_SECTION_NAME,
+  TECH_STACK_SELECTABLE_SECTION_NAMES,
 } from "@/components/cv/generator/cvGeneratorUtils";
 
 type BasicInfo = Record<string, string>;
 type DescriptionOverrides = Record<string, string>;
 type SelectedItems = Record<string, Set<string | number>>;
 type SelectedSkillEntries = Record<string, Set<string>>;
+type SelectedTechStackEntries = Record<string, Set<string>>;
 type CvSection = {
   sectionName: string;
   items: Record<string, any>[];
@@ -47,6 +51,7 @@ type SerializablePreferences = {
   selectedItems?: Record<string, Array<string | number>>;
   descriptionOverrides?: Record<string, string>;
   selectedSkillEntries?: Record<string, string[]>;
+  selectedTechStackEntries?: Record<string, string[]>;
 };
 type ConfirmDialogState = {
   title: string;
@@ -172,6 +177,24 @@ const CvGeneratorPage = () => {
       return {};
     });
 
+  const [selectedTechStackEntries, setSelectedTechStackEntries] =
+    useState<SelectedTechStackEntries>(() => {
+      try {
+        const saved = localStorage.getItem(config.cvGeneratorLocalStorageKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          return parseSavedSetMap(parsed.selectedTechStackEntries);
+        }
+      } catch (e) {
+        console.error(
+          "Failed to parse selected tech stack entries from localStorage",
+          e,
+        );
+      }
+
+      return {};
+    });
+
   const fetchData = useCallback(async () => {
     setShowLoading(true);
     setError(null);
@@ -220,6 +243,8 @@ const CvGeneratorPage = () => {
     const serializableSelectedItems = serializeSetMap(selectedItems);
     const serializableSelectedSkillEntries =
       serializeSetMap(selectedSkillEntries);
+    const serializableSelectedTechStackEntries =
+      serializeSetMap(selectedTechStackEntries);
 
     localStorage.setItem(
       config.cvGeneratorLocalStorageKey,
@@ -228,15 +253,23 @@ const CvGeneratorPage = () => {
         selectedItems: serializableSelectedItems,
         descriptionOverrides,
         selectedSkillEntries: serializableSelectedSkillEntries,
+        selectedTechStackEntries: serializableSelectedTechStackEntries,
       }),
     );
-  }, [basicInfo, selectedItems, descriptionOverrides, selectedSkillEntries]);
+  }, [
+    basicInfo,
+    selectedItems,
+    descriptionOverrides,
+    selectedSkillEntries,
+    selectedTechStackEntries,
+  ]);
 
   const buildPreferencesPayload = (): SerializablePreferences => ({
     basicInfo,
     selectedItems: serializeSetMap(selectedItems),
     descriptionOverrides,
     selectedSkillEntries: serializeSetMap(selectedSkillEntries),
+    selectedTechStackEntries: serializeSetMap(selectedTechStackEntries),
   });
 
   const handleSyncPreferences = async () => {
@@ -290,6 +323,11 @@ const CvGeneratorPage = () => {
       if (remotePreferences.selectedSkillEntries) {
         setSelectedSkillEntries(
           parseSavedSetMap(remotePreferences.selectedSkillEntries),
+        );
+      }
+      if (remotePreferences.selectedTechStackEntries) {
+        setSelectedTechStackEntries(
+          parseSavedSetMap(remotePreferences.selectedTechStackEntries),
         );
       }
 
@@ -357,6 +395,20 @@ const CvGeneratorPage = () => {
           const itemKey = String(itemId);
           if (!next[itemKey]?.size) {
             next[itemKey] = new Set(parseSkillNames(item.skillNames));
+          }
+        }
+
+        return next;
+      });
+    }
+
+    if (TECH_STACK_SELECTABLE_SECTION_NAMES.has(sectionName) && !allSelected) {
+      setSelectedTechStackEntries((prev) => {
+        const next = { ...prev };
+        for (const item of items) {
+          const itemKey = buildScopedItemKey(sectionName, item.id);
+          if (!next[itemKey]?.size) {
+            next[itemKey] = new Set(parseTechStack(item.techStack));
           }
         }
 
@@ -443,6 +495,67 @@ const CvGeneratorPage = () => {
     });
   };
 
+  const toggleTechStackCategory = (
+    sectionName: string,
+    itemId: string | number,
+    allTechStackEntries: string[],
+    isSelected: boolean,
+  ) => {
+    setSelectedItems((prev) => {
+      const nextSectionSet = new Set(prev[sectionName] || []);
+      if (isSelected) {
+        nextSectionSet.delete(itemId);
+      } else {
+        nextSectionSet.add(itemId);
+      }
+
+      return { ...prev, [sectionName]: nextSectionSet };
+    });
+
+    if (!isSelected && allTechStackEntries.length > 0) {
+      setSelectedTechStackEntries((prev) => {
+        const itemKey = buildScopedItemKey(sectionName, itemId);
+        if (prev[itemKey]?.size) {
+          return prev;
+        }
+
+        return { ...prev, [itemKey]: new Set(allTechStackEntries) };
+      });
+    }
+  };
+
+  const toggleTechStackEntry = (
+    sectionName: string,
+    itemId: string | number,
+    techStackEntry: string,
+    selectedEntries: string[],
+  ) => {
+    const itemKey = buildScopedItemKey(sectionName, itemId);
+    const nextTechStackSet = new Set(selectedEntries);
+
+    if (nextTechStackSet.has(techStackEntry)) {
+      nextTechStackSet.delete(techStackEntry);
+    } else {
+      nextTechStackSet.add(techStackEntry);
+    }
+
+    setSelectedTechStackEntries((prev) => ({
+      ...prev,
+      [itemKey]: nextTechStackSet,
+    }));
+
+    setSelectedItems((prev) => {
+      const nextSectionSet = new Set(prev[sectionName] || []);
+      if (nextTechStackSet.size > 0) {
+        nextSectionSet.add(itemId);
+      } else {
+        nextSectionSet.delete(itemId);
+      }
+
+      return { ...prev, [sectionName]: nextSectionSet };
+    });
+  };
+
   const buildSelectedData = () => {
     const selectedData: Record<string, any> = { basic_info: basicInfo };
 
@@ -456,13 +569,15 @@ const CvGeneratorPage = () => {
       selectedData[sectionName] = items
         .filter((item) => selectedIds.has(item.id))
         .map((item) => {
+          let currentItem = item;
+
           if (sectionName === SKILLS_SECTION_NAME) {
-            const allSkillNames = parseSkillNames(item.skillNames);
+            const allSkillNames = parseSkillNames(currentItem.skillNames);
             if (allSkillNames.length === 0) {
-              return item;
+              return currentItem;
             }
 
-            const selectedForItem = selectedSkillEntries[String(item.id)];
+            const selectedForItem = selectedSkillEntries[String(currentItem.id)];
             const activeSkillNames = selectedForItem?.size
               ? allSkillNames.filter((skillName) =>
                   selectedForItem.has(skillName),
@@ -474,47 +589,76 @@ const CvGeneratorPage = () => {
             }
 
             return {
-              ...item,
+              ...currentItem,
               skillNames: activeSkillNames.join(", "),
             };
           }
 
-          if (!canOverrideDescription(item)) {
+          if (TECH_STACK_SELECTABLE_SECTION_NAMES.has(sectionName)) {
+            const allTechStackEntries = parseTechStack(currentItem.techStack);
+            if (allTechStackEntries.length > 0) {
+              const selectedForItem =
+                selectedTechStackEntries[
+                  buildScopedItemKey(sectionName, currentItem.id)
+                ];
+              const activeTechStackEntries = selectedForItem?.size
+                ? allTechStackEntries.filter((entry) =>
+                    selectedForItem.has(entry),
+                  )
+                : allTechStackEntries;
+
+              if (activeTechStackEntries.length === 0) {
+                return null;
+              }
+
+              currentItem = {
+                ...currentItem,
+                techStack: activeTechStackEntries.join(", "),
+              };
+            }
+          }
+
+          if (!canOverrideDescription(currentItem)) {
             if (sectionName === "projects") {
               const projectOverride =
-                descriptionOverrides[buildOverrideKey(sectionName, item.id)] ||
+                descriptionOverrides[
+                  buildOverrideKey(sectionName, currentItem.id)
+                ] ||
                 "";
 
               if (!projectOverride.trim()) {
-                return item;
+                return currentItem;
               }
 
               return {
-                ...item,
+                ...currentItem,
                 purpose: projectOverride.trim(),
               };
             }
 
-            return item;
+            return currentItem;
           }
 
           if (sectionName === "projects") {
             const projectOverride =
-              descriptionOverrides[buildOverrideKey(sectionName, item.id)] ||
-              "";
+              descriptionOverrides[
+                buildOverrideKey(sectionName, currentItem.id)
+              ] || "";
             if (!projectOverride.trim()) {
-              return item;
+              return currentItem;
             }
 
             return {
-              ...item,
+              ...currentItem,
               purpose: projectOverride.trim(),
             };
           }
 
           return applyDescriptionOverride(
-            item,
-            descriptionOverrides[buildOverrideKey(sectionName, item.id)] || "",
+            currentItem,
+            descriptionOverrides[
+              buildOverrideKey(sectionName, currentItem.id)
+            ] || "",
           );
         })
         .filter(Boolean);
@@ -677,6 +821,7 @@ const CvGeneratorPage = () => {
               selectedItems={selectedItems[section.sectionName] || new Set()}
               descriptionOverrides={descriptionOverrides}
               selectedSkillEntries={selectedSkillEntries}
+              selectedTechStackEntries={selectedTechStackEntries}
               onToggleAll={() =>
                 toggleSectionAll(section.sectionName, section.items)
               }
@@ -684,6 +829,8 @@ const CvGeneratorPage = () => {
               onSetDescriptionOverride={setDescriptionOverride}
               onToggleSkillCategory={toggleSkillCategory}
               onToggleSkillEntry={toggleSkillEntry}
+              onToggleTechStackCategory={toggleTechStackCategory}
+              onToggleTechStackEntry={toggleTechStackEntry}
             />
           ))}
         </PageState>

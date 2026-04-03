@@ -67,6 +67,7 @@ describe("components/cv/CvTemplate.tsx", () => {
               displayOrder: 1,
               name: "AWS SA",
               url: "https://cert.test",
+              issuer: "Amazon Web Services",
             },
           ],
         },
@@ -82,6 +83,8 @@ describe("components/cv/CvTemplate.tsx", () => {
     expect(
       screen.getByText("Showcase product engineering skills."),
     ).toBeInTheDocument();
+    expect(screen.getByText("AWS SA")).toBeInTheDocument();
+    expect(screen.getByText("(Amazon Web Services)", { exact: false })).toBeInTheDocument();
     expect(screen.getAllByText(/Tech Stack:/)).toHaveLength(2);
   });
 

@@ -2,14 +2,14 @@ import { type CSSProperties } from "react";
 
 const THEME = {
   text: "#1f2933",
-  muted: "#52606d",
-  subtle: "#9aa5b1",
+  muted: "#334e68",
+  subtle: "#7b8794",
   border: "#d9e2ec",
-  accent: "#0b4f7a",
+  accent: "#0a558c",
 };
 
 const sectionTitleStyle: CSSProperties = {
-  fontSize: "12px",
+  fontSize: "11.5px",
   letterSpacing: "0.08em",
   textTransform: "uppercase",
   fontWeight: 700,
@@ -42,6 +42,7 @@ const Item = ({
   description,
   additionalInfo = "",
   techStack = "",
+  subtitleInline = false,
 }) => (
   <div
     style={{
@@ -70,7 +71,7 @@ const Item = ({
       </div>
     </div>
 
-    {subtitle && (
+    {!subtitleInline && subtitle && (
       <div style={{ marginTop: "2px", color: THEME.muted, fontSize: "10.8px" }}>
         {subtitle}
       </div>
@@ -97,7 +98,16 @@ const Item = ({
 
     {techStack && (
       <div style={{ marginTop: "3px", lineHeight: 1.3, color: THEME.muted }}>
-        <strong style={{ color: THEME.text }}>Tech Stack:</strong> {techStack}
+        <span
+          style={{
+            color: THEME.accent,
+            fontWeight: 700,
+            letterSpacing: "0.01em",
+          }}
+        >
+          Tech Stack:
+        </span>{" "}
+        <span style={{ color: THEME.text, fontWeight: 600 }}>{techStack}</span>
       </div>
     )}
   </div>
@@ -280,11 +290,15 @@ const CvTemplate = ({ data }) => {
             .map((exp) => (
               <Item
                 key={exp.id}
-                title={exp.position}
-                subtitle={`${exp.company}, ${exp.location}`}
+                title={
+                  exp.company && exp.location
+                    ? `${exp.position} • ${exp.company}, ${exp.location}`
+                    : exp.position
+                }
                 date={`${exp.startDate} - ${exp.endDate || "Present"}`}
                 description={exp.description}
                 techStack={exp.techStack}
+                subtitleInline
               />
             ))}
         </Section>
@@ -307,8 +321,13 @@ const CvTemplate = ({ data }) => {
               return (
                 <div key={edu.id} style={{ marginBottom: "2px" }}>
                   <Item
-                    title={edu.degree}
-                    subtitle={`${edu.institution}, ${edu.location}`}
+                    title={
+                      edu.institution
+                        ? `${edu.degree} • ${edu.institution}${
+                            edu.location ? `, ${edu.location}` : ""
+                          }`
+                        : `${edu.degree}${edu.location ? ` • ${edu.location}` : ""}`
+                    }
                     date={date}
                     description={descriptionParts.join(". ")}
                     additionalInfo={edu.thesis ? `Thesis: ${edu.thesis}` : ""}
@@ -332,24 +351,26 @@ const CvTemplate = ({ data }) => {
               .sort((a, b) => b.displayOrder - a.displayOrder)
               .map((project) => (
                 <div key={project.id}>
-                  <div style={{ fontWeight: 700 }}>{project.name}</div>
-                  {project.url && (
-                    <a
-                      href={project.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={project.url}
-                      style={{
-                        display: "inline-block",
-                        marginTop: "0px",
-                        color: THEME.accent,
-                        lineHeight: 1.2,
-                        textDecoration: "none",
-                      }}
-                    >
-                      {formatUrlLabel(project.url)}
-                    </a>
-                  )}
+                  <div style={{ fontWeight: 700 }}>
+                    {project.name}
+                    {project.url ? " (" : ""}
+                    {project.url && (
+                      <a
+                        href={project.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={project.url}
+                        style={{
+                          color: THEME.accent,
+                          lineHeight: 1.2,
+                          textDecoration: "none",
+                        }}
+                      >
+                        {formatUrlLabel(project.url)}
+                      </a>
+                    )}
+                    {project.url ? ")" : ""}
+                  </div>
                   {project.description && (
                     <div
                       style={{
@@ -377,11 +398,15 @@ const CvTemplate = ({ data }) => {
                     <div
                       style={{
                         marginTop: "1px",
-                        color: THEME.muted,
+                        color: THEME.text,
+                        fontWeight: 600,
                         lineHeight: 1.2,
                       }}
                     >
-                      Tech Stack: {project.techStack}
+                      <span style={{ color: THEME.accent, fontWeight: 700 }}>
+                        Tech Stack:
+                      </span>{" "}
+                      {project.techStack}
                     </div>
                   )}
                 </div>
@@ -424,6 +449,7 @@ const CvTemplate = ({ data }) => {
                   >
                     {cert.name}
                   </a>
+                  {cert.issuer ? ` (${cert.issuer})` : ""}
                   {index < certificates.length - 1 ? " • " : ""}
                 </span>
               ))}

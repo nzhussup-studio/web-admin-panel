@@ -6,6 +6,7 @@ export type base_service_Certificate = {
     id?: number;
     name?: string;
     url?: string;
+    issuer?: string;
     displayOrder?: number;
 };
 

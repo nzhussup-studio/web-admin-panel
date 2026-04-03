@@ -238,6 +238,38 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
     );
   });
 
+  test("exports only selected tech stack entries for selected work experience", async () => {
+    (WorkExperienceControllerService.listWorkExperience as jest.Mock).mockResolvedValue([
+      {
+        id: 1,
+        displayOrder: 1,
+        position: "Engineer",
+        techStack: "Go, AWS, Terraform",
+      },
+    ]);
+
+    render(React.createElement(CvGeneratorPage));
+    await waitFor(() => expect(screen.getByText("work experience")).toBeInTheDocument());
+
+    const wexCard = screen.getByText("work experience").closest(".card");
+    expect(wexCard).not.toBeNull();
+    fireEvent.click(within(wexCard as HTMLElement).getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: "Terraform" }));
+    fireEvent.click(screen.getByText("Export to PDF"));
+
+    expect(generateCV).toHaveBeenCalledWith(
+      expect.objectContaining({
+        work_experience: [
+          expect.objectContaining({
+            id: 1,
+            techStack: "Go, AWS",
+          }),
+        ],
+      }),
+      "pdf"
+    );
+  });
+
   test("exports project override as project purpose", async () => {
     (ProjectControllerService.listProject as jest.Mock).mockResolvedValue([
       { id: 4, displayOrder: 1, name: "Portfolio", techStack: "React" },

@@ -72,6 +72,15 @@ const CertificationsPage = () => {
         />
       </Form.Group>
       <Form.Group className="mb-3">
+        <Form.Label>Issuer (optional)</Form.Label>
+        <Form.Control
+          value={formData.issuer ?? ""}
+          onChange={(e) =>
+            setFormData({ ...formData, issuer: e.target.value })
+          }
+        />
+      </Form.Group>
+      <Form.Group className="mb-3">
         <Form.Label>Order Display</Form.Label>
         <Form.Control
           type="number"
@@ -102,6 +111,9 @@ const CertificationsPage = () => {
                 <Card.Title className="fw-semibold mb-3 app-card-title">
                   {certificate.name}
                 </Card.Title>
+                {certificate.issuer && (
+                  <div className="text-secondary mb-2">{certificate.issuer}</div>
+                )}
                 <div className="d-flex flex-wrap align-items-center gap-3">
                   {certificate.url && (
                     <Button
