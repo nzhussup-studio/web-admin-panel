@@ -14,8 +14,10 @@ import {
   saveCvGeneratorPreferences,
 } from "@/lib/cv/cvGeneratorPreferences";
 import { useNavigate } from "react-router-dom";
+import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
 
 const mockNavigate = jest.fn();
+const mockTriggerAlert = jest.fn();
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
@@ -28,6 +30,9 @@ jest.mock("@/lib/cv/generateCv", () => ({
 jest.mock("@/lib/cv/cvGeneratorPreferences", () => ({
   loadCvGeneratorPreferences: jest.fn(),
   saveCvGeneratorPreferences: jest.fn(),
+}));
+jest.mock("@/hooks/alerts/useOptionalGlobalAlert", () => ({
+  useOptionalGlobalAlert: jest.fn(),
 }));
 jest.mock("@/lib/api/client", () => ({
   WorkExperienceControllerService: { listWorkExperience: jest.fn() },
@@ -82,6 +87,11 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
     jest.clearAllMocks();
     localStorage.clear();
     (useNavigate as jest.Mock).mockReturnValue(mockNavigate);
+    (useOptionalGlobalAlert as jest.Mock).mockReturnValue({
+      triggerAlert: mockTriggerAlert,
+      closeAlert: jest.fn(),
+      alert: { show: false, message: "", type: "info" },
+    });
     (loadCvGeneratorPreferences as jest.Mock).mockResolvedValue(null);
     (saveCvGeneratorPreferences as jest.Mock).mockResolvedValue(undefined);
     (WorkExperienceControllerService.listWorkExperience as jest.Mock).mockResolvedValue([
@@ -350,7 +360,12 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
     fireEvent.click(screen.getByText("From Backend"));
     fireEvent.click(screen.getByRole("button", { name: "Load From Backend" }));
 
-    expect(await screen.findByText("No backend preferences found.")).toBeInTheDocument();
+    await waitFor(() =>
+      expect(mockTriggerAlert).toHaveBeenCalledWith(
+        "No backend preferences found.",
+        "warning",
+      ),
+    );
   });
 
   test("shows alert when syncing preferences to backend fails", async () => {
@@ -366,7 +381,12 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
     fireEvent.click(screen.getByText("To Backend"));
     fireEvent.click(screen.getByRole("button", { name: "Sync To Backend" }));
 
-    expect(await screen.findByText("Failed to sync preferences.")).toBeInTheDocument();
+    await waitFor(() =>
+      expect(mockTriggerAlert).toHaveBeenCalledWith(
+        "Failed to sync preferences.",
+        "danger",
+      ),
+    );
     consoleErrorSpy.mockRestore();
   });
 
@@ -383,9 +403,12 @@ describe("pages/cv/CvGeneratorPage.tsx", () => {
     fireEvent.click(screen.getByText("From Backend"));
     fireEvent.click(screen.getByRole("button", { name: "Load From Backend" }));
 
-    expect(
-      await screen.findByText("Failed to load preferences from backend."),
-    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(mockTriggerAlert).toHaveBeenCalledWith(
+        "Failed to load preferences from backend.",
+        "danger",
+      ),
+    );
     consoleErrorSpy.mockRestore();
   });
 

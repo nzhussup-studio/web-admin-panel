@@ -1,6 +1,5 @@
 import Header from "@/components/layout/Header";
 import PageState from "@/components/pages/PageState";
-import GlobalAlert from "@/components/layout/GlobalAlert";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
@@ -99,8 +98,6 @@ const CvGeneratorPage = () => {
   const navigate = useNavigate();
   const { triggerAlert } = useOptionalGlobalAlert();
 
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
   const [sections, setSections] = useState<CvSection[]>([]);
   const [isAscending, setIsAscending] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
@@ -278,12 +275,9 @@ const CvGeneratorPage = () => {
     try {
       await saveCvGeneratorPreferences(buildPreferencesPayload());
       triggerAlert("Preferences synced to backend.", "success");
-      setAlertMessage("Preferences synced to backend.");
-      setAlertVisible(true);
     } catch (syncError) {
       console.error("Failed to sync CV generator preferences", syncError);
-      setAlertMessage("Failed to sync preferences.");
-      setAlertVisible(true);
+      triggerAlert("Failed to sync preferences.", "danger");
     } finally {
       setIsSyncingPreferences(false);
     }
@@ -296,8 +290,7 @@ const CvGeneratorPage = () => {
         (await loadCvGeneratorPreferences()) as SerializablePreferences | null;
 
       if (!remotePreferences) {
-        setAlertMessage("No backend preferences found.");
-        setAlertVisible(true);
+        triggerAlert("No backend preferences found.", "warning");
         return;
       }
 
@@ -333,12 +326,9 @@ const CvGeneratorPage = () => {
       }
 
       triggerAlert("Preferences loaded from backend.", "success");
-      setAlertMessage("Preferences loaded from backend.");
-      setAlertVisible(true);
     } catch (syncError) {
       console.error("Failed to load CV generator preferences", syncError);
-      setAlertMessage("Failed to load preferences from backend.");
-      setAlertVisible(true);
+      triggerAlert("Failed to load preferences from backend.", "danger");
     } finally {
       setIsSyncingPreferences(false);
     }
@@ -672,11 +662,12 @@ const CvGeneratorPage = () => {
     const selectedData = buildSelectedData();
 
     if (Object.keys(selectedData).length === 0) {
-      setAlertMessage("Please select at least one item to generate CV.");
-      setAlertVisible(true);
+      triggerAlert(
+        "Please select at least one item to generate CV.",
+        "warning",
+      );
     } else {
-      setAlertMessage("CV generated successfully (mock)!");
-      setAlertVisible(true);
+      triggerAlert("CV generated successfully (mock)!", "success");
     }
 
     generateCV(selectedData, output);
@@ -690,8 +681,6 @@ const CvGeneratorPage = () => {
   const handleClearOverrides = () => {
     setDescriptionOverrides({});
     triggerAlert("Description overrides cleared.", "success");
-    setAlertMessage("Description overrides cleared.");
-    setAlertVisible(true);
   };
 
   const toggleSort = () => {
@@ -701,12 +690,6 @@ const CvGeneratorPage = () => {
   return (
     <>
       <Header text={"CV Generator"} />
-      <GlobalAlert
-        message={alertMessage}
-        show={alertVisible}
-        onClose={() => setAlertVisible(false)}
-        type="danger"
-      />
 
       <Container className="my-5">
         <Stack
