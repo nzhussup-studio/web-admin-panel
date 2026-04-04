@@ -136,7 +136,9 @@ const formatUrlLabel = (value) => {
   }
 };
 
-const CvTemplate = ({ data }) => {
+const EXPORT_CONTENT_WIDTH = "8in";
+
+const CvTemplate = ({ data, forExport = false }) => {
   const {
     basic_info = {},
     work_experience,
@@ -162,7 +164,8 @@ const CvTemplate = ({ data }) => {
         lineHeight: 1.24,
         color: THEME.text,
         padding: "7px 10px",
-        maxWidth: "840px",
+        width: forExport ? EXPORT_CONTENT_WIDTH : "100%",
+        maxWidth: forExport ? EXPORT_CONTENT_WIDTH : "840px",
         margin: "auto",
         backgroundColor: "#fff",
       }}
