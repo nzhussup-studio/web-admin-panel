@@ -12,6 +12,7 @@ import AlbumsPage from "@/pages/albums/AlbumsPage";
 import AlbumPage from "@/pages/albums/AlbumPage";
 import PublicAlbumPage from "@/pages/albums/PublicAlbumPage";
 import CvGeneratorPage from "@/pages/cv/CvGeneratorPage";
+import LlmConfigPage from "@/pages/llm/LlmConfigPage";
 
 const routes: AppRoute[] = [
   {
@@ -67,6 +68,11 @@ const routes: AppRoute[] = [
   {
     path: "/cv-generator",
     component: CvGeneratorPage,
+    isProtected: true,
+  },
+  {
+    path: "/llm",
+    component: LlmConfigPage,
     isProtected: true,
   },
   {

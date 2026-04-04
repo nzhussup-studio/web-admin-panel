@@ -2,7 +2,7 @@ import routes from "@/router/routes";
 
 describe("router/routes.ts", () => {
   test("defines the expected public and protected paths", () => {
-    expect(routes).toHaveLength(13);
+    expect(routes).toHaveLength(14);
     expect(routes.map((route) => route.path)).toEqual([
       "/",
       "/projects",
@@ -15,6 +15,7 @@ describe("router/routes.ts", () => {
       "/albums/:id",
       "/public/albums/:id",
       "/cv-generator",
+      "/llm",
       "/forbidden",
       "*",
     ]);
