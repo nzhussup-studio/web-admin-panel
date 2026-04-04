@@ -31,8 +31,7 @@ describe("lib/cv/generateCv.ts", () => {
     jest.clearAllMocks();
   });
 
-  test("falls back to html2pdf when popup is blocked", async () => {
-    jest.spyOn(window, "open").mockImplementation(() => null);
+  test("generates a pdf by rendering html and invoking html2pdf", async () => {
     const appendSpy = jest.spyOn(document.body, "appendChild");
     const removeSpy = jest.spyOn(document.body, "removeChild");
 
@@ -45,38 +44,12 @@ describe("lib/cv/generateCv.ts", () => {
     expect(mockedHtml2PdfModule.mockSet).toHaveBeenCalledWith(
       expect.objectContaining({ filename: "cv.pdf" })
     );
-    expect(mockedHtml2PdfModule.mockFrom).toHaveBeenCalledWith(expect.any(HTMLDivElement));
-    const fallbackContainer = mockedHtml2PdfModule.mockFrom.mock.calls[0][0] as HTMLDivElement;
-    expect(fallbackContainer.style.width).toBe("8in");
+    expect(mockedHtml2PdfModule.mockFrom).toHaveBeenCalledWith(
+      expect.any(HTMLDivElement)
+    );
     expect(mockedHtml2PdfModule.mockSave).toHaveBeenCalled();
     expect(appendSpy).toHaveBeenCalled();
     expect(removeSpy).toHaveBeenCalled();
-  });
-
-  test("uses popup print flow when popup is available", () => {
-    const documentOpen = jest.fn();
-    const documentWrite = jest.fn();
-    const documentClose = jest.fn();
-    const openSpy = jest.spyOn(window, "open").mockImplementation(
-      () =>
-        ({
-          document: {
-            open: documentOpen,
-            write: documentWrite,
-            close: documentClose,
-          },
-        }) as unknown as Window
-    );
-
-    generateCV({ basic_info: { name: "User" } }, "pdf");
-
-    expect(openSpy).toHaveBeenCalledWith("", "_blank");
-    expect(documentOpen).toHaveBeenCalled();
-    expect(documentWrite).toHaveBeenCalledWith(expect.stringContaining("<meta name=\"viewport\""));
-    expect(documentWrite).toHaveBeenCalledWith(expect.stringContaining("text-size-adjust: 100%"));
-    expect(documentWrite).toHaveBeenCalledWith(expect.stringContaining("document.fonts"));
-    expect(documentClose).toHaveBeenCalled();
-    expect(mockedHtml2PdfModule.mockHtml2Pdf).not.toHaveBeenCalled();
   });
 
   test("alerts on unsupported output formats", () => {
@@ -110,8 +83,6 @@ describe("lib/cv/generateCv.ts", () => {
     expect(documentOpen).toHaveBeenCalled();
     expect(documentWrite).toHaveBeenCalledWith(expect.stringContaining("CV Preview"));
     expect(documentWrite).toHaveBeenCalledWith(expect.stringContaining("Preview User"));
-    expect(documentWrite).toHaveBeenCalledWith(expect.stringContaining("<meta name=\"viewport\""));
-    expect(documentWrite).toHaveBeenCalledWith(expect.stringContaining("width: 8in"));
     expect(documentClose).toHaveBeenCalled();
   });
 

@@ -8,10 +8,9 @@ import {
 
 const POPUP_BLOCKED_MESSAGE =
   "Preview window was blocked. Please allow pop-ups for this site.";
-const EXPORT_PAGE_CONTENT_WIDTH_IN = 8;
 
 function renderCvMarkup(data: unknown): string {
-  return renderToStaticMarkup(CVTemplate({ data, forExport: true }));
+  return renderToStaticMarkup(CVTemplate({ data }));
 }
 
 function openWindowWithHtml(documentHtml: string): Window | null {
@@ -59,11 +58,6 @@ function waitForImagesToLoad(container: HTMLElement, timeoutMs = 8000) {
 
 function downloadPdfWithCanvasFallback(cvMarkup: string) {
   const scratchContainer = document.createElement("div");
-  scratchContainer.style.position = "fixed";
-  scratchContainer.style.left = "-10000px";
-  scratchContainer.style.top = "0";
-  scratchContainer.style.width = `${EXPORT_PAGE_CONTENT_WIDTH_IN}in`;
-  scratchContainer.style.background = "#ffffff";
   scratchContainer.innerHTML = cvMarkup;
   document.body.appendChild(scratchContainer);
 
