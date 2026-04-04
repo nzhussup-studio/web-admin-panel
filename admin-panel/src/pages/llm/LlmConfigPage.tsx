@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import Header from "@/components/layout/Header";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
@@ -31,7 +31,7 @@ const LlmConfigPage = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [generatedSummary, setGeneratedSummary] = useState("");
 
-  const loadConfiguration = async () => {
+  const loadConfiguration = useCallback(async () => {
     setIsLoading(true);
     setErrorMessage("");
     try {
@@ -51,11 +51,11 @@ const LlmConfigPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [triggerAlert]);
 
   useEffect(() => {
     void loadConfiguration();
-  }, []);
+  }, [loadConfiguration]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -103,9 +103,8 @@ const LlmConfigPage = () => {
     setSummaryErrorMessage("");
 
     try {
-      const response = await SummarizerService.getV1LlmSummarize(
-        selectedLanguage,
-      );
+      const response =
+        await SummarizerService.getV1LlmSummarize(selectedLanguage);
       setGeneratedSummary(response.message || "");
       triggerAlert("Summary generated.", "success");
     } catch (error) {
@@ -132,8 +131,12 @@ const LlmConfigPage = () => {
         </Button>
         <Form className="p-4 rounded shadow-sm border" onSubmit={handleSubmit}>
           <Stack gap={3}>
-            {isLoading && <Alert variant="info">Loading configuration...</Alert>}
-            {errorMessage ? <Alert variant="danger">{errorMessage}</Alert> : null}
+            {isLoading && (
+              <Alert variant="info">Loading configuration...</Alert>
+            )}
+            {errorMessage ? (
+              <Alert variant="danger">{errorMessage}</Alert>
+            ) : null}
 
             <Form.Group controlId="modelName">
               <Form.Label>Model Name</Form.Label>
