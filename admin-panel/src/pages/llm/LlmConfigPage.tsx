@@ -21,7 +21,7 @@ const LlmConfigPage = () => {
   const [modelName, setModelName] = useState("");
   const [systemPromptEN, setSystemPromptEN] = useState("");
   const [systemPromptDE, setSystemPromptDE] = useState("");
-  const [systemPromptKZ, setSystemPromptKZ] = useState("");
+  const [systemPromptKK, setSystemPromptKK] = useState("");
   const [enableBackgroundGen, setEnableBackgroundGen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -39,7 +39,7 @@ const LlmConfigPage = () => {
       setModelName(config.model || "");
       setSystemPromptEN(config.system_prompt_en || "");
       setSystemPromptDE(config.system_prompt_de || "");
-      setSystemPromptKZ(config.system_prompt_kz || "");
+      setSystemPromptKK(config.system_prompt_kk || "");
       setEnableBackgroundGen(Boolean(config.enable_parallel_generation));
     } catch (error) {
       const message = getApiErrorMessage(
@@ -74,7 +74,7 @@ const LlmConfigPage = () => {
       model: modelName.trim(),
       system_prompt_en: systemPromptEN,
       system_prompt_de: systemPromptDE,
-      system_prompt_kz: systemPromptKZ,
+      system_prompt_kk: systemPromptKK,
       enable_parallel_generation: enableBackgroundGen,
     };
 
@@ -83,7 +83,7 @@ const LlmConfigPage = () => {
       setModelName(updated.model || "");
       setSystemPromptEN(updated.system_prompt_en || "");
       setSystemPromptDE(updated.system_prompt_de || "");
-      setSystemPromptKZ(updated.system_prompt_kz || "");
+      setSystemPromptKK(updated.system_prompt_kk || "");
       setEnableBackgroundGen(Boolean(updated.enable_parallel_generation));
       triggerAlert("LLM configuration saved.", "success");
     } catch (error) {
@@ -171,13 +171,13 @@ const LlmConfigPage = () => {
               />
             </Form.Group>
 
-            <Form.Group controlId="systemPromptKZ">
-              <Form.Label>System Prompt (KZ)</Form.Label>
+            <Form.Group controlId="systemPromptKK">
+              <Form.Label>System Prompt (KK)</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={4}
-                value={systemPromptKZ}
-                onChange={(e) => setSystemPromptKZ(e.target.value)}
+                value={systemPromptKK}
+                onChange={(e) => setSystemPromptKK(e.target.value)}
                 disabled={isLoading || isSaving}
               />
             </Form.Group>
@@ -225,7 +225,7 @@ const LlmConfigPage = () => {
                 disabled={isGenerating}
               >
                 <option value="en">English (en)</option>
-                <option value="kz">Kazakh (kz)</option>
+                <option value="kk">Kazakh (kk)</option>
                 <option value="de">German (de)</option>
               </Form.Select>
             </Form.Group>

@@ -58,7 +58,7 @@ describe("pages/llm/LlmConfigPage.tsx", () => {
       model: "openai/gpt-4.1-mini",
       system_prompt_en: "EN prompt",
       system_prompt_de: "DE prompt",
-      system_prompt_kz: "KZ prompt",
+      system_prompt_kk: "KK prompt",
       enable_parallel_generation: true,
     });
     mockGenerateSummary.mockResolvedValue({
@@ -81,7 +81,7 @@ describe("pages/llm/LlmConfigPage.tsx", () => {
     );
     expect(screen.getByLabelText("System Prompt (EN)")).toHaveValue("EN prompt");
     expect(screen.getByLabelText("System Prompt (DE)")).toHaveValue("DE prompt");
-    expect(screen.getByLabelText("System Prompt (KZ)")).toHaveValue("KZ prompt");
+    expect(screen.getByLabelText("System Prompt (KK)")).toHaveValue("KK prompt");
     expect(screen.getByLabelText("Enable Background Generation")).toBeChecked();
   });
 
@@ -90,7 +90,7 @@ describe("pages/llm/LlmConfigPage.tsx", () => {
       model: "openai/gpt-5.4",
       system_prompt_en: "Updated EN",
       system_prompt_de: "Updated DE",
-      system_prompt_kz: "Updated KZ",
+      system_prompt_kk: "Updated KK",
       enable_parallel_generation: false,
     });
 
@@ -111,7 +111,7 @@ describe("pages/llm/LlmConfigPage.tsx", () => {
         model: "openai/gpt-5.4",
         system_prompt_en: "EN prompt",
         system_prompt_de: "DE prompt",
-        system_prompt_kz: "KZ prompt",
+        system_prompt_kk: "KK prompt",
         enable_parallel_generation: false,
       }),
     );

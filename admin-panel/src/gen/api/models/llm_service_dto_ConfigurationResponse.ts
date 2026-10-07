@@ -8,6 +8,6 @@ export type llm_service_dto_ConfigurationResponse = {
     status?: number;
     system_prompt_de?: string;
     system_prompt_en?: string;
-    system_prompt_kz?: string;
+    system_prompt_kk?: string;
 };
 
