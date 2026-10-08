@@ -6,9 +6,15 @@ import Button from "@/components/ui/button";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
+import Dropdown from "react-bootstrap/Dropdown";
 import { normalizeApiError } from "@/api";
 import { generateCV, previewCV } from "./export";
-import { CloudDownload, CloudUpload, Eye } from "lucide-react";
+import {
+  CloudDownload,
+  CloudUpload,
+  Eye,
+  SlidersHorizontal,
+} from "lucide-react";
 import { useOptionalGlobalAlert } from "@/providers/alerts";
 import {
   CvGeneratorBasicInfoCard,
@@ -427,32 +433,61 @@ const CvGeneratorPage = () => {
   return (
     <>
       <PageHeader
+        className="cv-generator-page-header"
         text="CV Generator"
         description="Choose content, customize details and export your CV."
         actions={
-          <div className="d-flex gap-2">
+          <div className="cv-generator-actions">
             <Button variant="outline-primary" onClick={handlePreviewCV}>
               <Eye size={17} /> Preview
             </Button>
-            <Button
-              variant="outline-secondary"
-              onClick={syncFromBackend}
-              disabled={isSyncingPreferences}
-            >
-              <CloudDownload size={17} /> Sync from backend
-            </Button>
-            <Button
-              variant="outline-secondary"
-              onClick={syncToBackend}
-              disabled={isSyncingPreferences}
-            >
-              <CloudUpload size={17} /> Sync to backend
-            </Button>
+            <div className="d-none d-md-flex gap-2">
+              <Button
+                variant="outline-secondary"
+                onClick={syncFromBackend}
+                disabled={isSyncingPreferences}
+              >
+                <CloudDownload size={17} /> Sync from backend
+              </Button>
+              <Button
+                variant="outline-secondary"
+                onClick={syncToBackend}
+                disabled={isSyncingPreferences}
+              >
+                <CloudUpload size={17} /> Sync to backend
+              </Button>
+            </div>
+            <Dropdown align="end" className="d-md-none cv-template-menu">
+              <Dropdown.Toggle as={Button} variant="outline-secondary">
+                Template
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item active>Standard</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+            <Dropdown align="end" className="d-md-none cv-preferences-menu">
+              <Dropdown.Toggle
+                as={Button}
+                variant="outline-secondary"
+                disabled={isSyncingPreferences}
+              >
+                <SlidersHorizontal size={17} />
+                {isSyncingPreferences ? "Syncing…" : "Preferences"}
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={syncFromBackend}>
+                  <CloudDownload size={16} /> Sync from backend
+                </Dropdown.Item>
+                <Dropdown.Item onClick={syncToBackend}>
+                  <CloudUpload size={16} /> Sync to backend
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </div>
         }
       />
 
-      <Container fluid="xl" className="page-content">
+      <Container fluid="xl" className="page-content cv-generator-page">
         <AsyncState
           isEmpty={sections.length === 0}
           loading={sourceData.isPending}
