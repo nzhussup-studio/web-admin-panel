@@ -36,5 +36,22 @@ export default defineConfig(({ mode }) => {
     server: {
       host: "0.0.0.0",
     },
+    test: {
+      environment: "jsdom",
+      globals: true,
+      setupFiles: ["./src/test/setup.ts"],
+      css: false,
+      coverage: {
+        provider: "v8",
+        reporter: ["text", "html"],
+        exclude: [
+          "src/api/generated/**",
+          "src/**/*.spec.ts",
+          "src/**/index.ts",
+          "src/main.tsx",
+          "src/types/**",
+        ],
+      },
+    },
   };
 });

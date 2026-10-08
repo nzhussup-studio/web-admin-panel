@@ -1,8 +1,6 @@
 dist
-coverage
 node_modules
-src/gen/api
-tests
+src/api/generated
 .prettierrc
 eslint.config.js
 index.html

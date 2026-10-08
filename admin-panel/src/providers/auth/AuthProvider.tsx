@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
-import LoadingState from "@/components/states/LoadingState";
+import { useEffect, useState, type PropsWithChildren } from "react";
 import { AuthContext } from "@/providers/auth/auth-context";
 import {
   getKeycloakInitPromise,
   resetKeycloakInitPromise,
   setKeycloakInitPromise,
 } from "@/providers/auth/keycloak-init";
-import type { AuthState, ProviderProps } from "@/types/common";
-import keycloak from "@/lib/auth/keycloak";
+import type { AuthState } from "./auth-context";
+import keycloak from "./keycloak";
 
 const initialState: AuthState = {
   isAuthenticated: false,
@@ -86,7 +85,7 @@ const resetLocalAuthState = () => {
   stripAuthCallbackParams();
 };
 
-export const AuthProvider = ({ children }: ProviderProps) => {
+export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [state, setState] = useState<AuthState>(initialState);
 
   useEffect(() => {
@@ -230,10 +229,6 @@ export const AuthProvider = ({ children }: ProviderProps) => {
       redirectUri: redirectUri ?? window.location.origin,
     });
   };
-
-  if (state.loading) {
-    return <LoadingState />;
-  }
 
   return (
     <AuthContext.Provider value={{ state, login, logout }}>

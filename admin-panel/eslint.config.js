@@ -6,7 +6,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 
 export default [
-  { ignores: ['dist', 'src/gen/api/**'] },
+  { ignores: ['dist', 'src/api/generated/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -15,7 +15,6 @@ export default [
       ecmaVersion: 'latest',
       globals: {
         ...globals.browser,
-        ...globals.jest,
         ...globals.node,
       },
       parserOptions: {
@@ -44,19 +43,6 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
-    },
-  },
-  {
-    files: ['**/*.{js,jsx}'],
-    rules: {
-      '@typescript-eslint/no-require-imports': 'off',
-      'react/display-name': 'off',
-    },
-  },
-  {
-    files: ['tests/**/*.ts', 'tests/**/*.tsx'],
-    rules: {
-      '@typescript-eslint/no-require-imports': 'off',
     },
   },
 ]
