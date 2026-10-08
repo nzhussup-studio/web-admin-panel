@@ -120,7 +120,9 @@ const AlbumPage = () => {
       const files = (formData.file || []).map(({ file }) => file);
       if (files.length > 0) {
         setUploadStatus("Starting upload...");
-        const response = await ImageService.postV1AlbumUpload(id, { file: files });
+        const response = await ImageService.postV1AlbumUpload(id, {
+          file: files,
+        });
         const job = response.data;
         if (!job?.id) {
           throw new Error("Upload was accepted without a job ID");
@@ -132,7 +134,10 @@ const AlbumPage = () => {
             `Uploading ${status.completed}/${status.total} images...`,
           );
           await new Promise((resolve) => setTimeout(resolve, 1000));
-          const statusResponse = await ImageService.getV1AlbumUpload(id, job.id);
+          const statusResponse = await ImageService.getV1AlbumUpload(
+            id,
+            job.id,
+          );
           if (!statusResponse.data) {
             throw new Error("Upload status response was empty");
           }
