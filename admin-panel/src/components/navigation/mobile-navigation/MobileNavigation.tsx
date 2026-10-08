@@ -29,7 +29,7 @@ export function MobileNavigation({
         </Button>
         <Button variant="link" className="admin-mobile-brand" onClick={onHome}>
           <BrandLogo />
-          Admin
+          Admin Panel
         </Button>
         <span className="admin-avatar">{initials}</span>
       </header>

@@ -71,7 +71,7 @@ export function Sidebar({
           onClick={() => onNavigate("/")}
         >
           <BrandLogo />
-          <span className="admin-brand-label">Admin</span>
+          <span className="admin-brand-label">Admin Panel</span>
         </Button>
       </div>
       <Nav className="admin-nav flex-column" aria-label="Primary navigation">

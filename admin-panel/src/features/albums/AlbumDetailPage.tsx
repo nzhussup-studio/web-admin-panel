@@ -15,10 +15,15 @@ import {
 import { getApiErrorMessage, normalizeApiError } from "@/api";
 import { FormDrawer as Popup } from "@/components/ui/form-drawer";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { AlbumForm, ImageMenu, UploadProgress } from "./components";
+import {
+  AlbumForm,
+  AlbumLightboxModal,
+  ImageMenu,
+  UploadProgress,
+} from "./components";
 import { useOptionalGlobalAlert } from "@/providers/alerts";
 import Badge from "react-bootstrap/Badge";
-import { API_BASE, queryKeys } from "@/api";
+import { queryKeys } from "@/api";
 import {
   deleteImage,
   getAlbum,
@@ -27,9 +32,14 @@ import {
   updateAlbum,
   uploadImages,
 } from "./api";
-import { normalizeAlbumPreview, type AlbumPreviewView } from "./albumData";
+import {
+  getAlbumImageUrl,
+  normalizeAlbumPreview,
+  type AlbumPreviewView,
+} from "./albumData";
+import { ImagePlus, Pencil, X } from "lucide-react";
 
-type ImagePreview = { file: Blob; preview: string };
+type ImagePreview = { file: File; preview: string };
 type UploadStatus = {
   jobId: string;
   completed: number;
@@ -49,6 +59,9 @@ const AlbumDetailPage = () => {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null,
+  );
   const [isEditMode, setIsEditMode] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadStatus | null>(
     null,
@@ -143,10 +156,14 @@ const AlbumDetailPage = () => {
     setIsEditMode(false);
   };
 
-  const handleFileInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+  const addFilePreviews = async (files: File[]) => {
+    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+    if (imageFiles.length !== files.length) {
+      triggerAlert("Only image files can be uploaded", "warning");
+    }
+    if (imageFiles.length === 0) return;
 
-    const readFiles = files.map((file) => {
+    const readFiles = imageFiles.map((file) => {
       return new Promise<ImagePreview>((resolve) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -157,8 +174,15 @@ const AlbumDetailPage = () => {
     });
 
     const results = await Promise.all(readFiles);
-    const updatedPreviews = [...(formData.file || []), ...results];
-    setFormData({ ...formData, file: updatedPreviews });
+    setFormData((current) => ({
+      ...current,
+      file: [...(current.file || []), ...results],
+    }));
+  };
+
+  const handleFileInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    await addFilePreviews(Array.from(e.target.files || []));
+    e.target.value = "";
   };
 
   const removeImagePreview = (index: number) => {
@@ -170,25 +194,23 @@ const AlbumDetailPage = () => {
     if (!id) return;
     try {
       const files = (formData.file || []).map(({ file }) => file);
-      if (files.length > 0) {
-        const response = await uploadImages(id, files);
-        const job = response.data;
-        if (!job?.id) {
-          throw new Error("Upload was accepted without a job ID");
-        }
-
-        setUploadProgress({
-          jobId: job.id,
-          completed: job.completed || 0,
-          total: job.total || files.length,
-          status: job.status || "queued",
-          error: job.error,
-        });
-        closePopup();
+      if (files.length === 0) {
+        triggerAlert("Choose at least one image to upload", "warning");
         return;
       }
-      await queryClient.invalidateQueries({
-        queryKey: queryKeys.albums.detail(id),
+
+      const response = await uploadImages(id, files);
+      const job = response.data;
+      if (!job?.id) {
+        throw new Error("Upload was accepted without a job ID");
+      }
+
+      setUploadProgress({
+        jobId: job.id,
+        completed: job.completed || 0,
+        total: job.total || files.length,
+        status: job.status || "queued",
+        error: job.error,
       });
       closePopup();
     } catch (saveError) {
@@ -206,58 +228,50 @@ const AlbumDetailPage = () => {
       onSubmit={saveImage}
     >
       <Form.Group className="mb-4">
-        <Form.Label>Upload Images</Form.Label>
-        <Form.Control
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleFileInputChange}
-          required
-          aria-label="Choose files"
-        />
+        <Form.Label>Images</Form.Label>
+        <label
+          className="album-upload-dropzone"
+          onDragOver={(event) => event.preventDefault()}
+          onDrop={(event) => {
+            event.preventDefault();
+            void addFilePreviews(Array.from(event.dataTransfer.files));
+          }}
+        >
+          <Form.Control
+            className="visually-hidden"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFileInputChange}
+            aria-label="Choose images"
+          />
+          <span className="album-upload-icon">
+            <ImagePlus size={24} />
+          </span>
+          <strong>Drop images here or choose files</strong>
+          <small>JPEG, PNG and HEIC files are supported</small>
+        </label>
       </Form.Group>
 
       {(formData.file || []).length > 0 ? (
-        <div className="d-flex flex-wrap gap-2 mt-3">
+        <div className="album-upload-previews mt-3">
           {(formData.file || []).map((image, index) => (
             <div
-              key={index}
-              style={{
-                position: "relative",
-                width: "80px",
-                height: "80px",
-              }}
+              key={`${image.file.name}-${index}`}
+              className="album-upload-preview"
             >
-              <img
-                src={image.preview}
-                alt={`Preview ${index}`}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                }}
-              />
+              <img src={image.preview} alt={`Preview of ${image.file.name}`} />
               <Button
                 type="button"
                 onClick={() => removeImagePreview(index)}
                 aria-label="Remove image"
-                variant="danger"
+                variant="light"
                 size="sm"
-                style={{
-                  position: "absolute",
-                  top: "-6px",
-                  right: "-6px",
-                  borderRadius: "50%",
-                  width: "20px",
-                  height: "20px",
-                  fontSize: "12px",
-                  padding: 0,
-                }}
+                className="album-upload-remove"
               >
-                ×
+                <X size={14} />
               </Button>
+              <span className="text-truncate">{image.file.name}</span>
             </div>
           ))}
         </div>
@@ -290,8 +304,11 @@ const AlbumDetailPage = () => {
         }
       }}
     >
-      {formData.id}
-      <Form.Group className="mt-3">
+      <div className="album-rename-current">
+        <span>Current image ID</span>
+        <strong>{formData.id}</strong>
+      </div>
+      <Form.Group className="mt-4">
         <Form.Label>New Image ID</Form.Label>
         <InputGroup>
           <Form.Control
@@ -336,12 +353,14 @@ const AlbumDetailPage = () => {
   };
 
   const albumImagesSection = (
-    <div className="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-4">
-      {album?.images?.map((image) => (
+    <div className="album-detail-grid">
+      {album?.images?.map((image, index) => (
         <div key={image.id} className="col">
           <ImageMenu
-            imageUrl={`${API_BASE}${image?.url || ""}`}
+            imageUrl={getAlbumImageUrl(image?.url)}
+            imageId={image.id}
             alt={image?.id}
+            onOpen={() => setSelectedImageIndex(index)}
             onDelete={() => confirmDelete(image.id)}
             onEdit={() => {
               openPopup(image);
@@ -404,10 +423,12 @@ const AlbumDetailPage = () => {
                 setShowDetails(true);
               }}
             >
-              Edit details
+              <Pencil size={17} /> Edit details
             </Button>
             {!albumQuery.error && !showPopup ? (
-              <Button onClick={() => openPopup()}>Upload images</Button>
+              <Button onClick={() => openPopup()}>
+                <ImagePlus size={17} /> Upload images
+              </Button>
             ) : null}
           </div>
         }
@@ -421,7 +442,6 @@ const AlbumDetailPage = () => {
             status={uploadProgress.status}
           />
         ) : null}
-        <h2 className="h4 fw-bold mb-3">{album?.images?.length ?? 0} images</h2>
         <AsyncState
           isEmpty={(album?.images || []).length === 0}
           loading={albumQuery.isPending}
@@ -455,6 +475,13 @@ const AlbumDetailPage = () => {
           <AlbumForm value={detailsForm} onChange={setDetailsForm} />
         </Popup>
       ) : null}
+      <AlbumLightboxModal
+        albumTitle={album?.title}
+        images={album?.images ?? []}
+        selectedImageIndex={selectedImageIndex}
+        onClose={() => setSelectedImageIndex(null)}
+        onSelectImage={setSelectedImageIndex}
+      />
     </>
   );
 };

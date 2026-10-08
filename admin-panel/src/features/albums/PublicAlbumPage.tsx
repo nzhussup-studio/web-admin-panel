@@ -25,22 +25,15 @@ const PublicAlbumPage = () => {
   return (
     <>
       <Header
-        text={album ? "Album " + album.title : "Album"}
+        text={album?.title ?? "Album"}
+        description={album?.desc}
         breadcrumbs={[
           { label: "Overview", to: "/" },
           { label: "Albums", to: "/albums" },
           { label: album?.title ?? "Album" },
         ]}
       />
-      <Container className="my-5">
-        {album?.desc ? (
-          <div
-            className="mx-auto mb-4 text-center"
-            style={{ maxWidth: "48rem" }}
-          >
-            <p className="lead text-secondary mb-0">{album.desc}</p>
-          </div>
-        ) : null}
+      <Container fluid="xl" className="page-content public-album-page">
         <AsyncState
           isEmpty={images.length === 0}
           loading={loading}

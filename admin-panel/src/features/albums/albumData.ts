@@ -13,5 +13,14 @@ export const normalizeAlbumPreview = (
   images_count: album.image_count,
 });
 
-export const getAlbumImageUrl = (imageUrl?: string) =>
-  `${API_BASE}${imageUrl || ""}`;
+export const getAlbumImageUrl = (imageUrl?: string) => {
+  const value = imageUrl?.trim();
+
+  if (!value) return "";
+
+  if (/^(https?:|data:|blob:)/i.test(value)) {
+    return value;
+  }
+
+  return `${API_BASE.replace(/\/+$/, "")}/${value.replace(/^\/+/, "")}`;
+};

@@ -3,6 +3,7 @@ import Image from "react-bootstrap/Image";
 import Ratio from "react-bootstrap/Ratio";
 import type { image_service_model_Image } from "@/api";
 import { getAlbumImageUrl } from "../albumData";
+import { Eye } from "lucide-react";
 
 interface ImageGridProps {
   images: image_service_model_Image[];
@@ -11,23 +12,17 @@ interface ImageGridProps {
 
 const ImageGrid = ({ images, onOpenImage }: ImageGridProps) => {
   return (
-    <div className="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3 g-md-4">
+    <div className="album-public-grid">
       {images.map((image, index) => (
-        <div key={image.id} className="col">
+        <div key={image.id}>
           <Button
             type="button"
             variant="link"
-            className="w-100 border-0 p-0 bg-transparent text-start text-decoration-none"
+            className="album-public-image"
             onClick={() => onOpenImage(index)}
             aria-label={`Open image ${image.id || index + 1}`}
           >
-            <div
-              className="position-relative overflow-hidden rounded-4 shadow-sm"
-              style={{
-                background:
-                  "linear-gradient(145deg, rgba(255,255,255,0.9), rgba(230,236,244,0.92))",
-              }}
-            >
+            <div className="album-public-image-frame">
               <Ratio aspectRatio="1x1">
                 <Image
                   src={getAlbumImageUrl(image.url)}
@@ -35,6 +30,9 @@ const ImageGrid = ({ images, onOpenImage }: ImageGridProps) => {
                   className="w-100 h-100 object-fit-cover"
                 />
               </Ratio>
+              <span className="album-public-image-overlay" aria-hidden="true">
+                <Eye size={20} /> View image
+              </span>
             </div>
           </Button>
         </div>

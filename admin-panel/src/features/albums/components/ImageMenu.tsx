@@ -1,18 +1,27 @@
 import Button from "@/components/ui/button";
 import Dropdown from "react-bootstrap/Dropdown";
-import { Ellipsis } from "lucide-react";
+import { Copy, Ellipsis, Eye, Pencil, Trash2 } from "lucide-react";
 import { useGlobalAlert } from "@/providers/alerts";
 
 interface ImageMenuProps {
   imageUrl: string;
+  imageId?: string;
   alt?: string;
+  onOpen?: () => void;
   onDelete?: () => void;
   onEdit?: () => void;
 }
 
-const ImageMenu = ({ imageUrl, alt, onDelete, onEdit }: ImageMenuProps) => {
+const ImageMenu = ({
+  imageUrl,
+  imageId: providedImageId,
+  alt,
+  onOpen,
+  onDelete,
+  onEdit,
+}: ImageMenuProps) => {
   const { triggerAlert } = useGlobalAlert();
-  const imageId = imageUrl.split("/").pop() ?? "Image";
+  const imageId = providedImageId || imageUrl.split("/").pop() || "Image";
 
   const copyUrl = async () => {
     try {
@@ -28,15 +37,21 @@ const ImageMenu = ({ imageUrl, alt, onDelete, onEdit }: ImageMenuProps) => {
       <Button
         variant="link"
         className="image-tile-preview"
-        onClick={() => void copyUrl()}
-        aria-label={`Copy URL for ${alt ?? imageId}`}
+        onClick={onOpen}
+        aria-label={`Preview ${alt ?? imageId}`}
       >
         <img src={imageUrl} alt={alt ?? imageId} loading="lazy" />
+        <span className="image-tile-overlay" aria-hidden="true">
+          <Eye size={20} /> Preview
+        </span>
       </Button>
       <figcaption>
-        <span className="text-truncate" title={imageId}>
-          {imageId}
-        </span>
+        <div className="image-tile-meta">
+          <strong className="text-truncate" title={imageId}>
+            {imageId}
+          </strong>
+          <span>Image</span>
+        </div>
         <Dropdown align="end">
           <Dropdown.Toggle
             as={Button}
@@ -48,14 +63,16 @@ const ImageMenu = ({ imageUrl, alt, onDelete, onEdit }: ImageMenuProps) => {
           </Dropdown.Toggle>
           <Dropdown.Menu>
             <Dropdown.Item onClick={() => void copyUrl()}>
-              Copy URL
+              <Copy size={16} /> Copy URL
             </Dropdown.Item>
             {onEdit ? (
-              <Dropdown.Item onClick={onEdit}>Rename</Dropdown.Item>
+              <Dropdown.Item onClick={onEdit}>
+                <Pencil size={16} /> Rename
+              </Dropdown.Item>
             ) : null}
             {onDelete ? (
               <Dropdown.Item className="text-danger" onClick={onDelete}>
-                Delete
+                <Trash2 size={16} /> Delete
               </Dropdown.Item>
             ) : null}
           </Dropdown.Menu>

@@ -48,7 +48,7 @@ const AlbumLightboxModal = ({
       onHide={onClose}
       centered
       size="xl"
-      contentClassName="app-modal-content"
+      contentClassName="app-modal-content album-lightbox-modal"
     >
       <Modal.Header closeButton>
         <Modal.Title>
@@ -68,18 +68,11 @@ const AlbumLightboxModal = ({
           >
             {images.map((image, index) => (
               <Carousel.Item key={image.id || index}>
-                <div
-                  className="overflow-hidden rounded-4"
-                  style={{
-                    maxHeight: "72vh",
-                    backgroundColor: "rgba(15, 23, 42, 0.06)",
-                  }}
-                >
+                <div className="album-lightbox-frame">
                   <Image
                     src={getAlbumImageUrl(image.url)}
                     alt={image.id || `Album image ${index + 1}`}
-                    className="w-100 h-100 object-fit-contain"
-                    style={{ maxHeight: "72vh" }}
+                    className="album-lightbox-image"
                   />
                 </div>
               </Carousel.Item>
@@ -87,6 +80,11 @@ const AlbumLightboxModal = ({
           </Carousel>
         ) : null}
       </Modal.Body>
+      {selectedImageIndex !== null ? (
+        <Modal.Footer className="justify-content-center text-secondary small">
+          {selectedImageIndex + 1} of {images.length}
+        </Modal.Footer>
+      ) : null}
     </Modal>
   );
 };
