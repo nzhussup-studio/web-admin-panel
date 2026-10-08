@@ -1,5 +1,9 @@
 import { createContext } from "react";
-import type { DarkModeContextValue } from "@/types/common";
+
+export interface DarkModeContextValue {
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+}
 
 export const ThemeContext = createContext<DarkModeContextValue | undefined>(
   undefined,

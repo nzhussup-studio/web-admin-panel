@@ -1,6 +1,5 @@
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState, type PropsWithChildren } from "react";
 import { ThemeContext } from "@/providers/theme/theme-context";
-import type { ProviderProps } from "@/types/common";
 
 const THEME_STORAGE_KEY = "isDarkMode";
 
@@ -32,7 +31,7 @@ const applyTheme = (isDarkMode: boolean) => {
   }
 };
 
-export const ThemeProvider = ({ children }: ProviderProps) => {
+export const ThemeProvider = ({ children }: PropsWithChildren) => {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(getStoredDarkMode);
 
   const toggleDarkMode = () => {

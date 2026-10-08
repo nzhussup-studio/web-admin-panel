@@ -2,7 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/icon.svg?v=1" />
+    <link rel="icon" type="image/svg+xml" href="/brand/nz-light.svg" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/svg+xml" href="/brand/nz-dark.svg" media="(prefers-color-scheme: dark)" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>nzhussup admin panel</title>
     <script>
@@ -34,18 +35,18 @@
 
       body {
         margin: 0;
-        background: #eef3f8;
-        color: #212529;
+        background: #fbfaf7;
+        color: #1d232d;
       }
 
       html[data-bs-theme="dark"] body {
-        background: #0f172a;
-        color: #f8f9fa;
+        background: #1d1f21;
+        color: #f0f1f2;
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/app/main.tsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

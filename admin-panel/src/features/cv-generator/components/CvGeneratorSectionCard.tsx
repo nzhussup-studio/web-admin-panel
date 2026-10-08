@@ -1,0 +1,417 @@
+import Badge from "react-bootstrap/Badge";
+import Button from "@/components/ui/button";
+import Card from "react-bootstrap/Card";
+import Form from "react-bootstrap/Form";
+import {
+  Award,
+  BriefcaseBusiness,
+  ChevronDown,
+  ChevronUp,
+  Folder,
+  GraduationCap,
+  Settings,
+} from "lucide-react";
+import CvGeneratorItemLabel from "./CvGeneratorItemLabel";
+import {
+  buildScopedItemKey,
+  buildOverrideKey,
+  canOverrideDescription,
+  formatLabel,
+  formatScalar,
+  getLongDescription,
+  parseTechStack,
+  parseSkillNames,
+  SKILLS_SECTION_NAME,
+  TECH_STACK_SELECTABLE_SECTION_NAMES,
+} from "./cvGeneratorUtils";
+
+type DescriptionOverrides = Record<string, string>;
+type SelectedSkillEntries = Record<string, Set<string>>;
+type SelectedTechStackEntries = Record<string, Set<string>>;
+
+type Props = {
+  sectionName: string;
+  items: Record<string, any>[];
+  selectedItems: Set<string | number>;
+  descriptionOverrides: DescriptionOverrides;
+  selectedSkillEntries: SelectedSkillEntries;
+  selectedTechStackEntries: SelectedTechStackEntries;
+  onToggleAll: () => void;
+  onToggleItem: (sectionName: string, itemId: string | number) => void;
+  onSetDescriptionOverride: (
+    sectionName: string,
+    itemId: string | number,
+    value: string,
+  ) => void;
+  onToggleSkillCategory: (
+    itemId: string | number,
+    allSkillNames: string[],
+    isSelected: boolean,
+  ) => void;
+  onToggleSkillEntry: (
+    itemId: string | number,
+    skillName: string,
+    selectedSkillNames: string[],
+  ) => void;
+  onToggleTechStackCategory: (
+    sectionName: string,
+    itemId: string | number,
+    allTechStackEntries: string[],
+    isSelected: boolean,
+  ) => void;
+  onToggleTechStackEntry: (
+    sectionName: string,
+    itemId: string | number,
+    techStackEntry: string,
+    selectedTechStackEntries: string[],
+  ) => void;
+};
+
+const entryClassName = (isChecked: boolean) =>
+  `position-relative rounded-4 border px-3 py-3 shadow-sm ${
+    isChecked
+      ? "bg-primary-subtle border-primary-subtle"
+      : "bg-body-tertiary border-secondary-subtle"
+  }`;
+
+const PROJECTS_SECTION_NAME = "projects";
+const sectionIcons = {
+  work_experience: BriefcaseBusiness,
+  education: GraduationCap,
+  skills: Settings,
+  projects: Folder,
+  certificates: Award,
+} as const;
+
+const CvGeneratorSectionCard = ({
+  sectionName,
+  items,
+  selectedItems,
+  descriptionOverrides,
+  selectedSkillEntries,
+  selectedTechStackEntries,
+  onToggleAll,
+  onToggleItem,
+  onSetDescriptionOverride,
+  onToggleSkillCategory,
+  onToggleSkillEntry,
+  onToggleTechStackCategory,
+  onToggleTechStackEntry,
+}: Props) => {
+  const [open, setOpen] = useState(sectionName === "work_experience");
+  const allSelected =
+    items.length > 0 && items.every((item) => selectedItems.has(item.id));
+  const isSkillsSection = sectionName === SKILLS_SECTION_NAME;
+  const isTechStackSelectableSection =
+    TECH_STACK_SELECTABLE_SECTION_NAMES.has(sectionName);
+
+  return (
+    <Card className="cv-generator-section">
+      <Card.Header className="cv-generator-section-header">
+        {(() => {
+          const Icon =
+            sectionIcons[sectionName as keyof typeof sectionIcons] ?? Folder;
+          return <Icon size={21} />;
+        })()}
+        <Card.Title className="text-capitalize">
+          {sectionName.replace(/_/g, " ")}
+        </Card.Title>
+        <Badge bg="primary-subtle" text="primary">
+          {selectedItems.size} selected
+        </Badge>
+        <Button
+          variant="link"
+          onClick={() => setOpen((value) => !value)}
+          aria-label={`Toggle ${sectionName}`}
+        >
+          {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        </Button>
+      </Card.Header>
+      {open ? (
+        <Card.Body className="p-4 app-card-body">
+          <div className="d-flex justify-content-end mb-3">
+            <Button
+              onClick={onToggleAll}
+              type="button"
+              variant="outline-secondary"
+              size="sm"
+            >
+              {allSelected ? "Deselect All" : "Select All"}
+            </Button>
+          </div>
+
+          {Array.isArray(items) && items.length > 0 ? (
+            items.map((item) => {
+              const itemId = item.id;
+              const isChecked = selectedItems.has(itemId);
+
+              if (isSkillsSection) {
+                const categoryName =
+                  formatScalar(item.category) || "Skill category";
+                const allSkillNames = parseSkillNames(item.skillNames);
+                const selectedSkillSet = selectedSkillEntries[String(itemId)];
+                const savedSkillSelection = selectedSkillSet?.size
+                  ? allSkillNames.filter((skillName) =>
+                      selectedSkillSet.has(skillName),
+                    )
+                  : allSkillNames;
+                const selectedSkillNames = isChecked ? savedSkillSelection : [];
+
+                return (
+                  <div key={itemId} className="mb-2">
+                    <div className={entryClassName(isChecked)}>
+                      <div className="d-flex align-items-start justify-content-between gap-3">
+                        <Form.Check
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() =>
+                            onToggleSkillCategory(
+                              itemId,
+                              allSkillNames,
+                              isChecked,
+                            )
+                          }
+                          label={
+                            <div>
+                              <div className="fw-semibold">{categoryName}</div>
+                              <div className="small text-body-secondary">
+                                {selectedSkillNames.length} of{" "}
+                                {allSkillNames.length} selected
+                              </div>
+                            </div>
+                          }
+                        />
+                        <Badge bg={isChecked ? "primary" : "secondary"} pill>
+                          {isChecked ? "Selected" : "Available"}
+                        </Badge>
+                      </div>
+
+                      {allSkillNames.length > 0 ? (
+                        <div className="d-flex flex-wrap gap-2 mt-3">
+                          {allSkillNames.map((skillName) => {
+                            const skillChecked =
+                              isChecked &&
+                              selectedSkillNames.includes(skillName);
+
+                            return (
+                              <Button
+                                key={skillName}
+                                type="button"
+                                size="sm"
+                                variant={
+                                  skillChecked ? "primary" : "outline-secondary"
+                                }
+                                className="rounded-pill"
+                                onClick={() =>
+                                  onToggleSkillEntry(
+                                    itemId,
+                                    skillName,
+                                    selectedSkillNames,
+                                  )
+                                }
+                              >
+                                {skillName}
+                              </Button>
+                            );
+                          })}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                );
+              }
+
+              if (isTechStackSelectableSection) {
+                const allTechStackEntries = parseTechStack(item.techStack);
+                const selectedTechStackSet =
+                  selectedTechStackEntries[
+                    buildScopedItemKey(sectionName, itemId)
+                  ];
+                const savedTechStackSelection = selectedTechStackSet?.size
+                  ? allTechStackEntries.filter((entry) =>
+                      selectedTechStackSet.has(entry),
+                    )
+                  : allTechStackEntries;
+                const activeTechStackEntries = isChecked
+                  ? savedTechStackSelection
+                  : [];
+                const overrideKey = buildOverrideKey(sectionName, itemId);
+                const overrideValue = descriptionOverrides[overrideKey] || "";
+                const defaultDescription = getLongDescription(item);
+                const isProjectsSection = sectionName === PROJECTS_SECTION_NAME;
+                const showOverrideInput =
+                  isChecked &&
+                  (canOverrideDescription(item) || isProjectsSection);
+
+                return (
+                  <div key={itemId} className="mb-2">
+                    <div className={entryClassName(isChecked)}>
+                      <div className="d-flex align-items-start justify-content-between gap-3">
+                        <Form.Check
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() =>
+                            onToggleTechStackCategory(
+                              sectionName,
+                              itemId,
+                              allTechStackEntries,
+                              isChecked,
+                            )
+                          }
+                          label={
+                            <div>
+                              <CvGeneratorItemLabel
+                                sectionName={sectionName}
+                                item={item}
+                                isChecked={isChecked}
+                              />
+                              {allTechStackEntries.length > 0 ? (
+                                <div className="small text-body-secondary">
+                                  {activeTechStackEntries.length} of{" "}
+                                  {allTechStackEntries.length} tech stack
+                                  entries selected
+                                </div>
+                              ) : null}
+                            </div>
+                          }
+                        />
+                      </div>
+
+                      {allTechStackEntries.length > 0 ? (
+                        <div className="d-flex flex-wrap gap-2 mt-3">
+                          {allTechStackEntries.map((techStackEntry) => {
+                            const techEntryChecked =
+                              isChecked &&
+                              activeTechStackEntries.includes(techStackEntry);
+
+                            return (
+                              <Button
+                                key={techStackEntry}
+                                type="button"
+                                size="sm"
+                                variant={
+                                  techEntryChecked
+                                    ? "primary"
+                                    : "outline-secondary"
+                                }
+                                className="rounded-pill"
+                                onClick={() =>
+                                  onToggleTechStackEntry(
+                                    sectionName,
+                                    itemId,
+                                    techStackEntry,
+                                    activeTechStackEntries,
+                                  )
+                                }
+                              >
+                                {techStackEntry}
+                              </Button>
+                            );
+                          })}
+                        </div>
+                      ) : null}
+                    </div>
+
+                    {showOverrideInput ? (
+                      <Form.Group className="mt-2">
+                        <Form.Label className="small text-body-secondary mb-1">
+                          {isProjectsSection
+                            ? "Project description (optional)"
+                            : "Custom description override (optional)"}
+                        </Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          rows={3}
+                          value={overrideValue}
+                          placeholder={
+                            defaultDescription
+                              ? `Current: ${defaultDescription.slice(0, 140)}${
+                                  defaultDescription.length > 140 ? "..." : ""
+                                }`
+                              : isProjectsSection
+                                ? "Type additional project description (optional)..."
+                                : `Type a custom ${formatLabel(sectionName)} description...`
+                          }
+                          onChange={(e) =>
+                            onSetDescriptionOverride(
+                              sectionName,
+                              itemId,
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </Form.Group>
+                    ) : null}
+                  </div>
+                );
+              }
+
+              const overrideKey = buildOverrideKey(sectionName, itemId);
+              const overrideValue = descriptionOverrides[overrideKey] || "";
+              const defaultDescription = getLongDescription(item);
+              const isProjectsSection = sectionName === PROJECTS_SECTION_NAME;
+              const showOverrideInput =
+                isChecked &&
+                (canOverrideDescription(item) || isProjectsSection);
+
+              return (
+                <div key={itemId} className="mb-2">
+                  <div className={entryClassName(isChecked)}>
+                    <Form.Check
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => onToggleItem(sectionName, itemId)}
+                      label={
+                        <CvGeneratorItemLabel
+                          sectionName={sectionName}
+                          item={item}
+                          isChecked={isChecked}
+                        />
+                      }
+                    />
+                  </div>
+
+                  {showOverrideInput ? (
+                    <Form.Group className="mt-2">
+                      <Form.Label className="small text-body-secondary mb-1">
+                        {isProjectsSection
+                          ? "Project description (optional)"
+                          : "Custom description override (optional)"}
+                      </Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        rows={3}
+                        value={overrideValue}
+                        placeholder={
+                          defaultDescription
+                            ? `Current: ${defaultDescription.slice(0, 140)}${
+                                defaultDescription.length > 140 ? "..." : ""
+                              }`
+                            : isProjectsSection
+                              ? "Type additional project description (optional)..."
+                              : `Type a custom ${formatLabel(sectionName)} description...`
+                        }
+                        onChange={(e) =>
+                          onSetDescriptionOverride(
+                            sectionName,
+                            itemId,
+                            e.target.value,
+                          )
+                        }
+                      />
+                    </Form.Group>
+                  ) : null}
+                </div>
+              );
+            })
+          ) : (
+            <div className="text-secondary">No items</div>
+          )}
+        </Card.Body>
+      ) : null}
+    </Card>
+  );
+};
+
+export default CvGeneratorSectionCard;
+import { useState } from "react";

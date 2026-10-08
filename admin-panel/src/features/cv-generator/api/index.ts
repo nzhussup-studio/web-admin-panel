@@ -1,0 +1,1 @@
+export { getCvGeneratorSourceData } from "./cvGeneratorQueries";

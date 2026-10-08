@@ -1,49 +1,56 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type PropsWithChildren,
+} from "react";
 import { GlobalAlertContext } from "@/providers/alerts/global-alert-context";
-import type {
-  AlertVariant,
-  GlobalAlertState,
-  ProviderProps,
-} from "@/types/common";
+import type { AlertVariant, GlobalAlertState } from "./global-alert-context";
 
 const initialAlert: GlobalAlertState = {
+  id: 0,
   show: false,
   message: "",
   type: "success",
 };
 
-export const GlobalAlertProvider = ({ children }: ProviderProps) => {
-  const [alert, setAlert] = useState<GlobalAlertState>(initialAlert);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+export const GlobalAlertProvider = ({ children }: PropsWithChildren) => {
+  const [alerts, setAlerts] = useState<GlobalAlertState[]>([]);
+  const nextId = useRef(1);
 
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
+  const triggerAlert = useCallback(
+    (message: string, type: AlertVariant = "success") => {
+      const cleanMessage = message.trim();
+      if (!cleanMessage) return;
+
+      const nextAlert = {
+        id: nextId.current++,
+        show: true,
+        message: cleanMessage,
+        type,
+      };
+      setAlerts((current) =>
+        current.length >= 5
+          ? [current[0], ...current.slice(-3), nextAlert]
+          : [...current, nextAlert],
+      );
+    },
+    [],
+  );
+
+  const closeAlert = useCallback(() => {
+    setAlerts((current) => current.slice(1));
   }, []);
 
-  const triggerAlert = (message: string, type: AlertVariant = "success") => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    setAlert({ show: true, message, type });
-    timeoutRef.current = setTimeout(() => {
-      setAlert((prev) => ({ ...prev, show: false }));
-    }, 3000);
-  };
-
-  const closeAlert = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    setAlert((prev) => ({ ...prev, show: false }));
-  };
+  const alert = alerts[0] ?? initialAlert;
+  const contextValue = useMemo(
+    () => ({ alert, triggerAlert, closeAlert }),
+    [alert, closeAlert, triggerAlert],
+  );
 
   return (
-    <GlobalAlertContext.Provider value={{ alert, triggerAlert, closeAlert }}>
+    <GlobalAlertContext.Provider value={contextValue}>
       {children}
     </GlobalAlertContext.Provider>
   );
