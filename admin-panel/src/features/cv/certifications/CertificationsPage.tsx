@@ -126,7 +126,7 @@ const CertificationsPage = () => {
               </a>
             ) : null}
           </DataTableMobileCard>
-          <td className="d-none d-md-table-cell" data-label="Certificate">
+          <td className="desktop-data-cell" data-label="Certificate">
             <div className="fw-semibold text-primary">{certificate.name}</div>
             {certificate.url ? (
               <Button
@@ -141,15 +141,15 @@ const CertificationsPage = () => {
               </Button>
             ) : null}
           </td>
-          <td className="d-none d-md-table-cell" data-label="Issuer">
+          <td className="desktop-data-cell" data-label="Issuer">
             {certificate.issuer || "—"}
           </td>
-          <td className="d-none d-md-table-cell" data-label="Order">
+          <td className="desktop-data-cell" data-label="Order">
             {certificate.displayOrder}
           </td>
           <td
             data-label="Actions"
-            className="text-end d-none d-md-table-cell"
+            className="text-end desktop-data-cell"
             onClick={(event) => event.stopPropagation()}
           >
             <OverflowMenu

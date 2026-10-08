@@ -23,7 +23,7 @@ export function DataTableMobileCard({
   actions,
 }: DataTableMobileCardProps) {
   return (
-    <td className="mobile-data-cell d-md-none" colSpan={colSpan}>
+    <td className="mobile-data-cell" colSpan={colSpan}>
       <article className="mobile-data-card">
         <header className="mobile-data-card-header">
           <div className="mobile-data-card-heading">

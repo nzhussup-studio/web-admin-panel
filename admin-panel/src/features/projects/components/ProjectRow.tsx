@@ -38,7 +38,7 @@ export function ProjectRow({ project, onEdit, onDelete }: ProjectRowProps) {
       >
         <ColorPills values={project.techStack} />
       </DataTableMobileCard>
-      <td className="d-none d-md-table-cell" data-label="Project">
+      <td className="desktop-data-cell" data-label="Project">
         <div className="project-cell">
           <div>
             <div className="project-name">{project.name}</div>
@@ -56,14 +56,14 @@ export function ProjectRow({ project, onEdit, onDelete }: ProjectRowProps) {
           </div>
         </div>
       </td>
-      <td className="d-none d-md-table-cell" data-label="Stack">
+      <td className="desktop-data-cell" data-label="Stack">
         <ColorPills values={project.techStack} />
       </td>
-      <td className="d-none d-md-table-cell" data-label="Order">
+      <td className="desktop-data-cell" data-label="Order">
         {project.displayOrder}
       </td>
       <td
-        className="text-end d-none d-md-table-cell"
+        className="text-end desktop-data-cell"
         data-label="Actions"
         onClick={(event) => event.stopPropagation()}
       >

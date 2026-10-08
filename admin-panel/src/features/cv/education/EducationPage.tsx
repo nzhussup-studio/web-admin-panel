@@ -146,17 +146,17 @@ const EducationPage = () => {
           />
           <td
             data-label="Degree"
-            className="fw-semibold text-primary d-none d-md-table-cell"
+            className="fw-semibold text-primary desktop-data-cell"
           >
             {edu.degree}
           </td>
-          <td className="d-none d-md-table-cell" data-label="Institution">
+          <td className="desktop-data-cell" data-label="Institution">
             <div>{edu.institution}</div>
             {edu.location ? (
               <small className="text-secondary">{edu.location}</small>
             ) : null}
           </td>
-          <td className="d-none d-md-table-cell" data-label="Period">
+          <td className="desktop-data-cell" data-label="Period">
             {edu.startDate
               ? new Date(edu.startDate).toLocaleDateString()
               : "Unknown"}{" "}
@@ -165,12 +165,12 @@ const EducationPage = () => {
               ? new Date(edu.endDate).toLocaleDateString()
               : "Present"}
           </td>
-          <td className="d-none d-md-table-cell" data-label="Order">
+          <td className="desktop-data-cell" data-label="Order">
             {edu.displayOrder}
           </td>
           <td
             data-label="Actions"
-            className="text-end d-none d-md-table-cell"
+            className="text-end desktop-data-cell"
             onClick={(event) => event.stopPropagation()}
           >
             <OverflowMenu

@@ -52,6 +52,7 @@ export function MobileNavigation({
         <Offcanvas.Header className="justify-content-end">
           <Button
             variant="link"
+            className="admin-offcanvas-close"
             aria-label="Close navigation"
             onClick={onClose}
           >

@@ -11,7 +11,7 @@ interface OverflowMenuProps {
 export function OverflowMenu({ label, onEdit, onDelete }: OverflowMenuProps) {
   return (
     <>
-      <div className="d-none d-md-inline-flex gap-1">
+      <div className="overflow-menu-desktop gap-1">
         {onEdit ? (
           <Button size="sm" variant="outline-secondary" onClick={onEdit}>
             Edit
@@ -35,7 +35,7 @@ export function OverflowMenu({ label, onEdit, onDelete }: OverflowMenuProps) {
           </Dropdown.Menu>
         </Dropdown>
       </div>
-      <Dropdown align="end" className="d-md-none">
+      <Dropdown align="end" className="overflow-menu-compact">
         <Dropdown.Toggle
           as={Button}
           variant="outline-secondary"

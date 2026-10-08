@@ -118,14 +118,14 @@ const WorkExperiencePage = () => {
           </DataTableMobileCard>
           <td
             data-label="Position"
-            className="fw-semibold text-primary d-none d-md-table-cell"
+            className="fw-semibold text-primary desktop-data-cell"
           >
             {experience.position}
           </td>
-          <td className="d-none d-md-table-cell" data-label="Company">
+          <td className="desktop-data-cell" data-label="Company">
             {experience.company}
           </td>
-          <td className="d-none d-md-table-cell" data-label="Period">
+          <td className="desktop-data-cell" data-label="Period">
             <div>
               {experience.startDate} – {experience.endDate || "Present"}
             </div>
@@ -136,15 +136,15 @@ const WorkExperiencePage = () => {
               </small>
             ) : null}
           </td>
-          <td className="d-none d-md-table-cell" data-label="Tech stack">
+          <td className="desktop-data-cell" data-label="Tech stack">
             <ColorPills values={experience.techStack} />
           </td>
-          <td className="d-none d-md-table-cell" data-label="Order">
+          <td className="desktop-data-cell" data-label="Order">
             {experience.displayOrder}
           </td>
           <td
             data-label="Actions"
-            className="text-end d-none d-md-table-cell"
+            className="text-end desktop-data-cell"
             onClick={(event) => event.stopPropagation()}
           >
             <OverflowMenu

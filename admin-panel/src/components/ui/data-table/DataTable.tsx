@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Table from "react-bootstrap/Table";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import Button from "@/components/ui/button";
 
 export interface DataTableColumn {
@@ -33,7 +33,7 @@ export function DataTable({
   return (
     <div className={`data-table-shell ${className}`.trim()}>
       {sortableColumn && onSort ? (
-        <div className="mobile-table-toolbar d-md-none">
+        <div className="mobile-table-toolbar">
           <Button
             variant="outline-secondary"
             onClick={onSort}
@@ -41,9 +41,9 @@ export function DataTable({
           >
             <span>Sort: {sortableColumn.label}</span>
             {sortDirection === "asc" ? (
-              <ChevronUp size={17} />
+              <ArrowUp className="data-table-sort-icon" size={17} />
             ) : (
-              <ChevronDown size={17} />
+              <ArrowDown className="data-table-sort-icon" size={17} />
             )}
           </Button>
           {mobileSummary ? (
@@ -57,6 +57,7 @@ export function DataTable({
             {columns.map((column) => (
               <th
                 key={column.key}
+                data-column={column.key}
                 className={`text-${column.align ?? "start"}`}
                 style={column.width ? { width: column.width } : undefined}
               >
@@ -69,9 +70,9 @@ export function DataTable({
                   >
                     {column.label}
                     {sortDirection === "asc" ? (
-                      <ChevronUp size={15} />
+                      <ArrowUp className="data-table-sort-icon" size={15} />
                     ) : (
-                      <ChevronDown size={15} />
+                      <ArrowDown className="data-table-sort-icon" size={15} />
                     )}
                   </Button>
                 ) : (

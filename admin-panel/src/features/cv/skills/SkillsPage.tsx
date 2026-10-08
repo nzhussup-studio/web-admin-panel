@@ -107,19 +107,19 @@ const SkillsPage = () => {
           </DataTableMobileCard>
           <td
             data-label="Category"
-            className="fw-semibold text-primary d-none d-md-table-cell"
+            className="fw-semibold text-primary desktop-data-cell"
           >
             {skill.category}
           </td>
-          <td className="d-none d-md-table-cell" data-label="Skills">
+          <td className="desktop-data-cell" data-label="Skills">
             <ColorPills values={skill.skillNames} />
           </td>
-          <td className="d-none d-md-table-cell" data-label="Order">
+          <td className="desktop-data-cell" data-label="Order">
             {skill.displayOrder}
           </td>
           <td
             data-label="Actions"
-            className="text-end d-none d-md-table-cell"
+            className="text-end desktop-data-cell"
             onClick={(event) => event.stopPropagation()}
           >
             <OverflowMenu

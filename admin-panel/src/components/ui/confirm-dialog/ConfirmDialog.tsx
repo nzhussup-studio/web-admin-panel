@@ -51,7 +51,7 @@ const ConfirmDialog = ({
       backdrop={isConfirming ? "static" : true}
       keyboard={!isConfirming}
       backdropClassName="confirm-dialog-backdrop"
-      dialogClassName="app-modal-dialog"
+      dialogClassName="app-modal-dialog confirm-dialog"
       contentClassName={`app-modal-content${isDarkMode ? " text-light" : ""}`}
     >
       <Modal.Header closeButton={!isConfirming}>

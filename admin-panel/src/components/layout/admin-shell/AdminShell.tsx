@@ -76,7 +76,7 @@ export function AdminShell({ children }: PropsWithChildren) {
     });
   };
 
-  const sidebar = (
+  const renderSidebar = (showCollapseControl: boolean) => (
     <Sidebar
       cvExpanded={cvExpanded}
       initials={initials}
@@ -90,6 +90,7 @@ export function AdminShell({ children }: PropsWithChildren) {
       onCollapseToggle={toggleSidebar}
       onProfile={() => window.location.assign(keycloakAccountUrl)}
       onAccountAction={setPendingAction}
+      showCollapseControl={showCollapseControl}
     />
   );
 
@@ -97,7 +98,9 @@ export function AdminShell({ children }: PropsWithChildren) {
     <div
       className={`admin-shell${isSidebarCollapsed ? " sidebar-collapsed" : ""}`}
     >
-      <aside className="admin-sidebar d-none d-lg-flex">{sidebar}</aside>
+      <aside className="admin-sidebar d-none d-lg-flex">
+        {renderSidebar(true)}
+      </aside>
       <MobileNavigation
         isOpen={showNavigation}
         initials={initials}
@@ -108,7 +111,7 @@ export function AdminShell({ children }: PropsWithChildren) {
         onProfile={() => window.location.assign(keycloakAccountUrl)}
         onAccountAction={setPendingAction}
       >
-        {sidebar}
+        {renderSidebar(false)}
       </MobileNavigation>
       <main className="admin-main">
         <ErrorBoundary resetKey={location.key}>{children}</ErrorBoundary>

@@ -35,6 +35,7 @@ interface SidebarProps {
   onCollapseToggle: () => void;
   onProfile: () => void;
   onAccountAction: (action: AccountAction) => void;
+  showCollapseControl?: boolean;
 }
 
 const primaryNavigation = [
@@ -66,6 +67,7 @@ export function Sidebar({
   onCollapseToggle,
   onProfile,
   onAccountAction,
+  showCollapseControl = true,
 }: SidebarProps) {
   const [isCvOpen, setIsCvOpen] = useState(cvExpanded);
 
@@ -149,22 +151,24 @@ export function Sidebar({
         </Nav>
       ) : null}
       <div className="admin-sidebar-footer">
-        <Button
-          variant="link"
-          className="admin-sidebar-collapse admin-footer-action"
-          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          onClick={onCollapseToggle}
-        >
-          {isCollapsed ? (
-            <PanelLeftOpen size={19} />
-          ) : (
-            <PanelLeftClose size={19} />
-          )}
-          <span className="admin-footer-label">
-            {isCollapsed ? "Expand" : "Collapse"}
-          </span>
-        </Button>
+        {showCollapseControl ? (
+          <Button
+            variant="link"
+            className="admin-sidebar-collapse admin-footer-action"
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            onClick={onCollapseToggle}
+          >
+            {isCollapsed ? (
+              <PanelLeftOpen size={19} />
+            ) : (
+              <PanelLeftClose size={19} />
+            )}
+            <span className="admin-footer-label">
+              {isCollapsed ? "Expand" : "Collapse"}
+            </span>
+          </Button>
+        ) : null}
         <Button
           variant="link"
           className="admin-footer-action"
