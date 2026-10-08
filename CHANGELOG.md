@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.8.0...v4.0.0) (2026-10-08)
+
+
+### Features
+
+* add llm configuration page ([06fdf9d](https://github.com/nzhussup/admin-panel-personal-website/commit/06fdf9d3db44eb6460646029b3b2bee8675718ef))
+* enable markdown rendering in cv ([5f6784c](https://github.com/nzhussup/admin-panel-personal-website/commit/5f6784c8b69258e16a7bca685a1c8f798d4ea2c7))
+* improve cv template ([ea2ea59](https://github.com/nzhussup/admin-panel-personal-website/commit/ea2ea591339fbf5b506bfe06c32938e8c139ce63))
+* improve cv template ([5a06566](https://github.com/nzhussup/admin-panel-personal-website/commit/5a06566fa5fb06f0e17b00f22f02d875770f27ea))
+* improve cv template ([42d59f1](https://github.com/nzhussup/admin-panel-personal-website/commit/42d59f14695107491da609dcaa4f8858300b955f))
+* remove .com references ([16d37a1](https://github.com/nzhussup/admin-panel-personal-website/commit/16d37a1730f4ec17b8012b4654e378a4e889142a))
+
+
+### Bug Fixes
+
+* concurrency bug in image service ([a0ce60e](https://github.com/nzhussup/admin-panel-personal-website/commit/a0ce60eef86e728cbf651818cf4848ad9a413c78))
+* fix availability pill ([fcaa476](https://github.com/nzhussup/admin-panel-personal-website/commit/fcaa476b0788c179be9f2c25d01a7f8a711bebef))
+* fix cicd fail reason ([dd69f4d](https://github.com/nzhussup/admin-panel-personal-website/commit/dd69f4de563b5c612242ab0060a779f2a5d281ee))
+* fix global alert ([7a0dfa4](https://github.com/nzhussup/admin-panel-personal-website/commit/7a0dfa423108810a0866b28937a8ba98237e96b6))
+* fix iphone export format ([468dd68](https://github.com/nzhussup/admin-panel-personal-website/commit/468dd68953a7b0c9370df77090bd4f7cc67cd19b))
+* fix lint issues ([655a9b3](https://github.com/nzhussup/admin-panel-personal-website/commit/655a9b33fbdcad58943f97c6aae50d647fe91411))
+* link truncation in project ([0a2a557](https://github.com/nzhussup/admin-panel-personal-website/commit/0a2a5579031bdcb514b9172af35d78d264347eea))
+* mobile alignment ([15e404f](https://github.com/nzhussup/admin-panel-personal-website/commit/15e404f3df5d92d3d6c326e9086ada541ac31d2f))
+* mobile alignment ([e28a6df](https://github.com/nzhussup/admin-panel-personal-website/commit/e28a6dffeb3efab477f91afc5819792ed610b319))
+* prettier error ([fa67a87](https://github.com/nzhussup/admin-panel-personal-website/commit/fa67a8792b2f3be4f945c72bafafb59ae911b5e2))
+* replace KZ lang code to KK ([2d027d6](https://github.com/nzhussup/admin-panel-personal-website/commit/2d027d62c9f4130764fb8d78e3ff9a309a2a24dd))
+* update cicd ([24a4192](https://github.com/nzhussup/admin-panel-personal-website/commit/24a41926e59cdf15bc9012239f6f392fd074bddf))
+
 ## [3.8.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.7.0...v3.8.0) (2026-04-02)
 
 
