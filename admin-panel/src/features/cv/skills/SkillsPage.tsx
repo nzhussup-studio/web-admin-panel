@@ -7,7 +7,7 @@ import type { base_service_Skill } from "@/api";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CvSectionNav } from "../components";
 import { createSkill, deleteSkill, listSkills, updateSkill } from "../api";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable, DataTableMobileCard } from "@/components/ui/data-table";
 import { OverflowMenu } from "@/components/ui/overflow-menu";
 import {
   ResourceForm,
@@ -91,16 +91,35 @@ const SkillsPage = () => {
     >
       {skills.map((skill) => (
         <tr key={skill.id} onClick={() => openPopup(skill)}>
-          <td data-label="Category" className="fw-semibold text-primary">
+          <DataTableMobileCard
+            colSpan={4}
+            title={skill.category}
+            metadata={[{ label: "Order", value: skill.displayOrder }]}
+            actions={
+              <OverflowMenu
+                label={`Actions for ${skill.category}`}
+                onEdit={() => openPopup(skill)}
+                onDelete={() => confirmDelete(skill.id ?? null)}
+              />
+            }
+          >
+            <ColorPills values={skill.skillNames} />
+          </DataTableMobileCard>
+          <td
+            data-label="Category"
+            className="fw-semibold text-primary d-none d-md-table-cell"
+          >
             {skill.category}
           </td>
-          <td data-label="Skills">
+          <td className="d-none d-md-table-cell" data-label="Skills">
             <ColorPills values={skill.skillNames} />
           </td>
-          <td data-label="Order">{skill.displayOrder}</td>
+          <td className="d-none d-md-table-cell" data-label="Order">
+            {skill.displayOrder}
+          </td>
           <td
             data-label="Actions"
-            className="text-end"
+            className="text-end d-none d-md-table-cell"
             onClick={(event) => event.stopPropagation()}
           >
             <OverflowMenu

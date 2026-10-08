@@ -13,7 +13,7 @@ import {
   listCertifications,
   updateCertification,
 } from "../api";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable, DataTableMobileCard } from "@/components/ui/data-table";
 import { OverflowMenu } from "@/components/ui/overflow-menu";
 import {
   ResourceForm,
@@ -101,7 +101,32 @@ const CertificationsPage = () => {
     >
       {certificates.map((certificate) => (
         <tr key={certificate.id} onClick={() => openPopup(certificate)}>
-          <td data-label="Certificate">
+          <DataTableMobileCard
+            colSpan={4}
+            title={certificate.name}
+            subtitle={certificate.issuer || undefined}
+            metadata={[{ label: "Order", value: certificate.displayOrder }]}
+            actions={
+              <OverflowMenu
+                label={`Actions for ${certificate.name}`}
+                onEdit={() => openPopup(certificate)}
+                onDelete={() => confirmDelete(certificate.id ?? null)}
+              />
+            }
+          >
+            {certificate.url ? (
+              <a
+                className="mobile-data-card-link"
+                href={certificate.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(event) => event.stopPropagation()}
+              >
+                {certificate.url.replace(/^https?:\/\//, "")}
+              </a>
+            ) : null}
+          </DataTableMobileCard>
+          <td className="d-none d-md-table-cell" data-label="Certificate">
             <div className="fw-semibold text-primary">{certificate.name}</div>
             {certificate.url ? (
               <Button
@@ -116,11 +141,15 @@ const CertificationsPage = () => {
               </Button>
             ) : null}
           </td>
-          <td data-label="Issuer">{certificate.issuer || "—"}</td>
-          <td data-label="Order">{certificate.displayOrder}</td>
+          <td className="d-none d-md-table-cell" data-label="Issuer">
+            {certificate.issuer || "—"}
+          </td>
+          <td className="d-none d-md-table-cell" data-label="Order">
+            {certificate.displayOrder}
+          </td>
           <td
             data-label="Actions"
-            className="text-end"
+            className="text-end d-none d-md-table-cell"
             onClick={(event) => event.stopPropagation()}
           >
             <OverflowMenu

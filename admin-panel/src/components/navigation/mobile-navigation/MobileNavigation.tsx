@@ -3,23 +3,31 @@ import { Menu, X } from "lucide-react";
 import Button from "@/components/ui/button";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import Offcanvas from "react-bootstrap/Offcanvas";
+import { AccountMenu } from "@/features/account";
+import type { AccountAction } from "@/components/navigation/sidebar";
 
 interface MobileNavigationProps {
   isOpen: boolean;
   initials: string;
+  profileName: string;
   children: ReactNode;
   onOpen: () => void;
   onClose: () => void;
   onHome: () => void;
+  onProfile: () => void;
+  onAccountAction: (action: AccountAction) => void;
 }
 
 export function MobileNavigation({
   isOpen,
   initials,
+  profileName,
   children,
   onOpen,
   onClose,
   onHome,
+  onProfile,
+  onAccountAction,
 }: MobileNavigationProps) {
   return (
     <>
@@ -31,7 +39,14 @@ export function MobileNavigation({
           <BrandLogo />
           Admin Panel
         </Button>
-        <span className="admin-avatar">{initials}</span>
+        <AccountMenu
+          compact
+          drop="down"
+          initials={initials}
+          profileName={profileName}
+          onProfile={onProfile}
+          onAction={onAccountAction}
+        />
       </header>
       <Offcanvas show={isOpen} onHide={onClose} className="admin-offcanvas">
         <Offcanvas.Header className="justify-content-end">

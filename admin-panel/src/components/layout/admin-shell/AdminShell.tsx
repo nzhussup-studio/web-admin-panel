@@ -64,6 +64,7 @@ export function AdminShell({ children }: PropsWithChildren) {
   };
 
   const toggleSidebar = () => {
+    setShowNavigation(false);
     setIsSidebarCollapsed((isCollapsed) => {
       const nextState = !isCollapsed;
       try {
@@ -100,9 +101,12 @@ export function AdminShell({ children }: PropsWithChildren) {
       <MobileNavigation
         isOpen={showNavigation}
         initials={initials}
+        profileName={state.firstName || "Profile"}
         onOpen={() => setShowNavigation(true)}
         onClose={() => setShowNavigation(false)}
         onHome={() => navigate("/")}
+        onProfile={() => window.location.assign(keycloakAccountUrl)}
+        onAccountAction={setPendingAction}
       >
         {sidebar}
       </MobileNavigation>

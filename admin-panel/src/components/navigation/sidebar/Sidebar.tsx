@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import Button from "@/components/ui/button";
 import { BrandLogo } from "@/components/ui/brand-logo";
@@ -66,6 +67,12 @@ export function Sidebar({
   onProfile,
   onAccountAction,
 }: SidebarProps) {
+  const [isCvOpen, setIsCvOpen] = useState(cvExpanded);
+
+  useEffect(() => {
+    if (cvExpanded) setIsCvOpen(true);
+  }, [cvExpanded]);
+
   return (
     <>
       <div className="admin-sidebar-header">
@@ -84,21 +91,35 @@ export function Sidebar({
         <Nav className="admin-nav flex-column" aria-label="Primary navigation">
           {primaryNavigation.map(({ label, path, icon: Icon }) => (
             <div key={path}>
-              <Nav.Link
-                as={NavLink}
-                to={path}
-                end={path === "/" || path === "/cv"}
-                onClick={() => onNavigate(path)}
-                className="admin-nav-link"
-                title={isCollapsed ? label : undefined}
-              >
-                <Icon size={19} aria-hidden="true" />
-                <span className="admin-nav-label">{label}</span>
+              <div className={label === "CV" ? "admin-nav-parent" : ""}>
+                <Nav.Link
+                  as={NavLink}
+                  to={path}
+                  end={path === "/" || path === "/cv"}
+                  onClick={() => onNavigate(path)}
+                  className="admin-nav-link"
+                  title={isCollapsed ? label : undefined}
+                >
+                  <Icon size={19} aria-hidden="true" />
+                  <span className="admin-nav-label">{label}</span>
+                </Nav.Link>
                 {label === "CV" ? (
-                  <ChevronDown size={15} className="ms-auto" />
+                  <Button
+                    variant="link"
+                    className="admin-nav-expand"
+                    aria-label={
+                      isCvOpen
+                        ? "Collapse CV navigation"
+                        : "Expand CV navigation"
+                    }
+                    aria-expanded={isCvOpen}
+                    onClick={() => setIsCvOpen((isOpen) => !isOpen)}
+                  >
+                    <ChevronDown size={15} />
+                  </Button>
                 ) : null}
-              </Nav.Link>
-              {label === "CV" && cvExpanded ? (
+              </div>
+              {label === "CV" && isCvOpen ? (
                 <Nav className="admin-subnav flex-column">
                   {cvNavigation.map((item) => (
                     <Nav.Link

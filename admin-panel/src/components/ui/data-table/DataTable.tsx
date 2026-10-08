@@ -17,6 +17,7 @@ interface DataTableProps {
   sortDirection?: "asc" | "desc";
   onSort?: () => void;
   className?: string;
+  mobileSummary?: ReactNode;
 }
 
 export function DataTable({
@@ -25,9 +26,31 @@ export function DataTable({
   sortDirection = "desc",
   onSort,
   className = "",
+  mobileSummary,
 }: DataTableProps) {
+  const sortableColumn = columns.find((column) => column.sortable);
+
   return (
     <div className={`data-table-shell ${className}`.trim()}>
+      {sortableColumn && onSort ? (
+        <div className="mobile-table-toolbar d-md-none">
+          <Button
+            variant="outline-secondary"
+            onClick={onSort}
+            aria-label={`Sort by ${String(sortableColumn.label)} ${sortDirection === "asc" ? "descending" : "ascending"}`}
+          >
+            <span>Sort: {sortableColumn.label}</span>
+            {sortDirection === "asc" ? (
+              <ChevronUp size={17} />
+            ) : (
+              <ChevronDown size={17} />
+            )}
+          </Button>
+          {mobileSummary ? (
+            <span className="mobile-table-summary">{mobileSummary}</span>
+          ) : null}
+        </div>
+      ) : null}
       <Table responsive hover className="align-middle mb-0 admin-data-table">
         <thead>
           <tr>

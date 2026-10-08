@@ -7,6 +7,8 @@ interface AccountMenuProps {
   profileName: string;
   onProfile: () => void;
   onAction: (action: AccountAction) => void;
+  compact?: boolean;
+  drop?: "up" | "down";
 }
 
 export function AccountMenu({
@@ -14,12 +16,22 @@ export function AccountMenu({
   profileName,
   onProfile,
   onAction,
+  compact = false,
+  drop = "up",
 }: AccountMenuProps) {
   return (
-    <Dropdown drop="up">
-      <Dropdown.Toggle variant="link" className="admin-profile-toggle">
+    <Dropdown drop={drop} align={compact ? "end" : undefined}>
+      <Dropdown.Toggle
+        variant="link"
+        className={`admin-profile-toggle${compact ? " admin-profile-toggle-compact" : ""}`}
+        aria-label={compact ? "Open account menu" : undefined}
+      >
         <span className="admin-avatar">{initials}</span>
-        <span className="admin-profile-label text-truncate">{profileName}</span>
+        {!compact ? (
+          <span className="admin-profile-label text-truncate">
+            {profileName}
+          </span>
+        ) : null}
       </Dropdown.Toggle>
       <Dropdown.Menu className="shadow-sm">
         <Dropdown.Item onClick={onProfile}>

@@ -28,6 +28,7 @@ export function ProjectList({
       ]}
       sortDirection={isAscending ? "asc" : "desc"}
       onSort={onSort}
+      mobileSummary={`${projects.length} ${projects.length === 1 ? "project" : "projects"}`}
     >
       {projects.map((project) => (
         <ProjectRow

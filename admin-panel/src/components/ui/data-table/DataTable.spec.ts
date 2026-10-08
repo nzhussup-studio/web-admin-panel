@@ -17,6 +17,7 @@ describe("DataTable", () => {
           ],
           sortDirection: "asc",
           onSort,
+          mobileSummary: "1 item",
         } as unknown as Parameters<typeof DataTable>[0],
         createElement(
           "tr",
@@ -28,8 +29,11 @@ describe("DataTable", () => {
     );
 
     expect(screen.getByText("Portfolio")).toBeVisible();
+    expect(screen.getByText("1 item")).toBeVisible();
     await userEvent.click(
-      screen.getByRole("button", { name: "Sort by Order descending" }),
+      screen.getAllByRole("button", {
+        name: "Sort by Order descending",
+      })[0],
     );
     expect(onSort).toHaveBeenCalledOnce();
   });

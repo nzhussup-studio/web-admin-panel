@@ -13,7 +13,7 @@ import {
   listEducation,
   updateEducation,
 } from "../api";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable, DataTableMobileCard } from "@/components/ui/data-table";
 import { OverflowMenu } from "@/components/ui/overflow-menu";
 import {
   ResourceForm,
@@ -122,16 +122,41 @@ const EducationPage = () => {
     >
       {education.map((edu) => (
         <tr key={edu.id} onClick={() => openPopup(edu)}>
-          <td data-label="Degree" className="fw-semibold text-primary">
+          <DataTableMobileCard
+            colSpan={5}
+            title={edu.degree}
+            subtitle={edu.institution}
+            metadata={[
+              ...(edu.location
+                ? [{ label: "Location", value: edu.location }]
+                : []),
+              {
+                label: "Period",
+                value: `${edu.startDate ? new Date(edu.startDate).toLocaleDateString() : "Unknown"} – ${edu.endDate ? new Date(edu.endDate).toLocaleDateString() : "Present"}`,
+              },
+              { label: "Order", value: edu.displayOrder },
+            ]}
+            actions={
+              <OverflowMenu
+                label={`Actions for ${edu.degree}`}
+                onEdit={() => openPopup(edu)}
+                onDelete={() => confirmDelete(edu.id ?? null)}
+              />
+            }
+          />
+          <td
+            data-label="Degree"
+            className="fw-semibold text-primary d-none d-md-table-cell"
+          >
             {edu.degree}
           </td>
-          <td data-label="Institution">
+          <td className="d-none d-md-table-cell" data-label="Institution">
             <div>{edu.institution}</div>
             {edu.location ? (
               <small className="text-secondary">{edu.location}</small>
             ) : null}
           </td>
-          <td data-label="Period">
+          <td className="d-none d-md-table-cell" data-label="Period">
             {edu.startDate
               ? new Date(edu.startDate).toLocaleDateString()
               : "Unknown"}{" "}
@@ -140,10 +165,12 @@ const EducationPage = () => {
               ? new Date(edu.endDate).toLocaleDateString()
               : "Present"}
           </td>
-          <td data-label="Order">{edu.displayOrder}</td>
+          <td className="d-none d-md-table-cell" data-label="Order">
+            {edu.displayOrder}
+          </td>
           <td
             data-label="Actions"
-            className="text-end"
+            className="text-end d-none d-md-table-cell"
             onClick={(event) => event.stopPropagation()}
           >
             <OverflowMenu

@@ -9,7 +9,7 @@ import type { base_service_WorkExperience } from "@/api";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CvSectionNav } from "../components";
 import { OverflowMenu } from "@/components/ui/overflow-menu";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable, DataTableMobileCard } from "@/components/ui/data-table";
 import {
   createWorkExperience,
   deleteWorkExperience,
@@ -92,11 +92,40 @@ const WorkExperiencePage = () => {
     >
       {workExperience.map((experience) => (
         <tr key={experience.id} onClick={() => openPopup(experience)}>
-          <td data-label="Position" className="fw-semibold text-primary">
+          <DataTableMobileCard
+            colSpan={6}
+            title={experience.position}
+            subtitle={experience.company}
+            metadata={[
+              {
+                label: "Period",
+                value: `${experience.startDate} – ${experience.endDate || "Present"}`,
+              },
+              ...(experience.location
+                ? [{ label: "Location", value: experience.location }]
+                : []),
+              { label: "Order", value: experience.displayOrder },
+            ]}
+            actions={
+              <OverflowMenu
+                label={`Actions for ${experience.position}`}
+                onEdit={() => openPopup(experience)}
+                onDelete={() => confirmDelete(experience.id ?? null)}
+              />
+            }
+          >
+            <ColorPills values={experience.techStack} />
+          </DataTableMobileCard>
+          <td
+            data-label="Position"
+            className="fw-semibold text-primary d-none d-md-table-cell"
+          >
             {experience.position}
           </td>
-          <td data-label="Company">{experience.company}</td>
-          <td data-label="Period">
+          <td className="d-none d-md-table-cell" data-label="Company">
+            {experience.company}
+          </td>
+          <td className="d-none d-md-table-cell" data-label="Period">
             <div>
               {experience.startDate} – {experience.endDate || "Present"}
             </div>
@@ -107,13 +136,15 @@ const WorkExperiencePage = () => {
               </small>
             ) : null}
           </td>
-          <td data-label="Tech stack">
+          <td className="d-none d-md-table-cell" data-label="Tech stack">
             <ColorPills values={experience.techStack} />
           </td>
-          <td data-label="Order">{experience.displayOrder}</td>
+          <td className="d-none d-md-table-cell" data-label="Order">
+            {experience.displayOrder}
+          </td>
           <td
             data-label="Actions"
-            className="text-end"
+            className="text-end d-none d-md-table-cell"
             onClick={(event) => event.stopPropagation()}
           >
             <OverflowMenu
