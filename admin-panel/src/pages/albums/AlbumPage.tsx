@@ -44,6 +44,7 @@ const AlbumPage = () => {
   const [error, setError] = useState<unknown>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [formData, setFormData] = useState<AlbumImageFormData>({});
 
   const fetchItem = useCallback(async () => {
@@ -87,6 +88,7 @@ const AlbumPage = () => {
     setShowPopup(false);
     setFormData({});
     setIsEditMode(false);
+    setUploadStatus(null);
   };
 
   const handleFileInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -117,7 +119,28 @@ const AlbumPage = () => {
     try {
       const files = (formData.file || []).map(({ file }) => file);
       if (files.length > 0) {
-        await ImageService.postV1AlbumUpload(id, { file: files });
+        setUploadStatus("Starting upload...");
+        const response = await ImageService.postV1AlbumUpload(id, { file: files });
+        const job = response.data;
+        if (!job?.id) {
+          throw new Error("Upload was accepted without a job ID");
+        }
+
+        let status = job;
+        while (status.status === "queued" || status.status === "processing") {
+          setUploadStatus(
+            `Uploading ${status.completed}/${status.total} images...`,
+          );
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          const statusResponse = await ImageService.getV1AlbumUpload(id, job.id);
+          if (!statusResponse.data) {
+            throw new Error("Upload status response was empty");
+          }
+          status = statusResponse.data;
+        }
+        if (status.status === "failed") {
+          throw new Error(status.error || "Upload processing failed");
+        }
       }
       await fetchItem();
       closePopup();
@@ -192,6 +215,7 @@ const AlbumPage = () => {
           ))}
         </div>
       ) : null}
+      {uploadStatus ? <Form.Text>{uploadStatus}</Form.Text> : null}
     </Popup>
   );
 

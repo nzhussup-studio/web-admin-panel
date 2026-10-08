@@ -14,6 +14,7 @@ const mockUseOptionalGlobalAlert = useOptionalGlobalAlert as jest.MockedFunction
 >;
 const mockGetAlbum = AlbumService.getV1Album1 as jest.Mock;
 const mockUploadImage = ImageService.postV1AlbumUpload as jest.Mock;
+const mockUploadStatus = ImageService.getV1AlbumUpload as jest.Mock;
 const mockRenameImage = ImageService.patchV1AlbumRename as jest.Mock;
 const mockDeleteImage = ImageService.deleteV1Album as jest.Mock;
 
@@ -33,6 +34,7 @@ jest.mock("@/lib/api/client", () => ({
   },
   ImageService: {
     postV1AlbumUpload: jest.fn(),
+    getV1AlbumUpload: jest.fn(),
     patchV1AlbumRename: jest.fn(),
     deleteV1Album: jest.fn(),
   },
@@ -208,7 +210,15 @@ describe("pages/albums/AlbumPage.tsx", () => {
       closeAlert: jest.fn(),
     });
     mockGetAlbum.mockResolvedValue(createAlbumResponse());
-    mockUploadImage.mockResolvedValue({});
+    mockUploadImage.mockResolvedValue({
+      data: {
+        id: "upload-1",
+        status: "completed",
+        total: 1,
+        completed: 1,
+      },
+    });
+    mockUploadStatus.mockResolvedValue({});
     mockRenameImage.mockResolvedValue({});
     mockDeleteImage.mockResolvedValue({});
   });

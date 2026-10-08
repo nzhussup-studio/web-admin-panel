@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { image_service_model_Image } from '../models/image_service_model_Image';
 import type { image_service_model_SuccessResponse } from '../models/image_service_model_SuccessResponse';
+import type { image_service_service_UploadJob } from '../models/image_service_service_UploadJob';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -99,7 +100,7 @@ export class ImageService {
      * Upload one or more image files to the specified album
      * @param id Album ID
      * @param formData
-     * @returns any Image uploaded successfully
+     * @returns any Upload accepted for background processing
      * @throws ApiError
      */
     public static postV1AlbumUpload(
@@ -111,7 +112,7 @@ export class ImageService {
             file: Array<Blob>;
         },
     ): CancelablePromise<(image_service_model_SuccessResponse & {
-        data?: Array<image_service_model_Image>;
+        data?: image_service_service_UploadJob;
     })> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -126,6 +127,32 @@ export class ImageService {
                 404: `Album Not Found`,
                 409: `Conflict`,
                 500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * Get upload job status
+     * Returns progress and final result for a background image upload
+     * @param id Album ID
+     * @param jobId Upload job ID
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static getV1AlbumUpload(
+        id: string,
+        jobId: string,
+    ): CancelablePromise<(image_service_model_SuccessResponse & {
+        data?: image_service_service_UploadJob;
+    })> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/v1/album/{id}/upload/{jobID}',
+            path: {
+                'id': id,
+                'jobID': jobId,
+            },
+            errors: {
+                404: `Upload job not found`,
             },
         });
     }

@@ -23,6 +23,7 @@ export type { image_service_model_ErrorResponse } from './models/image_service_m
 export type { image_service_model_Image } from './models/image_service_model_Image';
 export type { image_service_model_ImageType } from './models/image_service_model_ImageType';
 export type { image_service_model_SuccessResponse } from './models/image_service_model_SuccessResponse';
+export type { image_service_service_UploadJob } from './models/image_service_service_UploadJob';
 export type { llm_service_dto_APIResponse } from './models/llm_service_dto_APIResponse';
 export type { llm_service_dto_ConfigurationRequest } from './models/llm_service_dto_ConfigurationRequest';
 export type { llm_service_dto_ConfigurationResponse } from './models/llm_service_dto_ConfigurationResponse';
