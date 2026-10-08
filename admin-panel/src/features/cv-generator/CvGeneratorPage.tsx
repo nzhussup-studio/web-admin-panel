@@ -1,6 +1,6 @@
-import { PageHeader as Header } from "@/components/layout/page-header";
+import { PageHeader } from "@/components/layout/page-header";
 import { AsyncState } from "@/components/feedback/error-state";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Button from "@/components/ui/button";
 import Col from "react-bootstrap/Col";
@@ -8,10 +8,6 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import { normalizeApiError } from "@/api";
 import { generateCV, previewCV } from "./export";
-import {
-  loadCvGeneratorPreferences,
-  saveCvGeneratorPreferences,
-} from "./preferences";
 import { CloudDownload, CloudUpload, Eye } from "lucide-react";
 import { useOptionalGlobalAlert } from "@/providers/alerts";
 import {
@@ -20,6 +16,7 @@ import {
   ExportSummary,
 } from "./components";
 import { getCvGeneratorSourceData } from "./api";
+import { useCvGeneratorPreferences } from "./hooks";
 import {
   applyDescriptionOverride,
   buildScopedItemKey,
@@ -31,148 +28,29 @@ import {
   TECH_STACK_SELECTABLE_SECTION_NAMES,
 } from "./components/cvGeneratorUtils";
 
-type BasicInfo = Record<string, string>;
-type DescriptionOverrides = Record<string, string>;
-type SelectedItems = Record<string, Set<string | number>>;
-type SelectedSkillEntries = Record<string, Set<string>>;
-type SelectedTechStackEntries = Record<string, Set<string>>;
 type CvSection = {
   sectionName: string;
   items: Record<string, any>[];
-};
-type SerializablePreferences = {
-  basicInfo?: Record<string, unknown>;
-  selectedItems?: Record<string, (string | number)[]>;
-  descriptionOverrides?: Record<string, string>;
-  selectedSkillEntries?: Record<string, string[]>;
-  selectedTechStackEntries?: Record<string, string[]>;
-};
-
-const CV_GENERATOR_STORAGE_KEY = "cvGeneratorSelectedItems";
-
-const DEFAULT_BASIC_INFO: BasicInfo = {
-  name: "Nurzhanat Zhussup",
-  address: "123 Main St, Vienna, Austria",
-  email: "john.doe@example.com",
-  phone: "+7 777 777 7777",
-  website: "https://nzhussup.dev",
-  linkedin: "https://www.linkedin.com/in/nurzhanat-zhussup/",
-  github: "https://github.com/nzhussup",
-  image_url: "",
-  about:
-    "A passionate software engineer with a focus on backend and infrastructure.",
-};
-
-const parseSavedSetMap = <T extends string | number>(
-  savedValue: Record<string, T[]> | undefined,
-): Record<string, Set<T>> => {
-  const withSets: Record<string, Set<T>> = {};
-  for (const key in savedValue || {}) {
-    withSets[key] = new Set(savedValue?.[key] || []);
-  }
-  return withSets;
-};
-
-const serializeSetMap = <T extends string | number>(
-  value: Record<string, Set<T>>,
-): Record<string, T[]> => {
-  const serializable: Record<string, T[]> = {};
-  for (const key in value) {
-    serializable[key] = Array.from(value[key]);
-  }
-
-  return serializable;
 };
 
 const CvGeneratorPage = () => {
   const { triggerAlert } = useOptionalGlobalAlert();
 
-  const [isSyncingPreferences, setIsSyncingPreferences] = useState(false);
-
-  const [basicInfo, setBasicInfo] = useState<BasicInfo>(() => {
-    try {
-      const saved = localStorage.getItem(CV_GENERATOR_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return {
-          ...DEFAULT_BASIC_INFO,
-          ...(parsed.basicInfo || {}),
-        };
-      }
-    } catch (e) {
-      console.error("Failed to parse basic info from localStorage", e);
-    }
-
-    return DEFAULT_BASIC_INFO;
-  });
-
-  const [descriptionOverrides, setDescriptionOverrides] =
-    useState<DescriptionOverrides>(() => {
-      try {
-        const saved = localStorage.getItem(CV_GENERATOR_STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          return parsed.descriptionOverrides || {};
-        }
-      } catch (e) {
-        console.error(
-          "Failed to parse description overrides from localStorage",
-          e,
-        );
-      }
-
-      return {};
-    });
-
-  const [selectedItems, setSelectedItems] = useState<SelectedItems>(() => {
-    try {
-      const saved = localStorage.getItem(CV_GENERATOR_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return parseSavedSetMap(parsed.selectedItems);
-      }
-    } catch (e) {
-      console.error("Failed to parse selected items from localStorage", e);
-    }
-
-    return {};
-  });
-
-  const [selectedSkillEntries, setSelectedSkillEntries] =
-    useState<SelectedSkillEntries>(() => {
-      try {
-        const saved = localStorage.getItem(CV_GENERATOR_STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          return parseSavedSetMap(parsed.selectedSkillEntries);
-        }
-      } catch (e) {
-        console.error(
-          "Failed to parse selected skill entries from localStorage",
-          e,
-        );
-      }
-
-      return {};
-    });
-
-  const [selectedTechStackEntries, setSelectedTechStackEntries] =
-    useState<SelectedTechStackEntries>(() => {
-      try {
-        const saved = localStorage.getItem(CV_GENERATOR_STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          return parseSavedSetMap(parsed.selectedTechStackEntries);
-        }
-      } catch (e) {
-        console.error(
-          "Failed to parse selected tech stack entries from localStorage",
-          e,
-        );
-      }
-
-      return {};
-    });
+  const {
+    basicInfo,
+    setBasicInfo,
+    descriptionOverrides,
+    setDescriptionOverrides,
+    selectedItems,
+    setSelectedItems,
+    selectedSkillEntries,
+    setSelectedSkillEntries,
+    selectedTechStackEntries,
+    setSelectedTechStackEntries,
+    isSyncingPreferences,
+    syncToBackend,
+    syncFromBackend,
+  } = useCvGeneratorPreferences();
 
   const sourceData = useQuery({
     queryKey: ["cv-generator", "source-data"],
@@ -201,87 +79,6 @@ const CvGeneratorPage = () => {
       },
     ];
   }, [sourceData.data]);
-
-  useEffect(() => {
-    const serializableSelectedItems = serializeSetMap(selectedItems);
-    const serializableSelectedSkillEntries =
-      serializeSetMap(selectedSkillEntries);
-    const serializableSelectedTechStackEntries = serializeSetMap(
-      selectedTechStackEntries,
-    );
-
-    localStorage.setItem(
-      CV_GENERATOR_STORAGE_KEY,
-      JSON.stringify({
-        basicInfo,
-        selectedItems: serializableSelectedItems,
-        descriptionOverrides,
-        selectedSkillEntries: serializableSelectedSkillEntries,
-        selectedTechStackEntries: serializableSelectedTechStackEntries,
-      }),
-    );
-  }, [
-    basicInfo,
-    selectedItems,
-    descriptionOverrides,
-    selectedSkillEntries,
-    selectedTechStackEntries,
-  ]);
-
-  const buildPreferencesPayload = () => ({
-    basicInfo,
-    selectedItems: serializeSetMap(selectedItems),
-    descriptionOverrides,
-    selectedSkillEntries: serializeSetMap(selectedSkillEntries),
-    selectedTechStackEntries: serializeSetMap(selectedTechStackEntries),
-  });
-
-  const handleSyncPreferences = async () => {
-    setIsSyncingPreferences(true);
-    try {
-      await saveCvGeneratorPreferences(buildPreferencesPayload());
-      triggerAlert("Preferences synced to backend.", "success");
-    } catch (syncError) {
-      console.error("Failed to sync CV generator preferences", syncError);
-      triggerAlert("Failed to sync preferences.", "danger");
-    } finally {
-      setIsSyncingPreferences(false);
-    }
-  };
-
-  const handleLoadPreferencesFromBackend = async () => {
-    setIsSyncingPreferences(true);
-    try {
-      const loaded =
-        (await loadCvGeneratorPreferences()) as SerializablePreferences | null;
-
-      if (!loaded) {
-        triggerAlert("No preferences are saved in the backend yet.", "warning");
-        return;
-      }
-
-      if (loaded.basicInfo) {
-        const loadedBasicInfo = Object.fromEntries(
-          Object.entries(loaded.basicInfo).filter(
-            (entry): entry is [string, string] => typeof entry[1] === "string",
-          ),
-        );
-        setBasicInfo((current) => ({ ...current, ...loadedBasicInfo }));
-      }
-      setSelectedItems(parseSavedSetMap(loaded.selectedItems));
-      setDescriptionOverrides(loaded.descriptionOverrides ?? {});
-      setSelectedSkillEntries(parseSavedSetMap(loaded.selectedSkillEntries));
-      setSelectedTechStackEntries(
-        parseSavedSetMap(loaded.selectedTechStackEntries),
-      );
-      triggerAlert("Preferences synced from backend.", "success");
-    } catch (syncError) {
-      console.error("Failed to load CV generator preferences", syncError);
-      triggerAlert("Failed to sync preferences from backend.", "danger");
-    } finally {
-      setIsSyncingPreferences(false);
-    }
-  };
 
   const handleBasicInfoChange = (key: string, value: string) => {
     setBasicInfo((prev) => ({ ...prev, [key]: value }));
@@ -629,7 +426,7 @@ const CvGeneratorPage = () => {
 
   return (
     <>
-      <Header
+      <PageHeader
         text="CV Generator"
         description="Choose content, customize details and export your CV."
         actions={
@@ -639,14 +436,14 @@ const CvGeneratorPage = () => {
             </Button>
             <Button
               variant="outline-secondary"
-              onClick={handleLoadPreferencesFromBackend}
+              onClick={syncFromBackend}
               disabled={isSyncingPreferences}
             >
               <CloudDownload size={17} /> Sync from backend
             </Button>
             <Button
               variant="outline-secondary"
-              onClick={handleSyncPreferences}
+              onClick={syncToBackend}
               disabled={isSyncingPreferences}
             >
               <CloudUpload size={17} /> Sync to backend

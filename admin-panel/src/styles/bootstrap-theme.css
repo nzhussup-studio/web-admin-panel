@@ -765,7 +765,7 @@ body {
 .album-card .card-body {
   padding: 1rem 1.2rem 1.15rem;
 }
-.album-card .badge {
+.album-visibility-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;

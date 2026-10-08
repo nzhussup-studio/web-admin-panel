@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import { AlbumLightboxModal, ImageGrid } from "./components";
-import { PageHeader as Header } from "@/components/layout/page-header";
+import { PageHeader } from "@/components/layout/page-header";
 import { AsyncState } from "@/components/feedback/error-state";
 import { useAlbum } from "./api";
 
@@ -24,7 +24,7 @@ const PublicAlbumPage = () => {
 
   return (
     <>
-      <Header
+      <PageHeader
         text={album?.title ?? "Album"}
         description={album?.desc}
         breadcrumbs={[

@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import Badge from "react-bootstrap/Badge";
 import Button from "@/components/ui/button";
 import Card from "react-bootstrap/Card";
 import Dropdown from "react-bootstrap/Dropdown";
-import { Ellipsis, Globe2, Images, Lock, Users } from "lucide-react";
+import { Ellipsis, Images } from "lucide-react";
 import { getAlbumImageUrl } from "../albumData";
+import { AlbumVisibilityBadge } from "./AlbumVisibilityBadge";
 
 interface AlbumCardData {
   id?: string | number;
@@ -21,13 +21,6 @@ interface AlbumCardProps {
   onEdit?: (album: AlbumCardData) => void;
   onDelete?: (album: AlbumCardData) => void;
 }
-
-const visibilityVariant = (type?: string) =>
-  type === "private"
-    ? "danger"
-    : type === "semi-public"
-      ? "warning"
-      : "success";
 
 const AlbumCard = ({ album, onEdit, onDelete }: AlbumCardProps) => {
   const navigate = useNavigate();
@@ -86,20 +79,7 @@ const AlbumCard = ({ album, onEdit, onDelete }: AlbumCardProps) => {
             </Dropdown.Menu>
           </Dropdown>
         </div>
-        <Badge
-          bg={`${visibilityVariant(album.type)}-subtle`}
-          text={visibilityVariant(album.type)}
-          className="mt-3 text-capitalize"
-        >
-          {album.type === "private" ? (
-            <Lock size={14} />
-          ) : album.type === "semi-public" ? (
-            <Users size={14} />
-          ) : (
-            <Globe2 size={14} />
-          )}
-          {album.type ?? "unknown"}
-        </Badge>
+        <AlbumVisibilityBadge type={album.type} className="mt-3" />
       </Card.Body>
     </Card>
   );

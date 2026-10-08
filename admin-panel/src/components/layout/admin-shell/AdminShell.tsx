@@ -5,7 +5,7 @@ import { MobileNavigation } from "@/components/navigation/mobile-navigation";
 import { Sidebar, type AccountAction } from "@/components/navigation/sidebar";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useOptionalGlobalAlert } from "@/providers/alerts";
-import { useAuth } from "@/providers/auth";
+import { hasAdminRole, useAuth } from "@/providers/auth";
 import { useDarkMode } from "@/providers/theme";
 import { deleteAccount } from "@/features/account";
 import {
@@ -82,7 +82,7 @@ export function AdminShell({ children }: PropsWithChildren) {
       profileName={state.firstName || "Profile"}
       isDarkMode={isDarkMode}
       isCollapsed={isSidebarCollapsed}
-      isAdmin={state.roles.includes("ROLE_ADMIN")}
+      isAdmin={hasAdminRole(state.roles)}
       authRealmUrl={keycloakAdminRealmUrl}
       onNavigate={closeAndNavigate}
       onThemeToggle={toggleDarkMode}

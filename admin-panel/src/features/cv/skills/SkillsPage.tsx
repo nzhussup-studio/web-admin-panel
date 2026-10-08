@@ -2,7 +2,7 @@ import React from "react";
 import { queryKeys, useResourceEditor } from "@/api";
 import Container from "react-bootstrap/Container";
 import { PageContainer } from "@/components/layout/page-container";
-import { FormDrawer as Popup } from "@/components/ui/form-drawer";
+import { FormDrawer } from "@/components/ui/form-drawer";
 import type { base_service_Skill } from "@/api";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CvSectionNav } from "../components";
@@ -64,7 +64,7 @@ const SkillsPage = () => {
   });
 
   const skillForm = (
-    <Popup
+    <FormDrawer
       closePopup={closePopup}
       title={isEditMode ? "Edit Skill" : "Add Skill"}
       onSubmit={saveItem}
@@ -74,7 +74,7 @@ const SkillsPage = () => {
         value={formData}
         onChange={setFormData}
       />
-    </Popup>
+    </FormDrawer>
   );
 
   const skillPage = (

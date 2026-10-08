@@ -1,11 +1,9 @@
 import { useParams } from "react-router-dom";
-import React, { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Button from "@/components/ui/button";
 import Container from "react-bootstrap/Container";
-import Form from "react-bootstrap/Form";
-import InputGroup from "react-bootstrap/InputGroup";
-import { PageHeader as Header } from "@/components/layout/page-header";
+import { PageHeader } from "@/components/layout/page-header";
 import { AsyncState } from "@/components/feedback/error-state";
 import {
   type image_service_model_Album,
@@ -13,16 +11,19 @@ import {
   type image_service_model_Image,
 } from "@/api";
 import { getApiErrorMessage, normalizeApiError } from "@/api";
-import { FormDrawer as Popup } from "@/components/ui/form-drawer";
+import { FormDrawer } from "@/components/ui/form-drawer";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   AlbumForm,
+  AlbumImageUploadField,
   AlbumLightboxModal,
+  AlbumVisibilityBadge,
   ImageMenu,
+  RenameImageField,
+  type ImagePreview,
   UploadProgress,
 } from "./components";
 import { useOptionalGlobalAlert } from "@/providers/alerts";
-import Badge from "react-bootstrap/Badge";
 import { queryKeys } from "@/api";
 import {
   deleteImage,
@@ -37,9 +38,8 @@ import {
   normalizeAlbumPreview,
   type AlbumPreviewView,
 } from "./albumData";
-import { ImagePlus, Pencil, X } from "lucide-react";
+import { ImagePlus, Pencil } from "lucide-react";
 
-type ImagePreview = { file: File; preview: string };
 type UploadStatus = {
   jobId: string;
   completed: number;
@@ -170,40 +170,6 @@ const AlbumDetailPage = () => {
     setIsEditMode(false);
   };
 
-  const addFilePreviews = async (files: File[]) => {
-    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
-    if (imageFiles.length !== files.length) {
-      triggerAlert("Only image files can be uploaded", "warning");
-    }
-    if (imageFiles.length === 0) return;
-
-    const readFiles = imageFiles.map((file) => {
-      return new Promise<ImagePreview>((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => {
-          resolve({ file, preview: String(reader.result || "") });
-        };
-      });
-    });
-
-    const results = await Promise.all(readFiles);
-    setFormData((current) => ({
-      ...current,
-      file: [...(current.file || []), ...results],
-    }));
-  };
-
-  const handleFileInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    await addFilePreviews(Array.from(e.target.files || []));
-    e.target.value = "";
-  };
-
-  const removeImagePreview = (index: number) => {
-    const updatedPreviews = (formData.file || []).filter((_, i) => i !== index);
-    setFormData({ ...formData, file: updatedPreviews });
-  };
-
   const saveImage = async () => {
     if (!id) return;
     try {
@@ -236,65 +202,23 @@ const AlbumDetailPage = () => {
   };
 
   const albumForm = (
-    <Popup
+    <FormDrawer
       closePopup={closePopup}
       title={isEditMode ? "Edit Image" : "Add Image"}
       onSubmit={saveImage}
     >
-      <Form.Group className="mb-4">
-        <Form.Label>Images</Form.Label>
-        <label
-          className="album-upload-dropzone"
-          onDragOver={(event) => event.preventDefault()}
-          onDrop={(event) => {
-            event.preventDefault();
-            void addFilePreviews(Array.from(event.dataTransfer.files));
-          }}
-        >
-          <Form.Control
-            className="visually-hidden"
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleFileInputChange}
-            aria-label="Choose images"
-          />
-          <span className="album-upload-icon">
-            <ImagePlus size={24} />
-          </span>
-          <strong>Drop images here or choose files</strong>
-          <small>JPEG, PNG and HEIC files are supported</small>
-        </label>
-      </Form.Group>
-
-      {(formData.file || []).length > 0 ? (
-        <div className="album-upload-previews mt-3">
-          {(formData.file || []).map((image, index) => (
-            <div
-              key={`${image.file.name}-${index}`}
-              className="album-upload-preview"
-            >
-              <img src={image.preview} alt={`Preview of ${image.file.name}`} />
-              <Button
-                type="button"
-                onClick={() => removeImagePreview(index)}
-                aria-label="Remove image"
-                variant="light"
-                size="sm"
-                className="album-upload-remove"
-              >
-                <X size={14} />
-              </Button>
-              <span className="text-truncate">{image.file.name}</span>
-            </div>
-          ))}
-        </div>
-      ) : null}
-    </Popup>
+      <AlbumImageUploadField
+        value={formData.file ?? []}
+        onChange={(file) => setFormData((current) => ({ ...current, file }))}
+        onInvalidFiles={() =>
+          triggerAlert("Only image files can be uploaded", "warning")
+        }
+      />
+    </FormDrawer>
   );
 
   const imageForm = (
-    <Popup
+    <FormDrawer
       closePopup={closePopup}
       title={isEditMode ? "Edit Image" : "Add Image"}
       onSubmit={async () => {
@@ -318,30 +242,12 @@ const AlbumDetailPage = () => {
         }
       }}
     >
-      <div className="album-rename-current">
-        <span>Current image ID</span>
-        <strong>{formData.id}</strong>
-      </div>
-      <Form.Group className="mt-4">
-        <Form.Label>New Image ID</Form.Label>
-        <InputGroup>
-          <Form.Control
-            value={formData.newId ?? ""}
-            onChange={(e) =>
-              setFormData({ ...formData, newId: e.target.value })
-            }
-            required
-          />
-          <Button
-            variant="outline-secondary"
-            onClick={() => setFormData({ ...formData, newId: "" })}
-            disabled={!formData.newId}
-          >
-            Clear
-          </Button>
-        </InputGroup>
-      </Form.Group>
-    </Popup>
+      <RenameImageField
+        currentId={formData.id}
+        value={formData.newId ?? ""}
+        onChange={(newId) => setFormData((current) => ({ ...current, newId }))}
+      />
+    </FormDrawer>
   );
 
   const confirmDelete = (itemId?: string) => {
@@ -387,7 +293,7 @@ const AlbumDetailPage = () => {
 
   return (
     <>
-      <Header
+      <PageHeader
         breadcrumbs={[
           { label: "Overview", to: "/" },
           { label: "Albums", to: "/albums" },
@@ -396,21 +302,7 @@ const AlbumDetailPage = () => {
         titleContent={
           <div className="d-flex align-items-center gap-3 flex-wrap">
             <h1>{album?.title ?? "Album"}</h1>
-            {album?.type ? (
-              <Badge
-                bg={`${album.type === "private" ? "danger" : album.type === "semi-public" ? "warning" : "success"}-subtle`}
-                text={
-                  album.type === "private"
-                    ? "danger"
-                    : album.type === "semi-public"
-                      ? "warning"
-                      : "success"
-                }
-                className="text-capitalize"
-              >
-                {album.type}
-              </Badge>
-            ) : null}
+            <AlbumVisibilityBadge type={album?.type} />
           </div>
         }
         description={
@@ -475,7 +367,7 @@ const AlbumDetailPage = () => {
 
       {showPopup ? (isEditMode ? imageForm : albumForm) : null}
       {showDetails ? (
-        <Popup
+        <FormDrawer
           closePopup={() => setShowDetails(false)}
           title="Edit album"
           onSubmit={async () => {
@@ -487,7 +379,7 @@ const AlbumDetailPage = () => {
           }}
         >
           <AlbumForm value={detailsForm} onChange={setDetailsForm} />
-        </Popup>
+        </FormDrawer>
       ) : null}
       <AlbumLightboxModal
         albumTitle={album?.title}

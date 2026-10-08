@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { queryKeys, useResourceEditor } from "@/api";
 import Container from "react-bootstrap/Container";
 import { PageContainer } from "@/components/layout/page-container";
-import { FormDrawer as Popup } from "@/components/ui/form-drawer";
+import { FormDrawer } from "@/components/ui/form-drawer";
 import type { base_service_Education } from "@/api";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CvSectionNav } from "../components";
@@ -94,7 +94,7 @@ const EducationPage = () => {
   );
 
   const eduForm = (
-    <Popup
+    <FormDrawer
       closePopup={closePopup}
       title={isEditMode ? "Edit Education" : "Add Education"}
       onSubmit={saveItem}
@@ -104,7 +104,7 @@ const EducationPage = () => {
         value={formData}
         onChange={setFormData}
       />
-    </Popup>
+    </FormDrawer>
   );
 
   const eduPage = (

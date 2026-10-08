@@ -12,7 +12,7 @@ import {
   Settings,
   UserRound,
 } from "lucide-react";
-import { PageHeader as Header } from "@/components/layout/page-header";
+import { PageHeader } from "@/components/layout/page-header";
 import { useOverviewQueries } from "./api";
 import {
   InfrastructureLinks,
@@ -78,7 +78,7 @@ const OverviewPage = () => {
 
   return (
     <>
-      <Header
+      <PageHeader
         className="overview-page-shell"
         text="Overview"
         description="Manage your portfolio, CV and media from one place."

@@ -4,7 +4,7 @@ import { queryKeys, useResourceEditor } from "@/api";
 import Container from "react-bootstrap/Container";
 import { MapPin } from "lucide-react";
 import { PageContainer } from "@/components/layout/page-container";
-import { FormDrawer as Popup } from "@/components/ui/form-drawer";
+import { FormDrawer } from "@/components/ui/form-drawer";
 import type { base_service_WorkExperience } from "@/api";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CvSectionNav } from "../components";
@@ -63,7 +63,7 @@ const WorkExperiencePage = () => {
   });
 
   const wexForm = (
-    <Popup
+    <FormDrawer
       closePopup={closePopup}
       title={isEditMode ? "Edit Work Experience" : "Add Work Experience"}
       onSubmit={saveItem}
@@ -73,7 +73,7 @@ const WorkExperiencePage = () => {
         value={formData}
         onChange={setFormData}
       />
-    </Popup>
+    </FormDrawer>
   );
 
   const wexPage = (

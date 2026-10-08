@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Button from "@/components/ui/button";
 import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/Stack";
-import { PageHeader as Header } from "@/components/layout/page-header";
+import { PageHeader } from "@/components/layout/page-header";
 import { AsyncState } from "@/components/feedback/error-state";
 import { ArrowDownAZ, Eye } from "lucide-react";
 import { Plus } from "lucide-react";
@@ -55,7 +55,7 @@ const PageContainer = ({
 }: PageContainerProps) => {
   return (
     <>
-      <Header
+      <PageHeader
         className={className}
         breadcrumbs={breadcrumbs}
         text={title}

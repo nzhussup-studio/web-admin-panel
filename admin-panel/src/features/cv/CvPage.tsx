@@ -9,7 +9,7 @@ import {
   GraduationCap,
   Wrench,
 } from "lucide-react";
-import { PageHeader as Header } from "@/components/layout/page-header";
+import { PageHeader } from "@/components/layout/page-header";
 
 const sections = [
   {
@@ -42,7 +42,7 @@ const CvPage = () => {
   const navigate = useNavigate();
   return (
     <>
-      <Header
+      <PageHeader
         text="CV"
         description="Manage the structured content used by your portfolio and CV generator."
       />

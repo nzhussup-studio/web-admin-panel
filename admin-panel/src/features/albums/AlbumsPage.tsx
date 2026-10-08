@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Button from "@/components/ui/button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import { queryKeys, useResourceEditor } from "@/api";
 import { PageContainer } from "@/components/layout/page-container";
 import { AlbumCard, AlbumForm } from "./components";
 import type { image_service_model_AlbumType } from "@/api";
-import { FormDrawer as Popup } from "@/components/ui/form-drawer";
+import { FormDrawer } from "@/components/ui/form-drawer";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { createAlbum, deleteAlbum, listAlbums, updateAlbum } from "./api";
 import { normalizeAlbumPreview, type AlbumPreviewView } from "./albumData";
@@ -56,13 +56,13 @@ const AlbumsPage = () => {
   );
 
   const albumForm = (
-    <Popup
+    <FormDrawer
       closePopup={closePopup}
       title={isEditMode ? "Edit Album" : "Add Album"}
       onSubmit={saveItem}
     >
       <AlbumForm value={formData} onChange={setFormData} />
-    </Popup>
+    </FormDrawer>
   );
 
   const albumsPreviewPage = (

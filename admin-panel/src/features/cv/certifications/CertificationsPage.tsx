@@ -3,7 +3,7 @@ import { queryKeys, useResourceEditor } from "@/api";
 import Button from "@/components/ui/button";
 import Container from "react-bootstrap/Container";
 import { PageContainer } from "@/components/layout/page-container";
-import { FormDrawer as Popup } from "@/components/ui/form-drawer";
+import { FormDrawer } from "@/components/ui/form-drawer";
 import type { base_service_Certificate } from "@/api";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CvSectionNav } from "../components";
@@ -74,7 +74,7 @@ const CertificationsPage = () => {
   });
 
   const certForm = (
-    <Popup
+    <FormDrawer
       closePopup={closePopup}
       title={isEditMode ? "Edit Certificate" : "Add Certificate"}
       onSubmit={saveItem}
@@ -84,7 +84,7 @@ const CertificationsPage = () => {
         value={formData}
         onChange={setFormData}
       />
-    </Popup>
+    </FormDrawer>
   );
 
   const certPage = (

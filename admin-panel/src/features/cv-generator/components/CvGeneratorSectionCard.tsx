@@ -1,8 +1,7 @@
-import { useState, type KeyboardEvent } from "react";
+import { useState } from "react";
 import Badge from "react-bootstrap/Badge";
 import Button from "@/components/ui/button";
 import Card from "react-bootstrap/Card";
-import Form from "react-bootstrap/Form";
 import {
   Award,
   BriefcaseBusiness,
@@ -12,11 +11,12 @@ import {
   Settings,
 } from "lucide-react";
 import CvGeneratorItemLabel from "./CvGeneratorItemLabel";
+import { CvSelectableEntry } from "./CvSelectableEntry";
+import { DescriptionOverrideField } from "./DescriptionOverrideField";
 import {
   buildScopedItemKey,
   buildOverrideKey,
   canOverrideDescription,
-  formatLabel,
   formatScalar,
   getLongDescription,
   parseTechStack,
@@ -67,9 +67,6 @@ type Props = {
   ) => void;
 };
 
-const entryClassName = (isChecked: boolean) =>
-  `cv-generator-entry${isChecked ? " is-selected" : ""}`;
-
 const PROJECTS_SECTION_NAME = "projects";
 const sectionIcons = {
   work_experience: BriefcaseBusiness,
@@ -100,16 +97,6 @@ const CvGeneratorSectionCard = ({
   const isSkillsSection = sectionName === SKILLS_SECTION_NAME;
   const isTechStackSelectableSection =
     TECH_STACK_SELECTABLE_SECTION_NAMES.has(sectionName);
-
-  const handleEntryKeyDown = (
-    event: KeyboardEvent<HTMLDivElement>,
-    toggle: () => void,
-  ) => {
-    if (event.target !== event.currentTarget) return;
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    toggle();
-  };
 
   return (
     <Card className={`cv-generator-section${open ? " is-open" : ""}`}>
@@ -177,42 +164,21 @@ const CvGeneratorSectionCard = ({
 
                 return (
                   <div key={itemId} className="mb-2">
-                    <div
-                      className={entryClassName(isChecked)}
-                      role="checkbox"
-                      aria-checked={isChecked}
-                      tabIndex={0}
-                      onClick={() =>
+                    <CvSelectableEntry
+                      selected={isChecked}
+                      onToggle={() =>
                         onToggleSkillCategory(itemId, allSkillNames, isChecked)
                       }
-                      onKeyDown={(event) =>
-                        handleEntryKeyDown(event, () =>
-                          onToggleSkillCategory(
-                            itemId,
-                            allSkillNames,
-                            isChecked,
-                          ),
-                        )
+                      label={
+                        <div>
+                          <div className="fw-semibold">{categoryName}</div>
+                          <div className="small text-body-secondary">
+                            {selectedSkillNames.length} of{" "}
+                            {allSkillNames.length} selected
+                          </div>
+                        </div>
                       }
                     >
-                      <div className="d-flex align-items-start justify-content-between gap-3">
-                        <Form.Check
-                          type="checkbox"
-                          checked={isChecked}
-                          readOnly
-                          tabIndex={-1}
-                          label={
-                            <div>
-                              <div className="fw-semibold">{categoryName}</div>
-                              <div className="small text-body-secondary">
-                                {selectedSkillNames.length} of{" "}
-                                {allSkillNames.length} selected
-                              </div>
-                            </div>
-                          }
-                        />
-                      </div>
-
                       {allSkillNames.length > 0 ? (
                         <div className="cv-generator-pill-list">
                           {allSkillNames.map((skillName) => {
@@ -244,7 +210,7 @@ const CvGeneratorSectionCard = ({
                           })}
                         </div>
                       ) : null}
-                    </div>
+                    </CvSelectableEntry>
                   </div>
                 );
               }
@@ -273,12 +239,9 @@ const CvGeneratorSectionCard = ({
 
                 return (
                   <div key={itemId} className="mb-2">
-                    <div
-                      className={entryClassName(isChecked)}
-                      role="checkbox"
-                      aria-checked={isChecked}
-                      tabIndex={0}
-                      onClick={() =>
+                    <CvSelectableEntry
+                      selected={isChecked}
+                      onToggle={() =>
                         onToggleTechStackCategory(
                           sectionName,
                           itemId,
@@ -286,42 +249,23 @@ const CvGeneratorSectionCard = ({
                           isChecked,
                         )
                       }
-                      onKeyDown={(event) =>
-                        handleEntryKeyDown(event, () =>
-                          onToggleTechStackCategory(
-                            sectionName,
-                            itemId,
-                            allTechStackEntries,
-                            isChecked,
-                          ),
-                        )
+                      label={
+                        <div>
+                          <CvGeneratorItemLabel
+                            sectionName={sectionName}
+                            item={item}
+                            isChecked={isChecked}
+                          />
+                          {allTechStackEntries.length > 0 ? (
+                            <div className="small text-body-secondary">
+                              {activeTechStackEntries.length} of{" "}
+                              {allTechStackEntries.length} tech stack entries
+                              selected
+                            </div>
+                          ) : null}
+                        </div>
                       }
                     >
-                      <div className="d-flex align-items-start justify-content-between gap-3">
-                        <Form.Check
-                          type="checkbox"
-                          checked={isChecked}
-                          readOnly
-                          tabIndex={-1}
-                          label={
-                            <div>
-                              <CvGeneratorItemLabel
-                                sectionName={sectionName}
-                                item={item}
-                                isChecked={isChecked}
-                              />
-                              {allTechStackEntries.length > 0 ? (
-                                <div className="small text-body-secondary">
-                                  {activeTechStackEntries.length} of{" "}
-                                  {allTechStackEntries.length} tech stack
-                                  entries selected
-                                </div>
-                              ) : null}
-                            </div>
-                          }
-                        />
-                      </div>
-
                       {allTechStackEntries.length > 0 ? (
                         <div className="cv-generator-pill-list">
                           {allTechStackEntries.map((techStackEntry) => {
@@ -356,37 +300,17 @@ const CvGeneratorSectionCard = ({
                           })}
                         </div>
                       ) : null}
-                    </div>
+                    </CvSelectableEntry>
 
                     {showOverrideInput ? (
-                      <Form.Group className="mt-2">
-                        <Form.Label className="small text-body-secondary mb-1">
-                          {isProjectsSection
-                            ? "Project description (optional)"
-                            : "Custom description override (optional)"}
-                        </Form.Label>
-                        <Form.Control
-                          as="textarea"
-                          rows={3}
-                          value={overrideValue}
-                          placeholder={
-                            defaultDescription
-                              ? `Current: ${defaultDescription.slice(0, 140)}${
-                                  defaultDescription.length > 140 ? "..." : ""
-                                }`
-                              : isProjectsSection
-                                ? "Type additional project description (optional)..."
-                                : `Type a custom ${formatLabel(sectionName)} description...`
-                          }
-                          onChange={(e) =>
-                            onSetDescriptionOverride(
-                              sectionName,
-                              itemId,
-                              e.target.value,
-                            )
-                          }
-                        />
-                      </Form.Group>
+                      <DescriptionOverrideField
+                        sectionName={sectionName}
+                        value={overrideValue}
+                        defaultDescription={defaultDescription}
+                        onChange={(value) =>
+                          onSetDescriptionOverride(sectionName, itemId, value)
+                        }
+                      />
                     ) : null}
                   </div>
                 );
@@ -402,62 +326,27 @@ const CvGeneratorSectionCard = ({
 
               return (
                 <div key={itemId} className="mb-2">
-                  <div
-                    className={entryClassName(isChecked)}
-                    role="checkbox"
-                    aria-checked={isChecked}
-                    tabIndex={0}
-                    onClick={() => onToggleItem(sectionName, itemId)}
-                    onKeyDown={(event) =>
-                      handleEntryKeyDown(event, () =>
-                        onToggleItem(sectionName, itemId),
-                      )
+                  <CvSelectableEntry
+                    selected={isChecked}
+                    onToggle={() => onToggleItem(sectionName, itemId)}
+                    label={
+                      <CvGeneratorItemLabel
+                        sectionName={sectionName}
+                        item={item}
+                        isChecked={isChecked}
+                      />
                     }
-                  >
-                    <Form.Check
-                      type="checkbox"
-                      checked={isChecked}
-                      readOnly
-                      tabIndex={-1}
-                      label={
-                        <CvGeneratorItemLabel
-                          sectionName={sectionName}
-                          item={item}
-                          isChecked={isChecked}
-                        />
-                      }
-                    />
-                  </div>
+                  />
 
                   {showOverrideInput ? (
-                    <Form.Group className="mt-2">
-                      <Form.Label className="small text-body-secondary mb-1">
-                        {isProjectsSection
-                          ? "Project description (optional)"
-                          : "Custom description override (optional)"}
-                      </Form.Label>
-                      <Form.Control
-                        as="textarea"
-                        rows={3}
-                        value={overrideValue}
-                        placeholder={
-                          defaultDescription
-                            ? `Current: ${defaultDescription.slice(0, 140)}${
-                                defaultDescription.length > 140 ? "..." : ""
-                              }`
-                            : isProjectsSection
-                              ? "Type additional project description (optional)..."
-                              : `Type a custom ${formatLabel(sectionName)} description...`
-                        }
-                        onChange={(e) =>
-                          onSetDescriptionOverride(
-                            sectionName,
-                            itemId,
-                            e.target.value,
-                          )
-                        }
-                      />
-                    </Form.Group>
+                    <DescriptionOverrideField
+                      sectionName={sectionName}
+                      value={overrideValue}
+                      defaultDescription={defaultDescription}
+                      onChange={(value) =>
+                        onSetDescriptionOverride(sectionName, itemId, value)
+                      }
+                    />
                   ) : null}
                 </div>
               );

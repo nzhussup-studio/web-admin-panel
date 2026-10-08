@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "@/providers/auth";
+import { hasAdminRole, useAuth } from "@/providers/auth";
 import { LoadingPage } from "@/components/feedback/loading-state";
 
 const RequireAuth = ({ children }: { children: ReactNode }) => {
@@ -14,7 +14,7 @@ const RequireAuth = ({ children }: { children: ReactNode }) => {
     return <Navigate to="/forbidden" replace />;
   }
 
-  if (!state.roles.includes("ROLE_ADMIN")) {
+  if (!hasAdminRole(state.roles)) {
     return <Navigate to="/forbidden" replace />;
   }
 
