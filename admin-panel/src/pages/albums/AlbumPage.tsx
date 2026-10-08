@@ -10,6 +10,7 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
+import ProgressBar from "react-bootstrap/ProgressBar";
 import Stack from "react-bootstrap/Stack";
 import Header from "@/components/layout/Header";
 import PageState from "@/components/pages/PageState";
@@ -28,6 +29,13 @@ import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
 import { BackCircleIcon, FunnelIcon } from "@/assets/icons";
 
 type ImagePreview = { file: Blob; preview: string };
+type UploadProgress = {
+  jobId: string;
+  completed: number;
+  total: number;
+  status: string;
+  error?: string;
+};
 type AlbumImageFormData = Partial<
   image_service_model_Image & { file?: ImagePreview[]; newId?: string }
 >;
@@ -44,7 +52,9 @@ const AlbumPage = () => {
   const [error, setError] = useState<unknown>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(
+    null,
+  );
   const [formData, setFormData] = useState<AlbumImageFormData>({});
 
   const fetchItem = useCallback(async () => {
@@ -78,6 +88,69 @@ const AlbumPage = () => {
     fetchItem();
   }, [fetchItem]);
 
+  useEffect(() => {
+    if (!id || !uploadProgress) return;
+    if (
+      uploadProgress.status !== "queued" &&
+      uploadProgress.status !== "processing"
+    ) {
+      return;
+    }
+
+    let cancelled = false;
+    const pollUpload = async () => {
+      try {
+        const response = await ImageService.getV1AlbumUpload(
+          id,
+          uploadProgress.jobId,
+        );
+        const status = response.data;
+        if (!status || cancelled) return;
+
+        setUploadProgress({
+          jobId: uploadProgress.jobId,
+          completed: status.completed || 0,
+          total: status.total || uploadProgress.total,
+          status: status.status || "processing",
+          error: status.error,
+        });
+      } catch (pollError) {
+        if (!cancelled) {
+          setUploadProgress((current) =>
+            current
+              ? {
+                  ...current,
+                  status: "failed",
+                  error: getApiErrorMessage(
+                    pollError,
+                    "Failed to check upload progress",
+                  ),
+                }
+              : current,
+          );
+        }
+      }
+    };
+
+    const timer = setTimeout(pollUpload, 1000);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [id, uploadProgress]);
+
+  useEffect(() => {
+    if (!uploadProgress || uploadProgress.status === "processing") return;
+    if (uploadProgress.status === "completed") {
+      fetchItem();
+    } else if (uploadProgress.status === "failed") {
+      triggerAlert(
+        uploadProgress.error || "Upload processing failed",
+        "danger",
+      );
+    }
+  }, [fetchItem, triggerAlert, uploadProgress]);
+
   const openPopup = (data?: AlbumImageFormData | null) => {
     setIsEditMode(Boolean(data));
     setFormData(data || {});
@@ -88,7 +161,6 @@ const AlbumPage = () => {
     setShowPopup(false);
     setFormData({});
     setIsEditMode(false);
-    setUploadStatus(null);
   };
 
   const handleFileInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -119,7 +191,6 @@ const AlbumPage = () => {
     try {
       const files = (formData.file || []).map(({ file }) => file);
       if (files.length > 0) {
-        setUploadStatus("Starting upload...");
         const response = await ImageService.postV1AlbumUpload(id, {
           file: files,
         });
@@ -128,24 +199,15 @@ const AlbumPage = () => {
           throw new Error("Upload was accepted without a job ID");
         }
 
-        let status = job;
-        while (status.status === "queued" || status.status === "processing") {
-          setUploadStatus(
-            `Uploading ${status.completed}/${status.total} images...`,
-          );
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          const statusResponse = await ImageService.getV1AlbumUpload(
-            id,
-            job.id,
-          );
-          if (!statusResponse.data) {
-            throw new Error("Upload status response was empty");
-          }
-          status = statusResponse.data;
-        }
-        if (status.status === "failed") {
-          throw new Error(status.error || "Upload processing failed");
-        }
+        setUploadProgress({
+          jobId: job.id,
+          completed: job.completed || 0,
+          total: job.total || files.length,
+          status: job.status || "queued",
+          error: job.error,
+        });
+        closePopup();
+        return;
       }
       await fetchItem();
       closePopup();
@@ -220,7 +282,6 @@ const AlbumPage = () => {
           ))}
         </div>
       ) : null}
-      {uploadStatus ? <Form.Text>{uploadStatus}</Form.Text> : null}
     </Popup>
   );
 
@@ -356,6 +417,33 @@ const AlbumPage = () => {
       <Header text={album ? "Album " + album.title : "Album"} />
 
       <Container className="my-5">
+        {uploadProgress ? (
+          <div className="mb-4" role="status" aria-live="polite">
+            <div className="d-flex justify-content-between mb-2">
+              <span>
+                {uploadProgress.status === "failed"
+                  ? "Image upload failed"
+                  : uploadProgress.status === "completed"
+                    ? "Images uploaded"
+                    : "Uploading images"}
+              </span>
+              <span>
+                {uploadProgress.completed}/{uploadProgress.total}
+              </span>
+            </div>
+            <ProgressBar
+              now={
+                uploadProgress.total > 0
+                  ? (uploadProgress.completed / uploadProgress.total) * 100
+                  : 0
+              }
+              variant={
+                uploadProgress.status === "failed" ? "danger" : "primary"
+              }
+              label={`${uploadProgress.completed}/${uploadProgress.total}`}
+            />
+          </div>
+        ) : null}
         <Stack
           direction="horizontal"
           gap={3}
