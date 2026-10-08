@@ -1,6 +1,5 @@
 import Button from "@/components/ui/button";
 import Image from "react-bootstrap/Image";
-import Ratio from "react-bootstrap/Ratio";
 import type { image_service_model_Image } from "@/api";
 import { getAlbumImageUrl } from "../albumData";
 import { Eye } from "lucide-react";
@@ -14,7 +13,7 @@ const ImageGrid = ({ images, onOpenImage }: ImageGridProps) => {
   return (
     <div className="album-public-grid">
       {images.map((image, index) => (
-        <div key={image.id}>
+        <div className="album-collage-item" key={image.id}>
           <Button
             type="button"
             variant="link"
@@ -23,13 +22,11 @@ const ImageGrid = ({ images, onOpenImage }: ImageGridProps) => {
             aria-label={`Open image ${image.id || index + 1}`}
           >
             <div className="album-public-image-frame">
-              <Ratio aspectRatio="1x1">
-                <Image
-                  src={getAlbumImageUrl(image.url)}
-                  alt={image.id || `Album image ${index + 1}`}
-                  className="w-100 h-100 object-fit-cover"
-                />
-              </Ratio>
+              <Image
+                src={getAlbumImageUrl(image.url)}
+                alt={image.id || `Album image ${index + 1}`}
+                loading={index < 3 ? "eager" : "lazy"}
+              />
               <span className="album-public-image-overlay" aria-hidden="true">
                 <Eye size={20} /> View image
               </span>

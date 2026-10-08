@@ -34,7 +34,7 @@ export function AdminShell({ children }: PropsWithChildren) {
   );
   const location = useLocation();
   const navigate = useNavigate();
-  const { state, logout } = useAuth();
+  const { state, login, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const { triggerAlert } = useOptionalGlobalAlert();
   const cvExpanded =
@@ -76,18 +76,26 @@ export function AdminShell({ children }: PropsWithChildren) {
     });
   };
 
+  const handleLogin = () => {
+    void login().catch((error) => {
+      triggerAlert(getApiErrorMessage(error, "Login failed"), "danger");
+    });
+  };
+
   const renderSidebar = (showCollapseControl: boolean) => (
     <Sidebar
       cvExpanded={cvExpanded}
       initials={initials}
-      profileName={state.firstName || "Profile"}
+      profileName={state.firstName || "Guest"}
       isDarkMode={isDarkMode}
       isCollapsed={isSidebarCollapsed}
       isAdmin={hasAdminRole(state.roles)}
+      isAuthenticated={state.isAuthenticated}
       authRealmUrl={keycloakAdminRealmUrl}
       onNavigate={closeAndNavigate}
       onThemeToggle={toggleDarkMode}
       onCollapseToggle={toggleSidebar}
+      onLogin={handleLogin}
       onProfile={() => window.location.assign(keycloakAccountUrl)}
       onAccountAction={setPendingAction}
       showCollapseControl={showCollapseControl}
@@ -104,10 +112,12 @@ export function AdminShell({ children }: PropsWithChildren) {
       <MobileNavigation
         isOpen={showNavigation}
         initials={initials}
-        profileName={state.firstName || "Profile"}
+        profileName={state.firstName || "Guest"}
+        isAuthenticated={state.isAuthenticated}
         onOpen={() => setShowNavigation(true)}
         onClose={() => setShowNavigation(false)}
         onHome={() => navigate("/")}
+        onLogin={handleLogin}
         onProfile={() => window.location.assign(keycloakAccountUrl)}
         onAccountAction={setPendingAction}
       >

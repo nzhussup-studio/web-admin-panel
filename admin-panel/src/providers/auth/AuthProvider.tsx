@@ -35,7 +35,8 @@ const buildLoginOptions = () => {
   };
 };
 
-const isPublicPath = (pathname: string) => pathname.startsWith("/public/");
+const isPublicPath = (pathname: string) =>
+  /^\/albums\/[^/]+\/?$/.test(pathname);
 const keycloakCallbackStoragePrefix = "kc-callback-";
 const authRecoveryFlag = "kc-auth-recovery-attempted";
 const authCallbackParams = [
@@ -90,6 +91,13 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     let mounted = true;
+    const publicPath = isPublicPath(window.location.pathname);
+
+    const settleAsGuest = () => {
+      if (mounted) {
+        setState({ ...initialState, loading: false });
+      }
+    };
 
     const recoverAuthentication = async () => {
       resetLocalAuthState();
@@ -139,10 +147,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
     const initialize = async () => {
       try {
-        const onLoad = isPublicPath(window.location.pathname)
-          ? "check-sso"
-          : "login-required";
-
         keycloak.onAuthSuccess = () => {
           void syncState();
         };
@@ -150,19 +154,22 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
           void syncState();
         };
         keycloak.onAuthError = () => {
+          if (publicPath) {
+            settleAsGuest();
+            return;
+          }
           void recoverAuthentication().catch(() => {
-            if (!mounted) {
-              return;
-            }
-            setState({ ...initialState, loading: false });
+            settleAsGuest();
           });
         };
         keycloak.onAuthRefreshError = () => {
+          if (publicPath) {
+            resetLocalAuthState();
+            settleAsGuest();
+            return;
+          }
           void recoverAuthentication().catch(() => {
-            if (!mounted) {
-              return;
-            }
-            setState({ ...initialState, loading: false });
+            settleAsGuest();
           });
         };
         keycloak.onAuthLogout = () => {
@@ -177,11 +184,13 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             .updateToken(30)
             .then(syncState)
             .catch(() => {
+              if (publicPath) {
+                resetLocalAuthState();
+                settleAsGuest();
+                return;
+              }
               void recoverAuthentication().catch(() => {
-                if (!mounted) {
-                  return;
-                }
-                setState({ ...initialState, loading: false });
+                settleAsGuest();
               });
             });
         };
@@ -189,7 +198,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         if (!getKeycloakInitPromise()) {
           setKeycloakInitPromise(
             keycloak.init({
-              onLoad,
+              onLoad: publicPath ? "check-sso" : "login-required",
               pkceMethod: "S256",
               checkLoginIframe: false,
             }),
@@ -200,14 +209,15 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
         await syncState();
       } catch {
+        if (publicPath) {
+          settleAsGuest();
+          return;
+        }
         const recovered = await recoverAuthentication().catch(() => false);
         if (recovered) {
           return;
         }
-        if (!mounted) {
-          return;
-        }
-        setState({ ...initialState, loading: false });
+        settleAsGuest();
       }
     };
 

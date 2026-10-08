@@ -88,13 +88,13 @@ const routes: AppRoute[] = [
   },
   {
     path: "/albums/:id",
-    component: AlbumDetailPage,
-    isProtected: true,
-  },
-  {
-    path: "/public/albums/:id",
     component: PublicAlbumPage,
     isProtected: false,
+  },
+  {
+    path: "/albums/:id/manage",
+    component: AlbumDetailPage,
+    isProtected: true,
   },
   {
     path: "/cv-generator",

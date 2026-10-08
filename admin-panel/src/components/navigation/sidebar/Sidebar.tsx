@@ -29,10 +29,12 @@ interface SidebarProps {
   isDarkMode: boolean;
   isCollapsed: boolean;
   isAdmin: boolean;
+  isAuthenticated: boolean;
   authRealmUrl: string;
   onNavigate: (path: string) => void;
   onThemeToggle: () => void;
   onCollapseToggle: () => void;
+  onLogin: () => void;
   onProfile: () => void;
   onAccountAction: (action: AccountAction) => void;
   showCollapseControl?: boolean;
@@ -61,10 +63,12 @@ export function Sidebar({
   isDarkMode,
   isCollapsed,
   isAdmin,
+  isAuthenticated,
   authRealmUrl,
   onNavigate,
   onThemeToggle,
   onCollapseToggle,
+  onLogin,
   onProfile,
   onAccountAction,
   showCollapseControl = true,
@@ -183,6 +187,8 @@ export function Sidebar({
         <AccountMenu
           initials={initials}
           profileName={profileName}
+          isAuthenticated={isAuthenticated}
+          onLogin={onLogin}
           onProfile={onProfile}
           onAction={onAccountAction}
         />

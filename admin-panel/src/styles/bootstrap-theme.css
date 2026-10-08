@@ -832,6 +832,15 @@ body {
 .album-card .card-body {
   padding: 1rem 1.2rem 1.15rem;
 }
+.album-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.album-card-footer .btn {
+  flex: 0 0 auto;
+}
 .album-visibility-badge {
   display: inline-flex;
   align-items: center;
@@ -931,11 +940,42 @@ body {
 }
 .album-public-grid {
   display: grid;
+  grid-auto-flow: dense;
+  grid-auto-rows: 8rem;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+.album-collage-item {
+  min-width: 0;
+  grid-row: span 2;
+}
+.album-collage-item:nth-child(8n + 1) {
+  grid-column: span 2;
+  grid-row: span 4;
+}
+.album-collage-item:nth-child(8n + 4) {
+  grid-row: span 3;
+}
+.album-collage-item:nth-child(8n + 6) {
+  grid-column: span 2;
+  grid-row: span 3;
+}
+.public-album-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 1rem;
+  margin-bottom: 1rem;
+  color: var(--admin-muted);
+  font-size: 0.85rem;
+}
+.public-album-summary span:first-child {
+  color: var(--bs-body-color);
+  font-weight: 600;
 }
 .album-public-image {
   width: 100%;
+  height: 100%;
   min-height: 0;
   padding: 0;
   border: 0;
@@ -943,6 +983,7 @@ body {
 }
 .album-public-image-frame {
   position: relative;
+  height: 100%;
   overflow: hidden;
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius);
@@ -2440,6 +2481,29 @@ body {
   .album-detail-grid,
   .album-public-grid {
     gap: 0.85rem 0.6rem;
+  }
+  .album-public-grid {
+    grid-auto-rows: 6rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .album-collage-item,
+  .album-collage-item:nth-child(8n + 4),
+  .album-collage-item:nth-child(8n + 6) {
+    grid-column: span 1;
+    grid-row: span 2;
+  }
+  .album-collage-item:nth-child(6n + 1) {
+    grid-column: span 2;
+    grid-row: span 3;
+  }
+  .public-album-summary {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .album-card-footer {
+    align-items: flex-start;
+    flex-direction: column;
   }
   .image-tile figcaption {
     align-items: flex-start;

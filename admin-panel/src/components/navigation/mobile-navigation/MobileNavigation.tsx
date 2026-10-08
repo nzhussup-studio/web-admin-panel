@@ -10,10 +10,12 @@ interface MobileNavigationProps {
   isOpen: boolean;
   initials: string;
   profileName: string;
+  isAuthenticated: boolean;
   children: ReactNode;
   onOpen: () => void;
   onClose: () => void;
   onHome: () => void;
+  onLogin: () => void;
   onProfile: () => void;
   onAccountAction: (action: AccountAction) => void;
 }
@@ -22,10 +24,12 @@ export function MobileNavigation({
   isOpen,
   initials,
   profileName,
+  isAuthenticated,
   children,
   onOpen,
   onClose,
   onHome,
+  onLogin,
   onProfile,
   onAccountAction,
 }: MobileNavigationProps) {
@@ -44,6 +48,8 @@ export function MobileNavigation({
           drop="down"
           initials={initials}
           profileName={profileName}
+          isAuthenticated={isAuthenticated}
+          onLogin={onLogin}
           onProfile={onProfile}
           onAction={onAccountAction}
         />

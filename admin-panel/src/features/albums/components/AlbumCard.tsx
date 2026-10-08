@@ -2,9 +2,10 @@ import { useNavigate } from "react-router-dom";
 import Button from "@/components/ui/button";
 import Card from "react-bootstrap/Card";
 import Dropdown from "react-bootstrap/Dropdown";
-import { Ellipsis, Images } from "lucide-react";
+import { Copy, Ellipsis, Images } from "lucide-react";
 import { getAlbumImageUrl } from "../albumData";
 import { AlbumVisibilityBadge } from "./AlbumVisibilityBadge";
+import { useOptionalGlobalAlert } from "@/providers/alerts";
 
 interface AlbumCardData {
   id?: string | number;
@@ -24,10 +25,25 @@ interface AlbumCardProps {
 
 const AlbumCard = ({ album, onEdit, onDelete }: AlbumCardProps) => {
   const navigate = useNavigate();
+  const { triggerAlert } = useOptionalGlobalAlert();
+  const isShareable = album.type === "public" || album.type === "semi-public";
+
+  const copyPublicUrl = async () => {
+    if (!album.id) return;
+
+    try {
+      const publicUrl = new URL(`/albums/${album.id}`, window.location.origin);
+      await navigator.clipboard.writeText(publicUrl.toString());
+      triggerAlert("Public album URL copied", "success");
+    } catch {
+      triggerAlert("Failed to copy public album URL", "danger");
+    }
+  };
+
   return (
     <Card
       className="h-100 album-card"
-      onClick={() => navigate(`/albums/${album.id}`)}
+      onClick={() => navigate(`/albums/${album.id}/manage`)}
     >
       <div className="album-card-cover">
         {album.preview_image ? (
@@ -79,7 +95,22 @@ const AlbumCard = ({ album, onEdit, onDelete }: AlbumCardProps) => {
             </Dropdown.Menu>
           </Dropdown>
         </div>
-        <AlbumVisibilityBadge type={album.type} className="mt-3" />
+        <div className="album-card-footer mt-3">
+          <AlbumVisibilityBadge type={album.type} />
+          {isShareable ? (
+            <Button
+              type="button"
+              variant="outline-secondary"
+              size="sm"
+              onClick={(event) => {
+                event.stopPropagation();
+                void copyPublicUrl();
+              }}
+            >
+              <Copy size={15} /> Copy public URL
+            </Button>
+          ) : null}
+        </div>
       </Card.Body>
     </Card>
   );
