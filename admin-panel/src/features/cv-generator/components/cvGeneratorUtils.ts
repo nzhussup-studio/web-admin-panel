@@ -9,6 +9,8 @@ const IGNORED_ITEM_FIELDS = new Set([
   "createdAt",
   "updatedAt",
   "displayOrder",
+  "techStack",
+  "skillNames",
 ]);
 
 const LONG_TEXT_FIELDS = [
@@ -155,7 +157,12 @@ export const canOverrideDescription = (item: Record<string, unknown>) =>
 export const getMetadataEntries = (item: Record<string, unknown>) =>
   Object.entries(item)
     .filter(([key, value]) => {
-      if (IGNORED_ITEM_FIELDS.has(key) || LONG_TEXT_FIELDS.includes(key)) {
+      if (
+        IGNORED_ITEM_FIELDS.has(key) ||
+        LONG_TEXT_FIELDS.includes(key) ||
+        TITLE_FIELDS.includes(key) ||
+        SUBTITLE_FIELDS.includes(key)
+      ) {
         return false;
       }
 

@@ -131,17 +131,31 @@ const AlbumDetailPage = () => {
   }, [id, uploadProgress]);
 
   useEffect(() => {
-    if (!uploadProgress || uploadProgress.status === "processing") return;
+    if (
+      !uploadProgress ||
+      (uploadProgress.status !== "completed" &&
+        uploadProgress.status !== "failed")
+    ) {
+      return;
+    }
+
     if (uploadProgress.status === "completed") {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.albums.detail(id ?? "missing"),
       });
-    } else if (uploadProgress.status === "failed") {
+      triggerAlert("Images uploaded successfully", "success");
+    } else {
       triggerAlert(
         uploadProgress.error || "Upload processing failed",
         "danger",
       );
     }
+
+    const clearProgress = window.setTimeout(() => {
+      setUploadProgress(null);
+    }, 2000);
+
+    return () => window.clearTimeout(clearProgress);
   }, [id, queryClient, triggerAlert, uploadProgress]);
 
   const openPopup = (data?: AlbumImageFormData | null) => {

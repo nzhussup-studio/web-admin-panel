@@ -14,7 +14,12 @@ import {
 } from "lucide-react";
 import { PageHeader as Header } from "@/components/layout/page-header";
 import { useOverviewQueries } from "./api";
-import { MetricGrid, QuickActions, ServiceStatusList } from "./components";
+import {
+  InfrastructureLinks,
+  MetricGrid,
+  QuickActions,
+  ServiceStatusList,
+} from "./components";
 import { clearAccountCaches } from "@/features/account";
 import { useOptionalGlobalAlert } from "@/providers/alerts";
 
@@ -106,6 +111,7 @@ const OverviewPage = () => {
             />
           </Col>
         </Row>
+        <InfrastructureLinks />
       </Container>
     </>
   );

@@ -43,8 +43,7 @@ const GlobalAlert = ({
   return (
     <ToastContainer
       position="bottom-center"
-      className="p-3"
-      style={{ zIndex: 1090 }}
+      className="app-alert-container p-3"
       aria-live="polite"
     >
       <Toast

@@ -1,3 +1,4 @@
+import { useState, type KeyboardEvent } from "react";
 import Badge from "react-bootstrap/Badge";
 import Button from "@/components/ui/button";
 import Card from "react-bootstrap/Card";
@@ -6,7 +7,6 @@ import {
   Award,
   BriefcaseBusiness,
   ChevronDown,
-  ChevronUp,
   Folder,
   GraduationCap,
   Settings,
@@ -68,11 +68,7 @@ type Props = {
 };
 
 const entryClassName = (isChecked: boolean) =>
-  `position-relative rounded-4 border px-3 py-3 shadow-sm ${
-    isChecked
-      ? "bg-primary-subtle border-primary-subtle"
-      : "bg-body-tertiary border-secondary-subtle"
-  }`;
+  `cv-generator-entry${isChecked ? " is-selected" : ""}`;
 
 const PROJECTS_SECTION_NAME = "projects";
 const sectionIcons = {
@@ -105,38 +101,60 @@ const CvGeneratorSectionCard = ({
   const isTechStackSelectableSection =
     TECH_STACK_SELECTABLE_SECTION_NAMES.has(sectionName);
 
+  const handleEntryKeyDown = (
+    event: KeyboardEvent<HTMLDivElement>,
+    toggle: () => void,
+  ) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    toggle();
+  };
+
   return (
-    <Card className="cv-generator-section">
-      <Card.Header className="cv-generator-section-header">
+    <Card className={`cv-generator-section${open ? " is-open" : ""}`}>
+      <Card.Header
+        as="button"
+        type="button"
+        className="cv-generator-section-header"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+      >
         {(() => {
           const Icon =
             sectionIcons[sectionName as keyof typeof sectionIcons] ?? Folder;
-          return <Icon size={21} />;
+          return (
+            <span className="cv-generator-section-icon">
+              <Icon size={19} />
+            </span>
+          );
         })()}
-        <Card.Title className="text-capitalize">
-          {sectionName.replace(/_/g, " ")}
-        </Card.Title>
+        <span className="cv-generator-section-heading">
+          <Card.Title className="text-capitalize">
+            {sectionName.replace(/_/g, " ")}
+          </Card.Title>
+          <small>
+            {items.length} {items.length === 1 ? "entry" : "entries"}
+          </small>
+        </span>
         <Badge bg="primary-subtle" text="primary">
           {selectedItems.size} selected
         </Badge>
-        <Button
-          variant="link"
-          onClick={() => setOpen((value) => !value)}
-          aria-label={`Toggle ${sectionName}`}
-        >
-          {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-        </Button>
+        <ChevronDown className="cv-generator-chevron" size={18} />
       </Card.Header>
       {open ? (
-        <Card.Body className="p-4 app-card-body">
-          <div className="d-flex justify-content-end mb-3">
+        <Card.Body className="cv-generator-section-body app-card-body">
+          <div className="cv-generator-section-toolbar">
+            <span>
+              Choose the entries to include in the generated document.
+            </span>
             <Button
               onClick={onToggleAll}
               type="button"
               variant="outline-secondary"
               size="sm"
             >
-              {allSelected ? "Deselect All" : "Select All"}
+              {allSelected ? "Deselect all" : "Select all"}
             </Button>
           </div>
 
@@ -159,18 +177,30 @@ const CvGeneratorSectionCard = ({
 
                 return (
                   <div key={itemId} className="mb-2">
-                    <div className={entryClassName(isChecked)}>
+                    <div
+                      className={entryClassName(isChecked)}
+                      role="checkbox"
+                      aria-checked={isChecked}
+                      tabIndex={0}
+                      onClick={() =>
+                        onToggleSkillCategory(itemId, allSkillNames, isChecked)
+                      }
+                      onKeyDown={(event) =>
+                        handleEntryKeyDown(event, () =>
+                          onToggleSkillCategory(
+                            itemId,
+                            allSkillNames,
+                            isChecked,
+                          ),
+                        )
+                      }
+                    >
                       <div className="d-flex align-items-start justify-content-between gap-3">
                         <Form.Check
                           type="checkbox"
                           checked={isChecked}
-                          onChange={() =>
-                            onToggleSkillCategory(
-                              itemId,
-                              allSkillNames,
-                              isChecked,
-                            )
-                          }
+                          readOnly
+                          tabIndex={-1}
                           label={
                             <div>
                               <div className="fw-semibold">{categoryName}</div>
@@ -181,13 +211,10 @@ const CvGeneratorSectionCard = ({
                             </div>
                           }
                         />
-                        <Badge bg={isChecked ? "primary" : "secondary"} pill>
-                          {isChecked ? "Selected" : "Available"}
-                        </Badge>
                       </div>
 
                       {allSkillNames.length > 0 ? (
-                        <div className="d-flex flex-wrap gap-2 mt-3">
+                        <div className="cv-generator-pill-list">
                           {allSkillNames.map((skillName) => {
                             const skillChecked =
                               isChecked &&
@@ -201,14 +228,15 @@ const CvGeneratorSectionCard = ({
                                 variant={
                                   skillChecked ? "primary" : "outline-secondary"
                                 }
-                                className="rounded-pill"
-                                onClick={() =>
+                                className="cv-generator-pill"
+                                onClick={(event) => {
+                                  event.stopPropagation();
                                   onToggleSkillEntry(
                                     itemId,
                                     skillName,
                                     selectedSkillNames,
-                                  )
-                                }
+                                  );
+                                }}
                               >
                                 {skillName}
                               </Button>
@@ -245,19 +273,36 @@ const CvGeneratorSectionCard = ({
 
                 return (
                   <div key={itemId} className="mb-2">
-                    <div className={entryClassName(isChecked)}>
+                    <div
+                      className={entryClassName(isChecked)}
+                      role="checkbox"
+                      aria-checked={isChecked}
+                      tabIndex={0}
+                      onClick={() =>
+                        onToggleTechStackCategory(
+                          sectionName,
+                          itemId,
+                          allTechStackEntries,
+                          isChecked,
+                        )
+                      }
+                      onKeyDown={(event) =>
+                        handleEntryKeyDown(event, () =>
+                          onToggleTechStackCategory(
+                            sectionName,
+                            itemId,
+                            allTechStackEntries,
+                            isChecked,
+                          ),
+                        )
+                      }
+                    >
                       <div className="d-flex align-items-start justify-content-between gap-3">
                         <Form.Check
                           type="checkbox"
                           checked={isChecked}
-                          onChange={() =>
-                            onToggleTechStackCategory(
-                              sectionName,
-                              itemId,
-                              allTechStackEntries,
-                              isChecked,
-                            )
-                          }
+                          readOnly
+                          tabIndex={-1}
                           label={
                             <div>
                               <CvGeneratorItemLabel
@@ -278,7 +323,7 @@ const CvGeneratorSectionCard = ({
                       </div>
 
                       {allTechStackEntries.length > 0 ? (
-                        <div className="d-flex flex-wrap gap-2 mt-3">
+                        <div className="cv-generator-pill-list">
                           {allTechStackEntries.map((techStackEntry) => {
                             const techEntryChecked =
                               isChecked &&
@@ -294,15 +339,16 @@ const CvGeneratorSectionCard = ({
                                     ? "primary"
                                     : "outline-secondary"
                                 }
-                                className="rounded-pill"
-                                onClick={() =>
+                                className="cv-generator-pill"
+                                onClick={(event) => {
+                                  event.stopPropagation();
                                   onToggleTechStackEntry(
                                     sectionName,
                                     itemId,
                                     techStackEntry,
                                     activeTechStackEntries,
-                                  )
-                                }
+                                  );
+                                }}
                               >
                                 {techStackEntry}
                               </Button>
@@ -356,11 +402,23 @@ const CvGeneratorSectionCard = ({
 
               return (
                 <div key={itemId} className="mb-2">
-                  <div className={entryClassName(isChecked)}>
+                  <div
+                    className={entryClassName(isChecked)}
+                    role="checkbox"
+                    aria-checked={isChecked}
+                    tabIndex={0}
+                    onClick={() => onToggleItem(sectionName, itemId)}
+                    onKeyDown={(event) =>
+                      handleEntryKeyDown(event, () =>
+                        onToggleItem(sectionName, itemId),
+                      )
+                    }
+                  >
                     <Form.Check
                       type="checkbox"
                       checked={isChecked}
-                      onChange={() => onToggleItem(sectionName, itemId)}
+                      readOnly
+                      tabIndex={-1}
                       label={
                         <CvGeneratorItemLabel
                           sectionName={sectionName}
@@ -414,4 +472,3 @@ const CvGeneratorSectionCard = ({
 };
 
 export default CvGeneratorSectionCard;
-import { useState } from "react";

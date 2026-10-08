@@ -21,11 +21,12 @@ const CvGeneratorItemLabel = ({ sectionName, item, isChecked }: Props) => {
 
   return (
     <div className="d-block w-100">
-      <div className="d-flex flex-column gap-2 w-100 pe-5">
+      <div className="cv-generator-item-content">
         <Badge
-          bg={isChecked ? "primary" : "secondary"}
+          bg={isChecked ? "primary-subtle" : "secondary-subtle"}
+          text={isChecked ? "primary" : "secondary-emphasis"}
           pill
-          className="position-absolute top-0 end-0 mt-2 me-3"
+          className="cv-generator-status-pill"
         >
           {isChecked ? "Selected" : "Available"}
         </Badge>
@@ -40,12 +41,13 @@ const CvGeneratorItemLabel = ({ sectionName, item, isChecked }: Props) => {
         </div>
 
         {metadata.length > 0 ? (
-          <div className="d-flex flex-wrap gap-2">
+          <div className="cv-generator-metadata">
             {metadata.map((entry) => (
               <Badge
                 key={entry.label}
-                bg="secondary"
-                className="fw-normal px-2 py-1 text-wrap"
+                bg="secondary-subtle"
+                text="secondary-emphasis"
+                className="cv-generator-metadata-pill"
               >
                 <span className="opacity-75">{entry.label}:</span> {entry.value}
               </Badge>
