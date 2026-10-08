@@ -25,11 +25,7 @@ const PublicAlbumPage = () => {
 
   return (
     <>
-      <Header
-        text={album ? "Album " + album.title : "Album"}
-        showClearCacheButton={false}
-        allowUnauthenticatedLogin
-      />
+      <Header text={album ? "Album " + album.title : "Album"} />
       <Container className="my-5">
         {album?.desc ? (
           <div

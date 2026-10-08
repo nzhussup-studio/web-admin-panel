@@ -1,4 +1,5 @@
 import React from "react";
+import { queryKeys } from "@/api";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
@@ -13,7 +14,7 @@ import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import MarkdownContent from "@/components/shared/MarkdownContent";
 import MarkdownField from "@/components/shared/MarkdownField";
 
-const formatDateForInput = (dateString) => {
+const formatDateForInput = (dateString?: string) => {
   if (!dateString) return "";
   const date = new Date(dateString);
   return date.toISOString().split("T")[0];
@@ -37,6 +38,7 @@ const EducationPage = () => {
     closeDeleteModal,
     handleDelete,
   } = useCrudPage<base_service_Education, base_service_Education, number>({
+    queryKey: queryKeys.cv.education,
     loadItems: () => EducationControllerService.listEducation(),
     createItem: (payload) =>
       EducationControllerService.createEducation(payload),
@@ -160,7 +162,10 @@ const EducationPage = () => {
                   <div>{edu.institution}</div>
                   <div>{edu.location}</div>
                   <div>
-                    {new Date(edu.startDate).toLocaleDateString()} -{" "}
+                    {edu.startDate
+                      ? new Date(edu.startDate).toLocaleDateString()
+                      : "Unknown"}{" "}
+                    -{" "}
                     {edu.endDate
                       ? new Date(edu.endDate).toLocaleDateString()
                       : "Present"}

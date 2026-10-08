@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/Stack";
 import Header from "@/components/layout/Header";
 import PageState from "@/components/pages/PageState";
-import { BackCircleIcon, FunnelIcon } from "@/assets/icons";
+import { ArrowDownAZ, Plus } from "lucide-react";
+import { CvSectionNav } from "@/components/navigation/cv-section-nav";
 
 interface CrudPageLayoutProps {
   title: string;
@@ -37,27 +37,27 @@ const CrudPageLayout = ({
   topContent,
   afterHeader,
 }: CrudPageLayoutProps) => {
-  const navigate = useNavigate();
-
   return (
     <>
-      <Header text={title} />
+      <Header
+        text={title}
+        description={`Manage ${title.toLowerCase()} records.`}
+      />
+      {["Work Experience", "Education", "Skills", "Certifications"].includes(
+        title,
+      ) ? (
+        <Container fluid="xl">
+          <CvSectionNav />
+        </Container>
+      ) : null}
       {afterHeader}
-      <Container className="my-5">
+      <Container fluid="xl" className="page-content">
         <Stack
           direction="horizontal"
           gap={3}
           className="align-items-center justify-content-between flex-wrap mb-4"
         >
-          <Button
-            variant="outline-secondary"
-            className="d-inline-flex align-items-center gap-2"
-            onClick={() => navigate(-1)}
-          >
-            <BackCircleIcon width={16} height={16} />
-            Back
-          </Button>
-          <div className="d-flex align-items-center gap-2 flex-wrap ms-auto">
+          <div className="d-flex align-items-center gap-2 flex-wrap ms-auto w-100 justify-content-end crud-toolbar">
             {topContent}
             <ButtonGroup>
               <Button
@@ -65,12 +65,16 @@ const CrudPageLayout = ({
                 className="d-inline-flex align-items-center gap-2"
                 onClick={toggleSort}
               >
-                <FunnelIcon width={16} height={16} />
+                <ArrowDownAZ size={16} />
                 Sort
               </Button>
               {showAddButton && onAdd ? (
-                <Button variant="primary" onClick={onAdd}>
-                  Add New
+                <Button
+                  variant="primary"
+                  onClick={onAdd}
+                  className="d-inline-flex align-items-center gap-2"
+                >
+                  <Plus size={16} /> Add new
                 </Button>
               ) : null}
             </ButtonGroup>

@@ -1,10 +1,9 @@
 import React from "react";
-import { AnimatePresence } from "framer-motion";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import routes from "@/router/routes";
 import RequireAuth from "@/router/RequireAuth";
 import GlobalAlert from "@/components/layout/GlobalAlert";
-import PageTransition from "@/motion/PageTransition";
+import { AdminShell } from "@/components/layout/admin-shell";
 
 function App() {
   return (
@@ -16,44 +15,32 @@ function App() {
 }
 
 function MainApp() {
-  const location = useLocation();
-
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        {routes.map((route) => {
-          const Component = route.component;
+    <Routes>
+      {routes.map((route) => {
+        const Component = route.component;
 
-          if (route.isProtected) {
-            return (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={
-                  <RequireAuth>
-                    <PageTransition>
-                      <Component />
-                    </PageTransition>
-                  </RequireAuth>
-                }
-              />
-            );
-          }
-
+        if (route.isProtected) {
           return (
             <Route
               key={route.path}
               path={route.path}
               element={
-                <PageTransition>
-                  <Component />
-                </PageTransition>
+                <RequireAuth>
+                  <AdminShell>
+                    <Component />
+                  </AdminShell>
+                </RequireAuth>
               }
             />
           );
-        })}
-      </Routes>
-    </AnimatePresence>
+        }
+
+        return (
+          <Route key={route.path} path={route.path} element={<Component />} />
+        );
+      })}
+    </Routes>
   );
 }
 

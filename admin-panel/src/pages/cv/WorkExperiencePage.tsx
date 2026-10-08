@@ -1,4 +1,5 @@
 import React from "react";
+import { queryKeys } from "@/api";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -36,6 +37,7 @@ const WorkExperiencePage = () => {
     base_service_WorkExperience,
     number
   >({
+    queryKey: queryKeys.cv.workExperience,
     loadItems: () => WorkExperienceControllerService.listWorkExperience(),
     createItem: (payload) =>
       WorkExperienceControllerService.createWorkExperience(payload),

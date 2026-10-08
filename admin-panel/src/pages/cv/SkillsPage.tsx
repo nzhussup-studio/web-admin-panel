@@ -1,4 +1,5 @@
 import React from "react";
+import { queryKeys } from "@/api";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -30,6 +31,7 @@ const SkillsPage = () => {
     closeDeleteModal,
     handleDelete,
   } = useCrudPage<base_service_Skill, base_service_Skill, number>({
+    queryKey: queryKeys.cv.skills,
     loadItems: () => SkillControllerService.listSkill(),
     createItem: (payload) => SkillControllerService.createSkill(payload),
     updateItem: (payload) => SkillControllerService.updateSkill(payload),
@@ -106,11 +108,14 @@ const SkillsPage = () => {
                   {skill.category}
                 </Card.Title>
                 <div className="d-flex flex-wrap gap-2 mb-3">
-                  {skill.skillNames.split(", ").map((skillName, index) => (
-                    <Badge key={index} bg="primary-subtle" text="primary">
-                      {skillName}
-                    </Badge>
-                  ))}
+                  {(skill.skillNames ?? "")
+                    .split(", ")
+                    .filter(Boolean)
+                    .map((skillName, index) => (
+                      <Badge key={index} bg="primary-subtle" text="primary">
+                        {skillName}
+                      </Badge>
+                    ))}
                 </div>
                 <div className="text-secondary">
                   Order: {skill.displayOrder}

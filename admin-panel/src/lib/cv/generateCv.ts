@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import html2pdf from "html2pdf.js";
 import CVTemplate from "@/components/cv/CvTemplate";
+import type { CvData } from "@/components/cv/CvTemplate";
 import {
   buildPreviewWindowHtml,
   buildPrintWindowHtml,
@@ -9,7 +10,7 @@ import {
 const POPUP_BLOCKED_MESSAGE =
   "Preview window was blocked. Please allow pop-ups for this site.";
 
-function renderCvMarkup(data: unknown): string {
+function renderCvMarkup(data: CvData): string {
   return renderToStaticMarkup(CVTemplate({ data }));
 }
 
@@ -80,7 +81,7 @@ function downloadPdfWithCanvasFallback(cvMarkup: string) {
     });
 }
 
-export function previewCV(data: unknown) {
+export function previewCV(data: CvData) {
   const cvMarkup = renderCvMarkup(data);
   const popup = openWindowWithHtml(buildPreviewWindowHtml(cvMarkup));
   if (!popup) {
@@ -88,7 +89,7 @@ export function previewCV(data: unknown) {
   }
 }
 
-export function generateCV(data: unknown, output = "pdf") {
+export function generateCV(data: CvData, output = "pdf") {
   const cvMarkup = renderCvMarkup(data);
 
   if (output === "pdf") {

@@ -1,258 +1,227 @@
-import { useCallback, useEffect, useState, type FormEvent } from "react";
-import Header from "@/components/layout/Header";
+import { useEffect, useState, type FormEvent } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Alert from "react-bootstrap/Alert";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import Stack from "react-bootstrap/Stack";
-import Alert from "react-bootstrap/Alert";
-import { useNavigate } from "react-router-dom";
+import Nav from "react-bootstrap/Nav";
+import Row from "react-bootstrap/Row";
+import { Save, Sparkles } from "lucide-react";
+import { queryKeys } from "@/api";
+import Header from "@/components/layout/Header";
 import {
   ConfigurationService,
   SummarizerService,
   type llm_service_dto_ConfigurationRequest,
 } from "@/lib/api/client";
-import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
 import { getApiErrorMessage } from "@/lib/api/errors";
-import { BackCircleIcon } from "@/assets/icons";
+import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
+
+type PromptLanguage = "en" | "de" | "kk";
+
+const languageLabels: Record<PromptLanguage, string> = {
+  en: "English",
+  de: "German",
+  kk: "Kazakh",
+};
 
 const LlmConfigPage = () => {
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { triggerAlert } = useOptionalGlobalAlert();
-  const [modelName, setModelName] = useState("");
-  const [systemPromptEN, setSystemPromptEN] = useState("");
-  const [systemPromptDE, setSystemPromptDE] = useState("");
-  const [systemPromptKK, setSystemPromptKK] = useState("");
-  const [enableBackgroundGen, setEnableBackgroundGen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [summaryErrorMessage, setSummaryErrorMessage] = useState("");
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
-  const [generatedSummary, setGeneratedSummary] = useState("");
+  const [form, setForm] = useState<llm_service_dto_ConfigurationRequest>({
+    model: "",
+  });
+  const [activePrompt, setActivePrompt] = useState<PromptLanguage>("en");
+  const [summaryLanguage, setSummaryLanguage] = useState("en");
+  const [summary, setSummary] = useState("");
 
-  const loadConfiguration = useCallback(async () => {
-    setIsLoading(true);
-    setErrorMessage("");
-    try {
-      const config = await ConfigurationService.getV1LlmConfiguration();
-      setModelName(config.model || "");
-      setSystemPromptEN(config.system_prompt_en || "");
-      setSystemPromptDE(config.system_prompt_de || "");
-      setSystemPromptKK(config.system_prompt_kk || "");
-      setEnableBackgroundGen(Boolean(config.enable_parallel_generation));
-    } catch (error) {
-      const message = getApiErrorMessage(
-        error,
-        "Failed to load LLM configuration",
-      );
-      setErrorMessage(message);
-      triggerAlert(message, "danger");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [triggerAlert]);
+  const configuration = useQuery({
+    queryKey: queryKeys.llm.configuration,
+    queryFn: () => ConfigurationService.getV1LlmConfiguration(),
+  });
 
   useEffect(() => {
-    void loadConfiguration();
-  }, [loadConfiguration]);
+    if (!configuration.data) return;
+    setForm({
+      model: configuration.data.model ?? "",
+      system_prompt_en: configuration.data.system_prompt_en ?? "",
+      system_prompt_de: configuration.data.system_prompt_de ?? "",
+      system_prompt_kk: configuration.data.system_prompt_kk ?? "",
+      enable_parallel_generation: Boolean(
+        configuration.data.enable_parallel_generation,
+      ),
+    });
+  }, [configuration.data]);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const saveConfiguration = useMutation({
+    mutationFn: (payload: llm_service_dto_ConfigurationRequest) =>
+      ConfigurationService.putV1LlmConfiguration(payload),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.llm.configuration,
+      });
+      triggerAlert("Configuration saved", "success");
+    },
+    onError: (error) =>
+      triggerAlert(
+        getApiErrorMessage(error, "Failed to save configuration"),
+        "danger",
+      ),
+  });
 
-    if (!modelName.trim()) {
-      const message = "Model name is required.";
-      setErrorMessage(message);
-      triggerAlert(message, "warning");
-      return;
-    }
+  const generateSummary = useMutation({
+    mutationFn: (language: string) =>
+      SummarizerService.getV1LlmSummarize(language),
+    onSuccess: (response) => setSummary(response.message ?? ""),
+    onError: (error) =>
+      triggerAlert(
+        getApiErrorMessage(error, "Failed to generate summary"),
+        "danger",
+      ),
+  });
 
-    setIsSaving(true);
-    setErrorMessage("");
-
-    const payload: llm_service_dto_ConfigurationRequest = {
-      model: modelName.trim(),
-      system_prompt_en: systemPromptEN,
-      system_prompt_de: systemPromptDE,
-      system_prompt_kk: systemPromptKK,
-      enable_parallel_generation: enableBackgroundGen,
-    };
-
-    try {
-      const updated = await ConfigurationService.putV1LlmConfiguration(payload);
-      setModelName(updated.model || "");
-      setSystemPromptEN(updated.system_prompt_en || "");
-      setSystemPromptDE(updated.system_prompt_de || "");
-      setSystemPromptKK(updated.system_prompt_kk || "");
-      setEnableBackgroundGen(Boolean(updated.enable_parallel_generation));
-      triggerAlert("LLM configuration saved.", "success");
-    } catch (error) {
-      const message = getApiErrorMessage(
-        error,
-        "Failed to save LLM configuration",
-      );
-      setErrorMessage(message);
-      triggerAlert(message, "danger");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleGenerateSummary = async () => {
-    setIsGenerating(true);
-    setSummaryErrorMessage("");
-
-    try {
-      const response =
-        await SummarizerService.getV1LlmSummarize(selectedLanguage);
-      setGeneratedSummary(response.message || "");
-      triggerAlert("Summary generated.", "success");
-    } catch (error) {
-      const message = getApiErrorMessage(error, "Failed to generate summary");
-      setSummaryErrorMessage(message);
-      triggerAlert(message, "danger");
-    } finally {
-      setIsGenerating(false);
-    }
+  const promptKey = `system_prompt_${activePrompt}` as const;
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    saveConfiguration.mutate(form);
   };
 
   return (
     <>
-      <Header text={"LLM Configuration"} />
-
-      <Container className="my-5">
-        <Button
-          variant="outline-secondary"
-          className="d-inline-flex align-items-center gap-2 mb-4"
-          onClick={() => navigate(-1)}
-        >
-          <BackCircleIcon width={16} height={16} />
-          Back
-        </Button>
-        <Form className="p-4 rounded shadow-sm border" onSubmit={handleSubmit}>
-          <Stack gap={3}>
-            {isLoading && (
-              <Alert variant="info">Loading configuration...</Alert>
+      <Header
+        eyebrow="Settings / LLM configuration"
+        text="LLM configuration"
+        description="Configure the model and professional-summary generation."
+        actions={
+          <Button
+            onClick={() => saveConfiguration.mutate(form)}
+            disabled={saveConfiguration.isPending || configuration.isPending}
+          >
+            <Save size={17} />{" "}
+            {saveConfiguration.isPending ? "Saving…" : "Save changes"}
+          </Button>
+        }
+      />
+      <Container fluid="xl" className="page-content">
+        {configuration.isError ? (
+          <Alert variant="danger">
+            {getApiErrorMessage(
+              configuration.error,
+              "Failed to load configuration",
             )}
-            {errorMessage ? (
-              <Alert variant="danger">{errorMessage}</Alert>
-            ) : null}
-
-            <Form.Group controlId="modelName">
-              <Form.Label>Model Name</Form.Label>
-              <Form.Control
-                type="text"
-                value={modelName}
-                onChange={(e) => setModelName(e.target.value)}
-                placeholder="Enter model name"
-                disabled={isLoading || isSaving}
-              />
-            </Form.Group>
-
-            <Form.Group controlId="systemPromptEN">
-              <Form.Label>System Prompt (EN)</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={4}
-                value={systemPromptEN}
-                onChange={(e) => setSystemPromptEN(e.target.value)}
-                disabled={isLoading || isSaving}
-              />
-            </Form.Group>
-
-            <Form.Group controlId="systemPromptDE">
-              <Form.Label>System Prompt (DE)</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={4}
-                value={systemPromptDE}
-                onChange={(e) => setSystemPromptDE(e.target.value)}
-                disabled={isLoading || isSaving}
-              />
-            </Form.Group>
-
-            <Form.Group controlId="systemPromptKK">
-              <Form.Label>System Prompt (KK)</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={4}
-                value={systemPromptKK}
-                onChange={(e) => setSystemPromptKK(e.target.value)}
-                disabled={isLoading || isSaving}
-              />
-            </Form.Group>
-
-            <Form.Check
-              id="enableBackgroundGen"
-              type="checkbox"
-              label="Enable Background Generation"
-              checked={enableBackgroundGen}
-              onChange={(e) => setEnableBackgroundGen(e.target.checked)}
-              disabled={isLoading || isSaving}
-            />
-
-            <div className="d-flex gap-2">
-              <Button type="submit" disabled={isLoading || isSaving}>
-                {isSaving ? "Saving..." : "Save Configuration"}
-              </Button>
-              <Button
-                type="button"
-                variant="outline-secondary"
-                disabled={isLoading || isSaving}
-                onClick={() => void loadConfiguration()}
-              >
-                Reload
-              </Button>
-            </div>
-          </Stack>
-        </Form>
-
-        <div className="p-4 rounded shadow-sm border mt-4">
-          <Stack gap={3}>
-            <h5 className="mb-0">Generate Summary</h5>
-
-            {summaryErrorMessage ? (
-              <Alert variant="danger" className="mb-0">
-                {summaryErrorMessage}
-              </Alert>
-            ) : null}
-
-            <Form.Group controlId="summaryLanguage">
-              <Form.Label>Language</Form.Label>
-              <Form.Select
-                value={selectedLanguage}
-                onChange={(e) => setSelectedLanguage(e.target.value)}
-                disabled={isGenerating}
-              >
-                <option value="en">English (en)</option>
-                <option value="kk">Kazakh (kk)</option>
-                <option value="de">German (de)</option>
-              </Form.Select>
-            </Form.Group>
-
-            <div className="d-flex gap-2">
-              <Button
-                type="button"
-                onClick={() => void handleGenerateSummary()}
-                disabled={isGenerating}
-              >
-                {isGenerating ? "Generating..." : "Generate Summary"}
-              </Button>
-            </div>
-
-            {generatedSummary ? (
-              <Form.Group controlId="generatedSummary">
-                <Form.Label>Generated Summary</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={8}
-                  value={generatedSummary}
-                  readOnly
-                />
-              </Form.Group>
-            ) : null}
-          </Stack>
-        </div>
+          </Alert>
+        ) : null}
+        <Row className="g-4">
+          <Col xl={7}>
+            <Card>
+              <Card.Header>
+                <h2>Model settings</h2>
+              </Card.Header>
+              <Card.Body className="p-4">
+                <Form onSubmit={submit}>
+                  <Form.Group className="mb-4" controlId="modelName">
+                    <Form.Label>Model name</Form.Label>
+                    <Form.Control
+                      value={form.model ?? ""}
+                      onChange={(event) =>
+                        setForm({ ...form, model: event.target.value })
+                      }
+                      disabled={configuration.isPending}
+                    />
+                  </Form.Group>
+                  <Form.Check
+                    className="mb-4"
+                    type="switch"
+                    id="parallel-generation"
+                    label="Enable parallel generation"
+                    checked={Boolean(form.enable_parallel_generation)}
+                    onChange={(event) =>
+                      setForm({
+                        ...form,
+                        enable_parallel_generation: event.target.checked,
+                      })
+                    }
+                  />
+                  <Nav
+                    variant="tabs"
+                    activeKey={activePrompt}
+                    onSelect={(key) =>
+                      setActivePrompt((key ?? "en") as PromptLanguage)
+                    }
+                  >
+                    {(Object.keys(languageLabels) as PromptLanguage[]).map(
+                      (language) => (
+                        <Nav.Item key={language}>
+                          <Nav.Link eventKey={language}>
+                            {languageLabels[language]}
+                          </Nav.Link>
+                        </Nav.Item>
+                      ),
+                    )}
+                  </Nav>
+                  <Form.Group className="mt-3" controlId="systemPrompt">
+                    <Form.Label>
+                      System prompt ({languageLabels[activePrompt]})
+                    </Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={10}
+                      value={form[promptKey] ?? ""}
+                      onChange={(event) =>
+                        setForm({ ...form, [promptKey]: event.target.value })
+                      }
+                    />
+                  </Form.Group>
+                </Form>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col xl={5}>
+            <Card>
+              <Card.Header>
+                <h2>Test summary</h2>
+              </Card.Header>
+              <Card.Body className="p-4">
+                <Form.Group className="mb-3" controlId="summaryLanguage">
+                  <Form.Label>Language</Form.Label>
+                  <Form.Select
+                    value={summaryLanguage}
+                    onChange={(event) => setSummaryLanguage(event.target.value)}
+                  >
+                    {Object.entries(languageLabels).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+                <Button
+                  variant="outline-primary"
+                  className="w-100 mb-4"
+                  onClick={() => generateSummary.mutate(summaryLanguage)}
+                  disabled={generateSummary.isPending}
+                >
+                  <Sparkles size={17} />{" "}
+                  {generateSummary.isPending
+                    ? "Generating…"
+                    : "Generate summary"}
+                </Button>
+                <Form.Group controlId="generatedSummary">
+                  <Form.Label>Generated summary</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={12}
+                    value={summary}
+                    readOnly
+                    placeholder="Your generated summary will appear here."
+                  />
+                </Form.Group>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
       </Container>
     </>
   );

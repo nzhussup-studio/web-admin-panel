@@ -1,17 +1,11 @@
-import { useNavigate, useParams } from "react-router-dom";
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-  type ChangeEvent,
-} from "react";
+import { useParams } from "react-router-dom";
+import React, { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Button from "react-bootstrap/Button";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import ProgressBar from "react-bootstrap/ProgressBar";
-import Stack from "react-bootstrap/Stack";
 import Header from "@/components/layout/Header";
 import PageState from "@/components/pages/PageState";
 import {
@@ -26,7 +20,8 @@ import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import FramedImageCard from "@/components/albums/FramedImageCard";
 import config from "@/config/app-config";
 import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
-import { BackCircleIcon, FunnelIcon } from "@/assets/icons";
+import { FunnelIcon } from "@/assets/icons";
+import { queryKeys } from "@/api";
 
 type ImagePreview = { file: Blob; preview: string };
 type UploadProgress = {
@@ -42,14 +37,11 @@ type AlbumImageFormData = Partial<
 
 const AlbumPage = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { triggerAlert } = useOptionalGlobalAlert();
-  const [album, setAlbum] = useState<image_service_model_Album | null>(null);
   const [isAscending, setIsAscending] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-  const [showLoading, setShowLoading] = useState(false);
-  const [error, setError] = useState<unknown>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(
@@ -57,36 +49,23 @@ const AlbumPage = () => {
   );
   const [formData, setFormData] = useState<AlbumImageFormData>({});
 
-  const fetchItem = useCallback(async () => {
-    if (!id) return;
-    setShowLoading(true);
-    setError(null);
-    try {
-      const response = await AlbumService.getV1Album1(id);
-      const fetchedAlbum = response.data || null;
-      if (fetchedAlbum?.images) {
-        fetchedAlbum.images = [...fetchedAlbum.images].sort((a, b) =>
-          isAscending
-            ? String(a.id || "").localeCompare(String(b.id || ""))
-            : String(b.id || "").localeCompare(String(a.id || "")),
-        );
-      }
-      setAlbum(fetchedAlbum);
-    } catch (fetchError) {
-      const normalizedError = normalizeApiError(fetchError);
-      setError(normalizedError);
-      triggerAlert(
-        getApiErrorMessage(fetchError, "Failed to load album"),
-        "danger",
-      );
-    } finally {
-      setShowLoading(false);
-    }
-  }, [id, isAscending, triggerAlert]);
-
-  useEffect(() => {
-    fetchItem();
-  }, [fetchItem]);
+  const albumQuery = useQuery({
+    queryKey: queryKeys.albums.detail(id ?? "missing"),
+    queryFn: async () =>
+      (await AlbumService.getV1Album1(id as string)).data ?? null,
+    enabled: Boolean(id),
+  });
+  const album = useMemo(() => {
+    if (!albumQuery.data) return null;
+    return {
+      ...albumQuery.data,
+      images: [...(albumQuery.data.images ?? [])].sort((a, b) =>
+        isAscending
+          ? String(a.id ?? "").localeCompare(String(b.id ?? ""))
+          : String(b.id ?? "").localeCompare(String(a.id ?? "")),
+      ),
+    } as image_service_model_Album;
+  }, [albumQuery.data, isAscending]);
 
   useEffect(() => {
     if (!id || !uploadProgress) return;
@@ -142,14 +121,16 @@ const AlbumPage = () => {
   useEffect(() => {
     if (!uploadProgress || uploadProgress.status === "processing") return;
     if (uploadProgress.status === "completed") {
-      fetchItem();
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.albums.detail(id ?? "missing"),
+      });
     } else if (uploadProgress.status === "failed") {
       triggerAlert(
         uploadProgress.error || "Upload processing failed",
         "danger",
       );
     }
-  }, [fetchItem, triggerAlert, uploadProgress]);
+  }, [id, queryClient, triggerAlert, uploadProgress]);
 
   const openPopup = (data?: AlbumImageFormData | null) => {
     setIsEditMode(Boolean(data));
@@ -209,7 +190,9 @@ const AlbumPage = () => {
         closePopup();
         return;
       }
-      await fetchItem();
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.albums.detail(id),
+      });
       closePopup();
     } catch (saveError) {
       triggerAlert(
@@ -308,7 +291,9 @@ const AlbumPage = () => {
             "danger",
           );
         } finally {
-          await fetchItem();
+          await queryClient.invalidateQueries({
+            queryKey: queryKeys.albums.detail(id ?? "missing"),
+          });
         }
       }}
     >
@@ -346,10 +331,10 @@ const AlbumPage = () => {
       await ImageService.deleteV1Album(id, selectedItemId);
       setDeleteModalOpen(false);
       setSelectedItemId(null);
-      await fetchItem();
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.albums.detail(id),
+      });
     } catch (deleteError) {
-      const normalizedError = normalizeApiError(deleteError);
-      setError(normalizedError);
       triggerAlert(
         getApiErrorMessage(deleteError, "Failed to delete image"),
         "danger",
@@ -414,9 +399,31 @@ const AlbumPage = () => {
 
   return (
     <>
-      <Header text={album ? "Album " + album.title : "Album"} />
+      <Header
+        eyebrow="Albums / Detail"
+        text={album?.title ?? "Album"}
+        description={album?.desc}
+        actions={
+          <div className="d-flex gap-2 flex-wrap">
+            {album && ["public", "semi-public"].includes(album.type) ? (
+              <Button
+                variant="outline-secondary"
+                onClick={handleCopyPublicLink}
+              >
+                Copy public link
+              </Button>
+            ) : null}
+            <Button variant="outline-secondary" onClick={toggleSort}>
+              <FunnelIcon width={16} height={16} /> Sort
+            </Button>
+            {!albumQuery.error && !showPopup ? (
+              <Button onClick={() => openPopup()}>Upload images</Button>
+            ) : null}
+          </div>
+        }
+      />
 
-      <Container className="my-5">
+      <Container fluid="xl" className="page-content">
         {uploadProgress ? (
           <div className="mb-4" role="status" aria-live="polite">
             <div className="d-flex justify-content-between mb-2">
@@ -444,44 +451,10 @@ const AlbumPage = () => {
             />
           </div>
         ) : null}
-        <Stack
-          direction="horizontal"
-          gap={3}
-          className="align-items-center justify-content-between flex-wrap mb-4"
-        >
-          <Button
-            variant="outline-secondary"
-            className="d-inline-flex align-items-center gap-2"
-            onClick={() => navigate(-1)}
-          >
-            <BackCircleIcon width={16} height={16} />
-            Back
-          </Button>
-          <ButtonGroup className="ms-auto">
-            {album && ["public", "semi-public"].includes(album.type) ? (
-              <Button variant="outline-success" onClick={handleCopyPublicLink}>
-                Copy Public Link
-              </Button>
-            ) : null}
-            <Button
-              variant="outline-primary"
-              className="d-inline-flex align-items-center gap-2"
-              onClick={toggleSort}
-            >
-              <FunnelIcon width={16} height={16} />
-              Sort
-            </Button>
-            {!error && !showPopup ? (
-              <Button variant="primary" onClick={() => openPopup()}>
-                Add Image
-              </Button>
-            ) : null}
-          </ButtonGroup>
-        </Stack>
         <PageState
           isEmpty={(album?.images || []).length === 0}
-          loading={showLoading}
-          error={error}
+          loading={albumQuery.isPending}
+          error={albumQuery.error ? normalizeApiError(albumQuery.error) : null}
         >
           {albumImagesSection}
         </PageState>

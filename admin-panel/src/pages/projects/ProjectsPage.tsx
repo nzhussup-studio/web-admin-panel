@@ -1,8 +1,11 @@
 import React from "react";
+import { queryKeys } from "@/api";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
+import Dropdown from "react-bootstrap/Dropdown";
 import Form from "react-bootstrap/Form";
+import Table from "react-bootstrap/Table";
+import { Ellipsis, ExternalLink } from "lucide-react";
 import CrudPageLayout from "@/components/pages/CrudPageLayout";
 import {
   ProjectControllerService,
@@ -30,6 +33,7 @@ const ProjectsPage = () => {
     closeDeleteModal,
     handleDelete,
   } = useCrudPage<base_service_Project, base_service_Project, number>({
+    queryKey: queryKeys.projects,
     loadItems: () => ProjectControllerService.listProject(),
     createItem: (payload) => ProjectControllerService.createProject(payload),
     updateItem: (payload) => ProjectControllerService.updateProject(payload),
@@ -100,67 +104,80 @@ const ProjectsPage = () => {
   );
 
   const projectPage = (
-    <div className="d-grid gap-3">
-      {projects.map((project) => (
-        <Card
-          key={project.id}
-          className="rounded-4 app-interactive-card app-resource-card"
-          onClick={() => openPopup(project)}
-        >
-          <Card.Body className="p-4 app-card-body">
-            <div className="d-flex justify-content-between align-items-start gap-3">
-              <div>
-                <Card.Title className="fw-semibold mb-3 app-card-title">
-                  {project.name}
-                </Card.Title>
-                <div className="d-flex flex-wrap gap-2 mb-3">
-                  {project.techStack &&
-                    project.techStack.split(",").map((tech, index) => (
-                      <Badge key={index} bg="primary-subtle" text="primary">
-                        {tech.trim()}
-                      </Badge>
-                    ))}
+    <div className="data-table-shell">
+      <Table responsive hover className="align-middle mb-0 admin-data-table">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th>Stack</th>
+            <th>Order</th>
+            <th className="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {projects.map((project) => (
+            <tr key={project.id} onClick={() => openPopup(project)}>
+              <td data-label="Project">
+                <div className="fw-semibold text-primary">{project.name}</div>
+                {project.url ? (
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(event) => event.stopPropagation()}
+                    className="small text-secondary"
+                  >
+                    Open project <ExternalLink size={13} />
+                  </a>
+                ) : null}
+              </td>
+              <td data-label="Stack">
+                <div className="d-flex flex-wrap gap-2">
+                  {project.techStack?.split(",").map((tech) => (
+                    <Badge key={tech} bg="primary-subtle" text="primary">
+                      {tech.trim()}
+                    </Badge>
+                  ))}
                 </div>
-              </div>
-              <div className="app-card-actions">
-                <Button
-                  variant="outline-danger"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    confirmDelete(project.id ?? null);
-                  }}
-                >
-                  Delete
-                </Button>
-              </div>
-            </div>
-            <div className="d-flex flex-wrap align-items-center gap-3">
-              {project.url && (
-                <Button
-                  variant="link"
-                  className="p-0"
-                  href={project.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  View Project
-                </Button>
-              )}
-              <span className="text-secondary">
-                Order: {project.displayOrder}
-              </span>
-            </div>
-          </Card.Body>
-        </Card>
-      ))}
+              </td>
+              <td data-label="Order">{project.displayOrder}</td>
+              <td
+                className="text-end"
+                data-label="Actions"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <Dropdown align="end">
+                  <Dropdown.Toggle
+                    as={Button}
+                    size="sm"
+                    variant="outline-secondary"
+                    aria-label={`Actions for ${project.name}`}
+                  >
+                    <Ellipsis size={17} />
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item onClick={() => openPopup(project)}>
+                      Edit
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      className="text-danger"
+                      onClick={() => confirmDelete(project.id ?? null)}
+                    >
+                      Delete
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </div>
   );
 
   return (
     <CrudPageLayout
-      title="Project Management"
+      title="Projects"
       toggleSort={toggleSort}
       loading={loading}
       error={error}

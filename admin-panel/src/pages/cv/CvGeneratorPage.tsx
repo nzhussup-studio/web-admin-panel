@@ -1,6 +1,7 @@
 import Header from "@/components/layout/Header";
 import PageState from "@/components/pages/PageState";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -12,15 +13,14 @@ import {
   SkillControllerService,
   WorkExperienceControllerService,
 } from "@/lib/api/client";
-import { getApiErrorMessage, normalizeApiError } from "@/lib/api/errors";
+import { normalizeApiError } from "@/lib/api/errors";
 import config from "@/config/app-config";
 import { generateCV, previewCV } from "@/lib/cv/generateCv";
 import {
   loadCvGeneratorPreferences,
   saveCvGeneratorPreferences,
 } from "@/lib/cv/cvGeneratorPreferences";
-import { BackCircleIcon, DownloadIcon, FunnelIcon } from "@/assets/icons";
-import { useNavigate } from "react-router-dom";
+import { DownloadIcon, FunnelIcon } from "@/assets/icons";
 import { useOptionalGlobalAlert } from "@/hooks/alerts/useOptionalGlobalAlert";
 import CvGeneratorBasicInfoCard from "@/components/cv/generator/CvGeneratorBasicInfoCard";
 import CvGeneratorSectionCard from "@/components/cv/generator/CvGeneratorSectionCard";
@@ -95,13 +95,9 @@ const serializeSetMap = <T extends string | number>(
 };
 
 const CvGeneratorPage = () => {
-  const navigate = useNavigate();
   const { triggerAlert } = useOptionalGlobalAlert();
 
-  const [sections, setSections] = useState<CvSection[]>([]);
   const [isAscending, setIsAscending] = useState(false);
-  const [showLoading, setShowLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
   const [isSyncingPreferences, setIsSyncingPreferences] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(
     null,
@@ -192,12 +188,10 @@ const CvGeneratorPage = () => {
       return {};
     });
 
-  const fetchData = useCallback(async () => {
-    setShowLoading(true);
-    setError(null);
-
-    try {
-      const [work_experience, education, skills, projects, certificates] =
+  const sourceData = useQuery({
+    queryKey: ["cv-generator", "source-data"],
+    queryFn: async () => {
+      const [workExperience, education, skills, projects, certificates] =
         await Promise.all([
           WorkExperienceControllerService.listWorkExperience(),
           EducationControllerService.listEducation(),
@@ -205,36 +199,34 @@ const CvGeneratorPage = () => {
           ProjectControllerService.listProject(),
           CertificateControllerService.listCertificate(),
         ]);
-
-      const sortItems = (items: Record<string, any>[]) =>
-        [...items].sort((a, b) =>
-          isAscending
-            ? Number(a.displayOrder) - Number(b.displayOrder)
-            : Number(b.displayOrder) - Number(a.displayOrder),
-        );
-
-      setSections([
-        { sectionName: "work_experience", items: sortItems(work_experience) },
-        { sectionName: "education", items: sortItems(education) },
-        { sectionName: SKILLS_SECTION_NAME, items: sortItems(skills) },
-        { sectionName: "projects", items: sortItems(projects) },
-        { sectionName: "certificates", items: sortItems(certificates) },
-      ]);
-    } catch (fetchError) {
-      const normalizedError = normalizeApiError(fetchError);
-      setError(normalizedError);
-      triggerAlert(
-        getApiErrorMessage(fetchError, "Failed to load CV data"),
-        "danger",
+      return { workExperience, education, skills, projects, certificates };
+    },
+  });
+  const sections = useMemo<CvSection[]>(() => {
+    if (!sourceData.data) return [];
+    const sortItems = (items: Record<string, any>[]) =>
+      [...items].sort((a, b) =>
+        isAscending
+          ? Number(a.displayOrder) - Number(b.displayOrder)
+          : Number(b.displayOrder) - Number(a.displayOrder),
       );
-    } finally {
-      setShowLoading(false);
-    }
-  }, [isAscending, triggerAlert]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    return [
+      {
+        sectionName: "work_experience",
+        items: sortItems(sourceData.data.workExperience),
+      },
+      { sectionName: "education", items: sortItems(sourceData.data.education) },
+      {
+        sectionName: SKILLS_SECTION_NAME,
+        items: sortItems(sourceData.data.skills),
+      },
+      { sectionName: "projects", items: sortItems(sourceData.data.projects) },
+      {
+        sectionName: "certificates",
+        items: sortItems(sourceData.data.certificates),
+      },
+    ];
+  }, [isAscending, sourceData.data]);
 
   useEffect(() => {
     const serializableSelectedItems = serializeSetMap(selectedItems);
@@ -689,23 +681,17 @@ const CvGeneratorPage = () => {
 
   return (
     <>
-      <Header text={"CV Generator"} />
+      <Header
+        text="CV Generator"
+        description="Choose content, customize details and export your CV."
+      />
 
-      <Container className="my-5">
+      <Container fluid="xl" className="page-content">
         <Stack
           direction="horizontal"
           gap={3}
           className="align-items-center justify-content-between flex-wrap mb-4"
         >
-          <Button
-            variant="outline-secondary"
-            className="d-inline-flex align-items-center gap-2"
-            onClick={() => navigate(-1)}
-          >
-            <BackCircleIcon width={16} height={16} />
-            Back
-          </Button>
-
           <div className="d-flex align-items-center gap-2 flex-wrap ms-auto">
             <Button
               variant="outline-primary"
@@ -789,8 +775,8 @@ const CvGeneratorPage = () => {
 
         <PageState
           isEmpty={sections.length === 0}
-          loading={showLoading}
-          error={error}
+          loading={sourceData.isPending}
+          error={sourceData.error ? normalizeApiError(sourceData.error) : null}
         >
           <CvGeneratorBasicInfoCard
             basicInfo={basicInfo}

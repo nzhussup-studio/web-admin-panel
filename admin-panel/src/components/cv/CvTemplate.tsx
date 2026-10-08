@@ -1,4 +1,34 @@
-import { type CSSProperties } from "react";
+import { type CSSProperties, type ReactNode } from "react";
+
+type CvRecord = {
+  id?: string | number;
+  displayOrder?: number;
+  name?: string;
+  position?: string;
+  company?: string;
+  location?: string;
+  startDate?: string;
+  endDate?: string;
+  description?: string;
+  purpose?: string;
+  techStack?: string;
+  institution?: string;
+  degree?: string;
+  thesis?: string;
+  category?: string;
+  skillNames?: string;
+  issuer?: string;
+  url?: string;
+};
+
+export type CvData = {
+  basic_info?: Record<string, string>;
+  work_experience?: CvRecord[];
+  education?: CvRecord[];
+  skills?: CvRecord[];
+  projects?: CvRecord[];
+  certificates?: CvRecord[];
+};
 
 const THEME = {
   text: "#1f2933",
@@ -24,7 +54,13 @@ const twoColumnFlowStyle: CSSProperties = {
   columnGap: "12px",
 };
 
-const Section = ({ title, children }) => (
+const Section = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) => (
   <section
     style={{
       marginBottom: "9px",
@@ -43,6 +79,14 @@ const Item = ({
   additionalInfo = "",
   techStack = "",
   subtitleInline = false,
+}: {
+  title?: string;
+  subtitle?: string;
+  date?: string;
+  description?: string;
+  additionalInfo?: string;
+  techStack?: string;
+  subtitleInline?: boolean;
 }) => (
   <div
     style={{
@@ -113,7 +157,7 @@ const Item = ({
   </div>
 );
 
-const formatUrlLabel = (value) => {
+const formatUrlLabel = (value: string) => {
   if (!value) {
     return "";
   }
@@ -136,7 +180,7 @@ const formatUrlLabel = (value) => {
   }
 };
 
-const CvTemplate = ({ data }) => {
+const CvTemplate = ({ data }: { data: CvData }) => {
   const {
     basic_info = {},
     work_experience,
@@ -301,7 +345,7 @@ const CvTemplate = ({ data }) => {
       {Array.isArray(work_experience) && work_experience.length > 0 && (
         <Section title="Work Experience">
           {[...work_experience]
-            .sort((a, b) => b.displayOrder - a.displayOrder)
+            .sort((a, b) => (b.displayOrder ?? 0) - (a.displayOrder ?? 0))
             .map((exp) => (
               <Item
                 key={exp.id}
@@ -322,9 +366,9 @@ const CvTemplate = ({ data }) => {
       {Array.isArray(education) && education.length > 0 && (
         <Section title="Education">
           {[...education]
-            .sort((a, b) => b.displayOrder - a.displayOrder)
+            .sort((a, b) => (b.displayOrder ?? 0) - (a.displayOrder ?? 0))
             .map((edu) => {
-              const date = `${edu.startDate.slice(0, 10)} - ${
+              const date = `${edu.startDate?.slice(0, 10) ?? ""} - ${
                 edu.endDate ? edu.endDate.slice(0, 10) : "Present"
               }`;
 
@@ -363,7 +407,7 @@ const CvTemplate = ({ data }) => {
             }}
           >
             {[...projects]
-              .sort((a, b) => b.displayOrder - a.displayOrder)
+              .sort((a, b) => (b.displayOrder ?? 0) - (a.displayOrder ?? 0))
               .map((project) => (
                 <div key={project.id}>
                   <div style={{ fontWeight: 700 }}>
@@ -434,7 +478,7 @@ const CvTemplate = ({ data }) => {
         <Section title="Skills">
           <div style={twoColumnFlowStyle}>
             {[...skills]
-              .sort((a, b) => b.displayOrder - a.displayOrder)
+              .sort((a, b) => (b.displayOrder ?? 0) - (a.displayOrder ?? 0))
               .map((skill) => (
                 <div
                   key={skill.id}
@@ -451,7 +495,7 @@ const CvTemplate = ({ data }) => {
         <Section title="Certificates">
           <div style={{ lineHeight: 1.2 }}>
             {[...certificates]
-              .sort((a, b) => b.displayOrder - a.displayOrder)
+              .sort((a, b) => (b.displayOrder ?? 0) - (a.displayOrder ?? 0))
               .map((cert, index) => (
                 <span key={cert.id}>
                   <a

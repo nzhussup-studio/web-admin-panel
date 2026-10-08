@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
+import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
-import { useDarkMode } from "@/hooks/theme/useDarkMode";
-import { ImagesIcon } from "@/assets/icons";
+import Dropdown from "react-bootstrap/Dropdown";
+import { Ellipsis, Images } from "lucide-react";
 
 interface AlbumCardData {
   id?: string | number;
@@ -10,6 +11,8 @@ interface AlbumCardData {
   title?: string;
   description?: string;
   images_count?: number;
+  date?: string;
+  type?: string;
 }
 
 interface EditableAlbumCardProps {
@@ -18,104 +21,81 @@ interface EditableAlbumCardProps {
   onDelete?: (album: AlbumCardData) => void;
 }
 
+const visibilityVariant = (type?: string) =>
+  type === "private"
+    ? "danger"
+    : type === "semi-public"
+      ? "warning"
+      : "success";
+
 const EditableAlbumCard = ({
   album,
   onEdit,
   onDelete,
 }: EditableAlbumCardProps) => {
   const navigate = useNavigate();
-  const { isDarkMode } = useDarkMode();
-
-  const handleNavigate = () => {
-    navigate(`/albums/${album.id}`);
-  };
-
   return (
     <Card
-      className={`h-100 rounded-4 app-interactive-card app-album-card editable-album-card ${
-        isDarkMode ? "text-white" : ""
-      }`}
-      style={{
-        backdropFilter: "blur(4px)",
-        WebkitBackdropFilter: "blur(4px)",
-        boxShadow: isDarkMode
-          ? "0 6px 16px rgba(0, 0, 0, 0.4)"
-          : "0 6px 20px rgba(0, 0, 0, 0.1)",
-        overflow: "hidden",
-        transition: "transform 0.3s ease, box-shadow 0.3s ease",
-      }}
-      onClick={handleNavigate}
+      className="h-100 album-card"
+      onClick={() => navigate(`/albums/${album.id}`)}
     >
-      <div style={{ width: "100%", height: "180px", overflow: "hidden" }}>
+      <div className="album-card-cover">
         {album.preview_image ? (
           <Card.Img
-            className="app-card-cover"
             src={album.preview_image}
-            alt={album.title}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            alt={album.title ?? "Album cover"}
           />
         ) : (
-          <div
-            className="d-flex align-items-center justify-content-center"
-            style={{
-              width: "100%",
-              height: "100%",
-              backgroundColor: isDarkMode ? "#2c2c2c" : "#eaeaea",
-            }}
-          >
-            <ImagesIcon width={48} height={48} className="text-secondary" />
+          <div className="album-card-placeholder">
+            <Images size={36} />
           </div>
         )}
       </div>
-
-      <Card.Body className="p-3 d-flex flex-column flex-grow-1 app-card-body">
-        <Card.Title
-          className="fw-semibold mb-1 app-card-title"
-          style={{ fontSize: "1.1rem" }}
-        >
-          {album.title}
-        </Card.Title>
-        <Card.Text
-          className="text-secondary small mb-2"
-          style={{ opacity: 0.85, minHeight: "3em" }}
-        >
-          {album.description ? (
-            album.description
-          ) : (
-            <span className="text-muted">No description</span>
-          )}
-        </Card.Text>
-        <Card.Text className="text-muted small mt-auto">
-          📸 {album.images_count} images
-        </Card.Text>
-        <div className="app-card-actions mt-3">
-          {onEdit ? (
-            <Button
+      <Card.Body>
+        <div className="d-flex align-items-start justify-content-between gap-3">
+          <div className="min-w-0">
+            <Card.Title>{album.title}</Card.Title>
+            <div className="text-secondary small">
+              {album.date
+                ? new Date(album.date).toLocaleDateString()
+                : "No date"}
+              <span className="mx-2">·</span>
+              {album.images_count ?? 0} images
+            </div>
+          </div>
+          <Dropdown onClick={(event) => event.stopPropagation()}>
+            <Dropdown.Toggle
+              as={Button}
               variant="outline-secondary"
               size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(album);
-              }}
-              aria-label="Edit album"
+              aria-label="Album actions"
             >
-              Edit
-            </Button>
-          ) : null}
-          {onDelete ? (
-            <Button
-              variant="outline-danger"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(album);
-              }}
-              aria-label="Delete album"
-            >
-              Delete
-            </Button>
-          ) : null}
+              <Ellipsis size={18} />
+            </Dropdown.Toggle>
+            <Dropdown.Menu align="end">
+              {onEdit ? (
+                <Dropdown.Item onClick={() => onEdit(album)}>
+                  Edit
+                </Dropdown.Item>
+              ) : null}
+              {onDelete ? (
+                <Dropdown.Item
+                  className="text-danger"
+                  onClick={() => onDelete(album)}
+                >
+                  Delete
+                </Dropdown.Item>
+              ) : null}
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
+        <Badge
+          bg={`${visibilityVariant(album.type)}-subtle`}
+          text={visibilityVariant(album.type)}
+          className="mt-3 text-capitalize"
+        >
+          {album.type ?? "unknown"}
+        </Badge>
       </Card.Body>
     </Card>
   );

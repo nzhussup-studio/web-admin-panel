@@ -1,4 +1,5 @@
 import React from "react";
+import { queryKeys } from "@/api";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
@@ -44,6 +45,7 @@ const AlbumsPage = () => {
     closeDeleteModal,
     handleDelete,
   } = useCrudPage<AlbumPreviewView, AlbumPreviewView, string>({
+    queryKey: queryKeys.albums.list("all"),
     loadItems: async () => {
       const response = await AlbumService.getV1Album("all");
       return (response.data || []).map(normalizeAlbumPreview);

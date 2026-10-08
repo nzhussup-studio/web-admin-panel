@@ -1,4 +1,5 @@
 import React from "react";
+import { queryKeys } from "@/api";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
@@ -29,6 +30,7 @@ const CertificationsPage = () => {
     closeDeleteModal,
     handleDelete,
   } = useCrudPage<base_service_Certificate, base_service_Certificate, number>({
+    queryKey: queryKeys.cv.certifications,
     loadItems: () => CertificateControllerService.listCertificate(),
     createItem: (payload) =>
       CertificateControllerService.createCertificate(payload),

@@ -1,10 +1,6 @@
 declare module "html2pdf.js";
 
-declare global {
-  const __APP_API_BASE__: string | undefined;
-  const __APP_KEYCLOAK_URL__: string | undefined;
-  const __APP_KEYCLOAK_REALM__: string | undefined;
-  const __APP_KEYCLOAK_CLIENT_ID__: string | undefined;
-}
-
-export {};
+declare const __APP_API_BASE__: string | undefined;
+declare const __APP_KEYCLOAK_URL__: string | undefined;
+declare const __APP_KEYCLOAK_REALM__: string | undefined;
+declare const __APP_KEYCLOAK_CLIENT_ID__: string | undefined;

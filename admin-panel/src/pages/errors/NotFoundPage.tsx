@@ -10,7 +10,6 @@ const NotFoundPage = ({ showHeader = true }: NotFoundPageProps) => {
     <>
       {showHeader ? (
         <Header
-          showClearCacheButton={false}
           titleContent={
             <NotFoundIcon width={36} height={36} aria-label="Page not found" />
           }
