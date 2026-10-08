@@ -259,7 +259,7 @@ describe("pages/albums/AlbumPage.tsx", () => {
     );
 
     await waitFor(() =>
-      expect(mockUploadImage).toHaveBeenCalledWith("album-1", { file }),
+      expect(mockUploadImage).toHaveBeenCalledWith("album-1", { file: [file] }),
     );
     await waitFor(() => expect(mockGetAlbum).toHaveBeenCalledTimes(2));
   });

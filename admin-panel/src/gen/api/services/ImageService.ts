@@ -108,7 +108,7 @@ export class ImageService {
             /**
              * Image file(s) to upload
              */
-            file: Blob;
+            file: Array<Blob>;
         },
     ): CancelablePromise<(image_service_model_SuccessResponse & {
         data?: Array<image_service_model_Image>;

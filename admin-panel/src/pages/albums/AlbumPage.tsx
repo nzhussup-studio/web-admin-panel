@@ -115,8 +115,9 @@ const AlbumPage = () => {
   const saveImage = async () => {
     if (!id) return;
     try {
-      for (const file of formData.file || []) {
-        await ImageService.postV1AlbumUpload(id, { file: file.file });
+      const files = (formData.file || []).map(({ file }) => file);
+      if (files.length > 0) {
+        await ImageService.postV1AlbumUpload(id, { file: files });
       }
       await fetchItem();
       closePopup();
