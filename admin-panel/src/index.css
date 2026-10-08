@@ -14,7 +14,11 @@ a {
 .app-markdown-badge,
 .app-markdown-preview-label {
   color: var(--bs-secondary-color);
-  font: 600 0.72rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font:
+    600 0.72rem/1.4 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
