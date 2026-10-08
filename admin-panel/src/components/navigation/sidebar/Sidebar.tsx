@@ -6,6 +6,7 @@ import {
   BookOpen,
   Bot,
   ChevronDown,
+  ExternalLink,
   FileUser,
   FolderKanban,
   Image,
@@ -13,6 +14,7 @@ import {
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
+  ShieldCheck,
   Sun,
 } from "lucide-react";
 import { AccountMenu } from "@/features/account";
@@ -25,6 +27,8 @@ interface SidebarProps {
   profileName: string;
   isDarkMode: boolean;
   isCollapsed: boolean;
+  isAdmin: boolean;
+  authRealmUrl: string;
   onNavigate: (path: string) => void;
   onThemeToggle: () => void;
   onCollapseToggle: () => void;
@@ -54,6 +58,8 @@ export function Sidebar({
   profileName,
   isDarkMode,
   isCollapsed,
+  isAdmin,
+  authRealmUrl,
   onNavigate,
   onThemeToggle,
   onCollapseToggle,
@@ -74,40 +80,53 @@ export function Sidebar({
           <span className="admin-brand-label">Admin Panel</span>
         </Button>
       </div>
-      <Nav className="admin-nav flex-column" aria-label="Primary navigation">
-        {primaryNavigation.map(({ label, path, icon: Icon }) => (
-          <div key={path}>
-            <Nav.Link
-              as={NavLink}
-              to={path}
-              end={path === "/" || path === "/cv"}
-              onClick={() => onNavigate(path)}
-              className="admin-nav-link"
-              title={isCollapsed ? label : undefined}
-            >
-              <Icon size={19} aria-hidden="true" />
-              <span className="admin-nav-label">{label}</span>
-              {label === "CV" ? (
-                <ChevronDown size={15} className="ms-auto" />
+      {isAdmin ? (
+        <Nav className="admin-nav flex-column" aria-label="Primary navigation">
+          {primaryNavigation.map(({ label, path, icon: Icon }) => (
+            <div key={path}>
+              <Nav.Link
+                as={NavLink}
+                to={path}
+                end={path === "/" || path === "/cv"}
+                onClick={() => onNavigate(path)}
+                className="admin-nav-link"
+                title={isCollapsed ? label : undefined}
+              >
+                <Icon size={19} aria-hidden="true" />
+                <span className="admin-nav-label">{label}</span>
+                {label === "CV" ? (
+                  <ChevronDown size={15} className="ms-auto" />
+                ) : null}
+              </Nav.Link>
+              {label === "CV" && cvExpanded ? (
+                <Nav className="admin-subnav flex-column">
+                  {cvNavigation.map((item) => (
+                    <Nav.Link
+                      key={item.path}
+                      as={NavLink}
+                      to={item.path}
+                      onClick={() => onNavigate(item.path)}
+                    >
+                      {item.label}
+                    </Nav.Link>
+                  ))}
+                </Nav>
               ) : null}
-            </Nav.Link>
-            {label === "CV" && cvExpanded ? (
-              <Nav className="admin-subnav flex-column">
-                {cvNavigation.map((item) => (
-                  <Nav.Link
-                    key={item.path}
-                    as={NavLink}
-                    to={item.path}
-                    onClick={() => onNavigate(item.path)}
-                  >
-                    {item.label}
-                  </Nav.Link>
-                ))}
-              </Nav>
-            ) : null}
-          </div>
-        ))}
-      </Nav>
+            </div>
+          ))}
+          <Nav.Link
+            href={authRealmUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="admin-nav-link"
+            title={isCollapsed ? "Auth Realm" : undefined}
+          >
+            <ShieldCheck size={19} aria-hidden="true" />
+            <span className="admin-nav-label">Auth Realm</span>
+            <ExternalLink size={15} className="ms-auto" aria-hidden="true" />
+          </Nav.Link>
+        </Nav>
+      ) : null}
       <div className="admin-sidebar-footer">
         <Button
           variant="link"

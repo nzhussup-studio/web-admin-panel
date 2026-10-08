@@ -8,7 +8,10 @@ import { useOptionalGlobalAlert } from "@/providers/alerts";
 import { useAuth } from "@/providers/auth";
 import { useDarkMode } from "@/providers/theme";
 import { deleteAccount } from "@/features/account";
-import { keycloakAccountUrl } from "@/providers/auth/keycloak";
+import {
+  keycloakAccountUrl,
+  keycloakAdminRealmUrl,
+} from "@/providers/auth/keycloak";
 import { ErrorBoundary } from "@/components/feedback/error-boundary";
 
 const SIDEBAR_STORAGE_KEY = "isSidebarCollapsed";
@@ -79,6 +82,8 @@ export function AdminShell({ children }: PropsWithChildren) {
       profileName={state.firstName || "Profile"}
       isDarkMode={isDarkMode}
       isCollapsed={isSidebarCollapsed}
+      isAdmin={state.roles.includes("ROLE_ADMIN")}
+      authRealmUrl={keycloakAdminRealmUrl}
       onNavigate={closeAndNavigate}
       onThemeToggle={toggleDarkMode}
       onCollapseToggle={toggleSidebar}

@@ -14,7 +14,10 @@ const keycloakClientId =
     ? __APP_KEYCLOAK_CLIENT_ID__
     : "frontend-admin-auth-client";
 
-export const keycloakAccountUrl = `${keycloakUrl}/realms/${keycloakRealm}/account`;
+const normalizedKeycloakUrl = keycloakUrl.replace(/\/+$/, "");
+
+export const keycloakAccountUrl = `${normalizedKeycloakUrl}/realms/${keycloakRealm}/account`;
+export const keycloakAdminRealmUrl = `${normalizedKeycloakUrl}/admin/${keycloakRealm}/console/`;
 
 const keycloak = new Keycloak({
   url: keycloakUrl,
