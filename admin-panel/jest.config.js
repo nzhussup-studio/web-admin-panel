@@ -3,6 +3,8 @@ const config = {
   testEnvironment: "jsdom",
   setupFilesAfterEnv: ["./tests/setup.ts"],
   moduleNameMapper: {
+    "^react-markdown$": "<rootDir>/tests/mocks/react-markdown.tsx",
+    "^remark-gfm$": "<rootDir>/tests/mocks/remark-gfm.ts",
     "^@/(.*)\\.(css|less|scss|sass)$": "identity-obj-proxy",
     "^@/(.*)$": "<rootDir>/src/$1",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",

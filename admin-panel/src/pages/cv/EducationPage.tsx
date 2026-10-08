@@ -10,6 +10,8 @@ import {
 } from "@/lib/api/client";
 import { useCrudPage } from "@/hooks/crud/useCrudPage";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
+import MarkdownContent from "@/components/shared/MarkdownContent";
+import MarkdownField from "@/components/shared/MarkdownField";
 
 const formatDateForInput = (dateString) => {
   if (!dateString) return "";
@@ -117,15 +119,12 @@ const EducationPage = () => {
           onChange={(e) => setFormData({ ...formData, thesis: e.target.value })}
         />
       </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Description</Form.Label>
-        <Form.Control
-          value={formData.description ?? ""}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-        />
-      </Form.Group>
+      <MarkdownField
+        label="Description"
+        value={formData.description ?? ""}
+        onChange={(description) => setFormData({ ...formData, description })}
+        rows={8}
+      />
       <Form.Group className="mb-3">
         <Form.Label>Order Display</Form.Label>
         <Form.Control
@@ -167,7 +166,9 @@ const EducationPage = () => {
                       : "Present"}
                   </div>
                   {edu.thesis ? <div>Thesis: {edu.thesis}</div> : null}
-                  {edu.description ? <div>{edu.description}</div> : null}
+                  {edu.description ? (
+                    <MarkdownContent>{edu.description}</MarkdownContent>
+                  ) : null}
                   <div>Order: {edu.displayOrder}</div>
                 </div>
               </div>

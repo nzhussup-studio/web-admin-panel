@@ -11,6 +11,8 @@ import {
 } from "@/lib/api/client";
 import { useCrudPage } from "@/hooks/crud/useCrudPage";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
+import MarkdownContent from "@/components/shared/MarkdownContent";
+import MarkdownField from "@/components/shared/MarkdownField";
 
 const WorkExperiencePage = () => {
   const {
@@ -110,18 +112,12 @@ const WorkExperiencePage = () => {
           }
         />
       </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Description</Form.Label>
-        <Form.Control
-          as="textarea"
-          rows={10}
-          value={formData.description ?? ""}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-          required
-        />
-      </Form.Group>
+      <MarkdownField
+        label="Description"
+        value={formData.description ?? ""}
+        onChange={(description) => setFormData({ ...formData, description })}
+        required
+      />
       <Form.Group className="mb-3">
         <Form.Label>Tech Stack (comma-separated)</Form.Label>
         <Form.Control
@@ -171,9 +167,9 @@ const WorkExperiencePage = () => {
                     {experience.startDate} -{" "}
                     {experience.endDate ? experience.endDate : "Present"}
                   </div>
-                  <div style={{ whiteSpace: "pre-line" }}>
-                    {experience.description}
-                  </div>
+                  {experience.description ? (
+                    <MarkdownContent>{experience.description}</MarkdownContent>
+                  ) : null}
                   <div className="d-flex flex-wrap gap-2">
                     {experience.techStack &&
                       experience.techStack.split(",").map((tech, index) => (
