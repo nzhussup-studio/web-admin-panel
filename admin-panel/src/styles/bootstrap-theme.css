@@ -1389,6 +1389,13 @@ body {
   font-size: 1.08rem;
   font-weight: 700;
 }
+.project-description {
+  max-width: 42rem;
+  margin: 0.45rem 0 0.65rem;
+  color: var(--bs-secondary-color);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
 .data-pill {
   padding: 0.48rem 0.7rem;
   border: 1px solid transparent;

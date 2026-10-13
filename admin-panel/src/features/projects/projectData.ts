@@ -29,8 +29,12 @@ export const sortProjects = (
       : Number(b.displayOrder) - Number(a.displayOrder),
   );
 
-export const toProjectPayload = (project: Partial<base_service_Project>) =>
-  ({
-    ...project,
+export const toProjectPayload = (project: Partial<base_service_Project>) => {
+  return ({
+    id: project.id,
+    name: project.name,
+    url: project.url,
+    techStack: project.techStack,
     displayOrder: Number(project.displayOrder),
   }) as base_service_Project;
+};

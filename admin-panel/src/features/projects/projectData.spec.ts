@@ -22,4 +22,10 @@ describe("projectData", () => {
         .displayOrder,
     ).toBe(4);
   });
+
+  it("omits the read-only GitHub description from API payloads", () => {
+    expect(
+      toProjectPayload({ name: "Site", description: "From GitHub", displayOrder: 1 }),
+    ).not.toHaveProperty("description");
+  });
 });

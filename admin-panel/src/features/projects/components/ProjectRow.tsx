@@ -36,6 +36,9 @@ export function ProjectRow({ project, onEdit, onDelete }: ProjectRowProps) {
           />
         }
       >
+        {project.description ? (
+          <p className="project-description">{project.description}</p>
+        ) : null}
         <ColorPills values={project.techStack} />
       </DataTableMobileCard>
       <td className="desktop-data-cell" data-label="Project">
@@ -52,6 +55,9 @@ export function ProjectRow({ project, onEdit, onDelete }: ProjectRowProps) {
               >
                 {project.url.replace(/^https?:\/\//, "")}
               </a>
+            ) : null}
+            {project.description ? (
+              <p className="project-description">{project.description}</p>
             ) : null}
           </div>
         </div>

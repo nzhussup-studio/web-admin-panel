@@ -1118,6 +1118,10 @@ components:
           type: string
         url:
           type: string
+        description:
+          type: string
+          nullable: true
+          readOnly: true
         techStack:
           type: string
         displayOrder:

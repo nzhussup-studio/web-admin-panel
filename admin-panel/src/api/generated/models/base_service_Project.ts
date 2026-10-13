@@ -6,6 +6,7 @@ export type base_service_Project = {
     id?: number;
     name?: string;
     url?: string;
+    readonly description?: string | null;
     techStack?: string;
     displayOrder?: number;
 };
