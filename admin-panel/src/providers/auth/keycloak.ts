@@ -18,6 +18,7 @@ const normalizedKeycloakUrl = keycloakUrl.replace(/\/+$/, "");
 
 export const keycloakAccountUrl = `${normalizedKeycloakUrl}/realms/${keycloakRealm}/account`;
 export const keycloakAdminRealmUrl = `${normalizedKeycloakUrl}/admin/${keycloakRealm}/console/`;
+export const keycloakHealthUrl = `${normalizedKeycloakUrl}/realms/${keycloakRealm}/.well-known/openid-configuration`;
 
 const keycloak = new Keycloak({
   url: keycloakUrl,

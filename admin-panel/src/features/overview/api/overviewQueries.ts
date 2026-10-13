@@ -3,12 +3,28 @@ import {
   AlbumService,
   CertificateControllerService,
   EducationControllerService,
+  HealthControllerService,
   HealthService,
   ProjectControllerService,
   SkillControllerService,
   WorkExperienceControllerService,
   queryKeys,
 } from "@/api";
+import { keycloakHealthUrl } from "@/providers/auth/keycloak";
+
+const checkKeycloakHealth = async () => {
+  const response = await fetch(keycloakHealthUrl, {
+    headers: { Accept: "application/json" },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Keycloak health check failed with status ${response.status}`,
+    );
+  }
+
+  return response.json();
+};
 
 export const useOverviewQueries = () =>
   useQueries({
@@ -38,6 +54,10 @@ export const useOverviewQueries = () =>
         queryFn: async () => (await AlbumService.getV1Album("all")).data ?? [],
       },
       {
+        queryKey: ["health", "base"],
+        queryFn: () => HealthControllerService.baseServiceHealth(),
+      },
+      {
         queryKey: ["health", "images"],
         queryFn: () => HealthService.getV1AlbumHealth(),
       },
@@ -47,7 +67,11 @@ export const useOverviewQueries = () =>
       },
       {
         queryKey: ["health", "account"],
-        queryFn: () => HealthService.getHealth(),
+        queryFn: () => HealthService.getV1AccountHealth(),
+      },
+      {
+        queryKey: ["health", "keycloak"],
+        queryFn: checkKeycloakHealth,
       },
     ],
   });

@@ -37,6 +37,7 @@ export { ConfigurationService } from './services/ConfigurationService';
 export { CvGeneratorPreferenceControllerService } from './services/CvGeneratorPreferenceControllerService';
 export { EducationControllerService } from './services/EducationControllerService';
 export { HealthService } from './services/HealthService';
+export { HealthControllerService } from './services/HealthControllerService';
 export { ImageService } from './services/ImageService';
 export { ProjectControllerService } from './services/ProjectControllerService';
 export { SkillControllerService } from './services/SkillControllerService';

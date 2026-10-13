@@ -42,10 +42,10 @@ export class HealthService {
      * @returns account_service_model_SuccessResponse Service is healthy
      * @throws ApiError
      */
-    public static getHealth(): CancelablePromise<account_service_model_SuccessResponse> {
+    public static getV1AccountHealth(): CancelablePromise<account_service_model_SuccessResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/health',
+            url: '/v1/account/health',
         });
     }
 }
