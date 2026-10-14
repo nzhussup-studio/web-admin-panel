@@ -9,7 +9,7 @@ const sectionHeading: CSSProperties = {
   margin: "8px 0 5px",
   paddingBottom: "2px",
   borderBottom: `1px solid ${divider}`,
-  fontSize: "12px",
+  fontSize: "14px",
   fontWeight: 800,
   letterSpacing: "0.035em",
   lineHeight: 1.1,
@@ -83,21 +83,22 @@ const ProfessionalCvTemplate = ({ data }: { data: CvData }) => {
     <div
       style={{
         width: "100%",
-        maxWidth: "840px",
+        maxWidth: "794px",
+        boxSizing: "border-box",
         margin: "auto",
-        padding: "22px 30px 18px",
+        padding: "20px 16px 16px",
         background: "#ffffff",
         color: ink,
         fontFamily: 'Arial, "Helvetica Neue", sans-serif',
-        fontSize: "9.2px",
-        lineHeight: 1.22,
+        fontSize: "12px",
+        lineHeight: 1.18,
       }}
     >
       <header style={{ marginBottom: "7px", textAlign: "center" }}>
         <h1
           style={{
             margin: 0,
-            fontSize: "19px",
+            fontSize: "22px",
             fontWeight: 800,
             letterSpacing: "0.045em",
             lineHeight: 1.05,
@@ -107,11 +108,11 @@ const ProfessionalCvTemplate = ({ data }: { data: CvData }) => {
           {basic_info.name}
         </h1>
         {basic_info.headline && (
-          <div style={{ marginTop: "4px", fontSize: "12px", fontWeight: 700 }}>
+          <div style={{ marginTop: "4px", fontSize: "14px", fontWeight: 700 }}>
             {basic_info.headline}
           </div>
         )}
-        <div style={{ marginTop: "4px", fontSize: "9px" }}>
+        <div style={{ marginTop: "4px", fontSize: "11px" }}>
           {contacts.map((contact, index) => (
             <span key={index}>
               {index > 0 ? " | " : ""}
@@ -144,7 +145,7 @@ const ProfessionalCvTemplate = ({ data }: { data: CvData }) => {
               key={experience.id}
               style={{ marginBottom: "6px", breakInside: "avoid" }}
             >
-              <div style={{ fontSize: "10.2px", fontWeight: 700 }}>
+              <div style={{ fontSize: "12.5px", fontWeight: 700 }}>
                 {experience.position}
                 {experience.company ? ` | ${experience.company}` : ""}
                 {experience.location ? `, ${experience.location}` : ""}
@@ -180,7 +181,7 @@ const ProfessionalCvTemplate = ({ data }: { data: CvData }) => {
               key={project.id}
               style={{ marginBottom: "5px", breakInside: "avoid" }}
             >
-              <div style={{ fontSize: "10px", fontWeight: 700 }}>
+              <div style={{ fontSize: "12.5px", fontWeight: 700 }}>
                 {project.name}
                 {project.url ? " | " : ""}
                 {project.url && (
@@ -188,7 +189,7 @@ const ProfessionalCvTemplate = ({ data }: { data: CvData }) => {
                     href={project.url}
                     style={{
                       color: ink,
-                      fontSize: "9px",
+                      fontSize: "11px",
                       fontWeight: 400,
                       textDecoration: "none",
                     }}
@@ -219,7 +220,7 @@ const ProfessionalCvTemplate = ({ data }: { data: CvData }) => {
               key={item.id}
               style={{ marginBottom: "5px", breakInside: "avoid" }}
             >
-              <div style={{ fontSize: "10px", fontWeight: 700 }}>
+              <div style={{ fontSize: "12.5px", fontWeight: 700 }}>
                 {item.degree}
                 {item.institution ? ` | ${item.institution}` : ""}
                 {item.location ? `, ${item.location}` : ""}
@@ -272,7 +273,7 @@ const ProfessionalCvTemplate = ({ data }: { data: CvData }) => {
       )}
 
       <footer
-        style={{ marginTop: "14px", textAlign: "center", fontSize: "8px" }}
+        style={{ marginTop: "14px", textAlign: "center", fontSize: "9.5px" }}
       >
         {[basic_info.name, basic_info.headline].filter(Boolean).join(" | ")}
       </footer>

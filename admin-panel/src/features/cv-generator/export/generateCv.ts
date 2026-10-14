@@ -57,7 +57,10 @@ function waitForImagesToLoad(container: HTMLElement, timeoutMs = 8000) {
   ]);
 }
 
-function downloadPdfWithCanvasFallback(cvMarkup: string) {
+function downloadPdfWithCanvasFallback(
+  cvMarkup: string,
+  templateId: CvTemplateId,
+) {
   const scratchContainer = document.createElement("div");
   scratchContainer.innerHTML = cvMarkup;
   document.body.appendChild(scratchContainer);
@@ -71,7 +74,11 @@ function downloadPdfWithCanvasFallback(cvMarkup: string) {
       useCORS: true,
       allowTaint: false,
     },
-    jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+    jsPDF: {
+      unit: "in",
+      format: templateId === "professional" ? "a4" : "letter",
+      orientation: "portrait",
+    },
   };
 
   waitForImagesToLoad(scratchContainer)
@@ -83,7 +90,8 @@ function downloadPdfWithCanvasFallback(cvMarkup: string) {
 
 export function previewCV(data: CvData, templateId: CvTemplateId = "modern") {
   const cvMarkup = renderCvMarkup(data, templateId);
-  const popup = openWindowWithHtml(buildPreviewWindowHtml(cvMarkup));
+  const pageSize = templateId === "professional" ? "a4" : "letter";
+  const popup = openWindowWithHtml(buildPreviewWindowHtml(cvMarkup, pageSize));
   if (!popup) {
     alert(POPUP_BLOCKED_MESSAGE);
   }
@@ -97,9 +105,10 @@ export function generateCV(
   const cvMarkup = renderCvMarkup(data, templateId);
 
   if (output === "pdf") {
-    const popup = openWindowWithHtml(buildPrintWindowHtml(cvMarkup));
+    const pageSize = templateId === "professional" ? "a4" : "letter";
+    const popup = openWindowWithHtml(buildPrintWindowHtml(cvMarkup, pageSize));
     if (!popup) {
-      downloadPdfWithCanvasFallback(cvMarkup);
+      downloadPdfWithCanvasFallback(cvMarkup, templateId);
     }
     return;
   }

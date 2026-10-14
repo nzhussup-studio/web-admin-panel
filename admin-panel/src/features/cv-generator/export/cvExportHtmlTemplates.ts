@@ -51,14 +51,17 @@ const PRINT_SCRIPT = `
   })();
 `;
 
-export function buildPrintWindowHtml(cvMarkup: string): string {
+export function buildPrintWindowHtml(
+  cvMarkup: string,
+  pageSize: "letter" | "a4" = "letter",
+): string {
   return `<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
     <title>CV</title>
     <style>
-      @page { size: letter portrait; margin: 0.25in; }
+      @page { size: ${pageSize} portrait; margin: 0.25in; }
       ${BASE_PRINT_STYLE}
       body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     </style>
@@ -70,7 +73,10 @@ export function buildPrintWindowHtml(cvMarkup: string): string {
 </html>`;
 }
 
-export function buildPreviewWindowHtml(cvMarkup: string): string {
+export function buildPreviewWindowHtml(
+  cvMarkup: string,
+  pageSize: "letter" | "a4" = "letter",
+): string {
   return `<!doctype html>
 <html>
   <head>
@@ -80,6 +86,7 @@ export function buildPreviewWindowHtml(cvMarkup: string): string {
       html, body { margin: 0; padding: 0; background: #f5f6f8; }
       body { font-family: Helvetica, Arial, sans-serif; }
       ${PREVIEW_CONTAINER_STYLE}
+      .cv-preview { max-width: ${pageSize === "a4" ? "210mm" : "8.5in"}; }
     </style>
   </head>
   <body>
