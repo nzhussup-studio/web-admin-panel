@@ -45,7 +45,9 @@ export function CvSelectableEntry({
         tabIndex={-1}
         label={label}
       />
-      {children}
+      {selected && children ? (
+        <div className="cv-generator-entry-options">{children}</div>
+      ) : null}
     </div>
   );
 }

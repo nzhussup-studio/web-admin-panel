@@ -10,10 +10,13 @@ import {
   Settings,
   UserRound,
 } from "lucide-react";
+import { CV_TEMPLATES, type CvTemplateId } from "../templates";
 
 interface ExportSummaryProps {
   counts: Record<string, number>;
   onGenerate: () => void;
+  templateId?: CvTemplateId;
+  onTemplateChange?: (templateId: CvTemplateId) => void;
 }
 
 const items = [
@@ -25,7 +28,12 @@ const items = [
   ["certificates", "Certifications", Award],
 ] as const;
 
-export function ExportSummary({ counts, onGenerate }: ExportSummaryProps) {
+export function ExportSummary({
+  counts,
+  onGenerate,
+  templateId = "modern",
+  onTemplateChange = () => undefined,
+}: ExportSummaryProps) {
   const selectedCount = Object.values(counts).reduce(
     (total, count) => total + count,
     0,
@@ -49,10 +57,21 @@ export function ExportSummary({ counts, onGenerate }: ExportSummaryProps) {
           <Form.Label>Template</Form.Label>
           <Dropdown className="bootstrap-select-dropdown">
             <Dropdown.Toggle variant="outline-secondary">
-              Standard
+              {CV_TEMPLATES[templateId].name}
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item active>Standard</Dropdown.Item>
+              {Object.values(CV_TEMPLATES).map((template) => (
+                <Dropdown.Item
+                  key={template.id}
+                  active={template.id === templateId}
+                  onClick={() => onTemplateChange(template.id)}
+                >
+                  <strong>{template.name}</strong>
+                  <small className="d-block text-body-secondary">
+                    {template.eyebrow}
+                  </small>
+                </Dropdown.Item>
+              ))}
             </Dropdown.Menu>
           </Dropdown>
         </Form.Group>

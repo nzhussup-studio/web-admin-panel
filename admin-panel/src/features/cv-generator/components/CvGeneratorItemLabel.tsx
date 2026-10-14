@@ -1,6 +1,6 @@
-import Badge from "react-bootstrap/Badge";
 import {
   formatLabel,
+  getItemDateRange,
   getItemSubtitle,
   getItemTitle,
   getLongDescription,
@@ -10,53 +10,44 @@ import {
 type Props = {
   sectionName: string;
   item: Record<string, unknown>;
-  isChecked: boolean;
 };
 
-const CvGeneratorItemLabel = ({ sectionName, item, isChecked }: Props) => {
+const CvGeneratorItemLabel = ({ sectionName, item }: Props) => {
   const title = getItemTitle(item, `${formatLabel(sectionName)} entry`);
   const subtitle = getItemSubtitle(item);
   const description = getLongDescription(item);
-  const metadata = getMetadataEntries(item);
+  const metadata = getMetadataEntries(item).filter(
+    (entry) => entry.label !== "Start Date" && entry.label !== "End Date",
+  );
+  const dateRange = getItemDateRange(item);
 
   return (
     <div className="d-block w-100">
       <div className="cv-generator-item-content">
-        <Badge
-          bg={isChecked ? "primary-subtle" : "secondary-subtle"}
-          text={isChecked ? "primary" : "secondary-emphasis"}
-          pill
-          className="cv-generator-status-pill"
-        >
-          {isChecked ? "Selected" : "Available"}
-        </Badge>
-
-        <div className="d-flex align-items-start gap-3 w-100">
-          <div className="pe-2 flex-grow-1 min-w-0">
-            <div className="fw-semibold">{title}</div>
+        <div className="cv-generator-item-heading">
+          <div className="cv-generator-item-identity">
+            <div className="cv-generator-item-title">{title}</div>
             {subtitle ? (
-              <div className="text-body-secondary small mt-1">{subtitle}</div>
+              <div className="cv-generator-item-subtitle">{subtitle}</div>
             ) : null}
           </div>
+          {dateRange ? (
+            <time className="cv-generator-item-date">{dateRange}</time>
+          ) : null}
         </div>
 
         {metadata.length > 0 ? (
           <div className="cv-generator-metadata">
             {metadata.map((entry) => (
-              <Badge
-                key={entry.label}
-                bg="secondary-subtle"
-                text="secondary-emphasis"
-                className="cv-generator-metadata-pill"
-              >
-                <span className="opacity-75">{entry.label}:</span> {entry.value}
-              </Badge>
+              <span key={entry.label} className="cv-generator-metadata-pill">
+                <span>{entry.label}</span> {entry.value}
+              </span>
             ))}
           </div>
         ) : null}
 
         {description ? (
-          <div className="small text-body-secondary">{description}</div>
+          <p className="cv-generator-item-description">{description}</p>
         ) : null}
       </div>
     </div>

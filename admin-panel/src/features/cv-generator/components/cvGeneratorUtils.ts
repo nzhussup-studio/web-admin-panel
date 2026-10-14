@@ -104,6 +104,29 @@ export const getLongDescription = (item: Record<string, unknown>) => {
   return "";
 };
 
+const formatDate = (value: unknown) => {
+  const rawValue = formatScalar(value);
+  if (!rawValue) return "";
+
+  const isoDate = /^\d{4}-\d{2}/.exec(rawValue)?.[0];
+  if (!isoDate) return rawValue;
+
+  const [year, month] = isoDate.split("-").map(Number);
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(year, month - 1, 1)));
+};
+
+export const getItemDateRange = (item: Record<string, unknown>) => {
+  const startDate = formatDate(item.startDate);
+  if (!startDate) return "";
+
+  const endDate = formatDate(item.endDate) || "Present";
+  return `${startDate} – ${endDate}`;
+};
+
 const parseDelimitedValues = (value: unknown): string[] =>
   formatScalar(value)
     .split(/[\n,;]+/g)
@@ -116,6 +139,64 @@ export const parseSkillNames = (value: unknown): string[] =>
 
 export const parseTechStack = (value: unknown): string[] =>
   parseDelimitedValues(value);
+
+export type CustomSkillCategory = {
+  id: string;
+  name: string;
+  skills: string[];
+};
+
+export const parseCustomSkillsText = (value: string): CustomSkillCategory[] =>
+  value
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line, index) => {
+      const separatorIndex = line.indexOf(":");
+      if (separatorIndex < 1) return null;
+
+      const name = line.slice(0, separatorIndex).trim();
+      const skills = parseDelimitedValues(line.slice(separatorIndex + 1));
+      if (!name || skills.length === 0) return null;
+
+      return {
+        id: `custom-skill-category-${index}`,
+        name,
+        skills,
+      };
+    })
+    .filter((category): category is CustomSkillCategory => category !== null);
+
+export const serializeCustomSkillCategories = (
+  categories: CustomSkillCategory[],
+) =>
+  categories
+    .filter((category) => category.name.trim() || category.skills.length > 0)
+    .map((category) => `${category.name.trim()}: ${category.skills.join(", ")}`)
+    .join("\n");
+
+const dateSortValue = (item: Record<string, unknown>) => {
+  for (const key of ["startDate", "date", "issuedAt", "createdAt"]) {
+    const value = formatScalar(item[key]);
+    if (!value) continue;
+    const timestamp = Date.parse(value);
+    if (!Number.isNaN(timestamp)) return timestamp;
+  }
+  return Number.NEGATIVE_INFINITY;
+};
+
+export const sortCvItemsLatestFirst = <T extends object>(items: T[]) =>
+  [...items].sort((a, b) => {
+    const first = a as Record<string, unknown>;
+    const second = b as Record<string, unknown>;
+    const firstDate = dateSortValue(first);
+    const secondDate = dateSortValue(second);
+    if (firstDate !== secondDate) {
+      return secondDate > firstDate ? 1 : -1;
+    }
+
+    return Number(second.displayOrder ?? 0) - Number(first.displayOrder ?? 0);
+  });
 
 export const buildOverrideKey = (
   sectionName: string,

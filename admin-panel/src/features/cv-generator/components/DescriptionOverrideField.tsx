@@ -22,7 +22,7 @@ export function DescriptionOverrideField({
       : `Type a custom ${formatLabel(sectionName)} description...`;
 
   return (
-    <Form.Group className="mt-2">
+    <Form.Group className="cv-generator-override">
       <Form.Label>
         {isProject ? "Project description" : "Custom description"}
         <span className="text-body-secondary fw-normal"> (optional)</span>

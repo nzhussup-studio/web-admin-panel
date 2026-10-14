@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { AsyncState } from "@/components/feedback/error-state";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Button from "@/components/ui/button";
 import Col from "react-bootstrap/Col";
@@ -19,6 +19,8 @@ import { useOptionalGlobalAlert } from "@/providers/alerts";
 import {
   CvGeneratorBasicInfoCard,
   CvGeneratorSectionCard,
+  CvSkillCategoriesCard,
+  CvSkillModeToggle,
   ExportSummary,
 } from "./components";
 import { getCvGeneratorSourceData } from "./api";
@@ -31,8 +33,10 @@ import {
   parseTechStack,
   parseSkillNames,
   SKILLS_SECTION_NAME,
+  sortCvItemsLatestFirst,
   TECH_STACK_SELECTABLE_SECTION_NAMES,
 } from "./components/cvGeneratorUtils";
+import { CV_TEMPLATES, getCvTemplate } from "./templates";
 
 type CvSection = {
   sectionName: string;
@@ -41,8 +45,11 @@ type CvSection = {
 
 const CvGeneratorPage = () => {
   const { triggerAlert } = useOptionalGlobalAlert();
+  const [skillsOpen, setSkillsOpen] = useState(false);
 
   const {
+    templateId,
+    setTemplateId,
     basicInfo,
     setBasicInfo,
     descriptionOverrides,
@@ -53,6 +60,11 @@ const CvGeneratorPage = () => {
     setSelectedSkillEntries,
     selectedTechStackEntries,
     setSelectedTechStackEntries,
+    customSkillCategories,
+    customSkillsText,
+    setCustomSkillsText,
+    skillCategoryMode,
+    setSkillCategoryMode,
     isSyncingPreferences,
     syncToBackend,
     syncFromBackend,
@@ -64,27 +76,21 @@ const CvGeneratorPage = () => {
   });
   const sections = useMemo<CvSection[]>(() => {
     if (!sourceData.data) return [];
-    const sortItems = (items: Record<string, any>[]) =>
-      [...items].sort(
-        (a, b) => Number(a.displayOrder) - Number(b.displayOrder),
-      );
-    return [
-      {
-        sectionName: "work_experience",
-        items: sortItems(sourceData.data.workExperience),
-      },
-      { sectionName: "education", items: sortItems(sourceData.data.education) },
-      {
-        sectionName: SKILLS_SECTION_NAME,
-        items: sortItems(sourceData.data.skills),
-      },
-      { sectionName: "projects", items: sortItems(sourceData.data.projects) },
-      {
-        sectionName: "certificates",
-        items: sortItems(sourceData.data.certificates),
-      },
-    ];
-  }, [sourceData.data]);
+    const sourceBySection: Record<string, Record<string, any>[]> = {
+      work_experience: sourceData.data.workExperience,
+      education: sourceData.data.education,
+      skills: sourceData.data.skills,
+      projects: sourceData.data.projects,
+      certificates: sourceData.data.certificates,
+    };
+
+    return getCvTemplate(templateId).sectionOrder.map((sectionName) => ({
+      sectionName,
+      items: sortCvItemsLatestFirst(sourceBySection[sectionName] ?? []),
+    }));
+  }, [sourceData.data, templateId]);
+
+  const template = getCvTemplate(templateId);
 
   const handleBasicInfoChange = (key: string, value: string) => {
     setBasicInfo((prev) => ({ ...prev, [key]: value }));
@@ -296,6 +302,25 @@ const CvGeneratorPage = () => {
 
     for (const section of sections) {
       const { sectionName, items } = section;
+      if (
+        sectionName === SKILLS_SECTION_NAME &&
+        skillCategoryMode === "custom"
+      ) {
+        const populatedCategories = customSkillCategories.filter(
+          (category) => category.name.trim() && category.skills.length > 0,
+        );
+        if (populatedCategories.length > 0) {
+          selectedData[sectionName] = populatedCategories.map(
+            (category, index) => ({
+              id: category.id,
+              category: category.name.trim(),
+              skillNames: category.skills.join(", "),
+              displayOrder: populatedCategories.length - index,
+            }),
+          );
+        }
+        continue;
+      }
       const selectedIds = selectedItems[sectionName];
       if (!selectedIds?.size) {
         continue;
@@ -308,9 +333,7 @@ const CvGeneratorPage = () => {
 
           if (sectionName === SKILLS_SECTION_NAME) {
             const allSkillNames = parseSkillNames(currentItem.skillNames);
-            if (allSkillNames.length === 0) {
-              return currentItem;
-            }
+            if (allSkillNames.length === 0) return currentItem;
 
             const selectedForItem =
               selectedSkillEntries[String(currentItem.id)];
@@ -320,9 +343,7 @@ const CvGeneratorPage = () => {
                 )
               : allSkillNames;
 
-            if (activeSkillNames.length === 0) {
-              return null;
-            }
+            if (activeSkillNames.length === 0) return null;
 
             return {
               ...currentItem,
@@ -414,21 +435,26 @@ const CvGeneratorPage = () => {
       triggerAlert("CV generated successfully (mock)!", "success");
     }
 
-    generateCV(selectedData, output);
+    generateCV(selectedData, output, templateId);
   };
 
   const handlePreviewCV = () => {
     const selectedData = buildSelectedData();
-    previewCV(selectedData);
+    previewCV(selectedData, templateId);
   };
 
   const summaryCounts = useMemo(() => {
     const counts: Record<string, number> = { basic_info: 1 };
     sections.forEach(({ sectionName }) => {
-      counts[sectionName] = selectedItems[sectionName]?.size ?? 0;
+      counts[sectionName] =
+        sectionName === SKILLS_SECTION_NAME && skillCategoryMode === "custom"
+          ? customSkillCategories.filter(
+              (category) => category.name.trim() && category.skills.length > 0,
+            ).length
+          : (selectedItems[sectionName]?.size ?? 0);
     });
     return counts;
-  }, [sections, selectedItems]);
+  }, [customSkillCategories, sections, selectedItems, skillCategoryMode]);
 
   return (
     <>
@@ -459,10 +485,18 @@ const CvGeneratorPage = () => {
             </div>
             <Dropdown align="end" className="d-md-none cv-template-menu">
               <Dropdown.Toggle as={Button} variant="outline-secondary">
-                Template
+                {template.name}
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                <Dropdown.Item active>Standard</Dropdown.Item>
+                {Object.values(CV_TEMPLATES).map((option) => (
+                  <Dropdown.Item
+                    key={option.id}
+                    active={option.id === templateId}
+                    onClick={() => setTemplateId(option.id)}
+                  >
+                    {option.name}
+                  </Dropdown.Item>
+                ))}
               </Dropdown.Menu>
             </Dropdown>
             <Dropdown align="end" className="d-md-none cv-preferences-menu">
@@ -498,34 +532,82 @@ const CvGeneratorPage = () => {
               <CvGeneratorBasicInfoCard
                 basicInfo={basicInfo}
                 onBasicInfoChange={handleBasicInfoChange}
+                fields={template.basicInfoFields}
+                title={template.basicInfoTitle}
+                description={template.basicInfoDescription}
               />
-              {sections.map((section) => (
-                <CvGeneratorSectionCard
-                  key={section.sectionName}
-                  sectionName={section.sectionName}
-                  items={section.items}
-                  selectedItems={
-                    selectedItems[section.sectionName] || new Set()
-                  }
-                  descriptionOverrides={descriptionOverrides}
-                  selectedSkillEntries={selectedSkillEntries}
-                  selectedTechStackEntries={selectedTechStackEntries}
-                  onToggleAll={() =>
-                    toggleSectionAll(section.sectionName, section.items)
-                  }
-                  onToggleItem={toggleSelect}
-                  onSetDescriptionOverride={setDescriptionOverride}
-                  onToggleSkillCategory={toggleSkillCategory}
-                  onToggleSkillEntry={toggleSkillEntry}
-                  onToggleTechStackCategory={toggleTechStackCategory}
-                  onToggleTechStackEntry={toggleTechStackEntry}
-                />
-              ))}
+              {sections.map((section) =>
+                section.sectionName === SKILLS_SECTION_NAME ? (
+                  skillCategoryMode === "custom" ? (
+                    <CvSkillCategoriesCard
+                      key={section.sectionName}
+                      value={customSkillsText}
+                      onChange={setCustomSkillsText}
+                      mode={skillCategoryMode}
+                      onModeChange={setSkillCategoryMode}
+                      open={skillsOpen}
+                      onOpenChange={setSkillsOpen}
+                    />
+                  ) : (
+                    <CvGeneratorSectionCard
+                      key={section.sectionName}
+                      open={skillsOpen}
+                      onOpenChange={setSkillsOpen}
+                      bodyHeader={
+                        <CvSkillModeToggle
+                          value={skillCategoryMode}
+                          onChange={setSkillCategoryMode}
+                        />
+                      }
+                      sectionName={section.sectionName}
+                      items={section.items}
+                      selectedItems={
+                        selectedItems[section.sectionName] || new Set()
+                      }
+                      descriptionOverrides={descriptionOverrides}
+                      selectedSkillEntries={selectedSkillEntries}
+                      selectedTechStackEntries={selectedTechStackEntries}
+                      onToggleAll={() =>
+                        toggleSectionAll(section.sectionName, section.items)
+                      }
+                      onToggleItem={toggleSelect}
+                      onSetDescriptionOverride={setDescriptionOverride}
+                      onToggleSkillCategory={toggleSkillCategory}
+                      onToggleSkillEntry={toggleSkillEntry}
+                      onToggleTechStackCategory={toggleTechStackCategory}
+                      onToggleTechStackEntry={toggleTechStackEntry}
+                    />
+                  )
+                ) : (
+                  <CvGeneratorSectionCard
+                    key={section.sectionName}
+                    sectionName={section.sectionName}
+                    items={section.items}
+                    selectedItems={
+                      selectedItems[section.sectionName] || new Set()
+                    }
+                    descriptionOverrides={descriptionOverrides}
+                    selectedSkillEntries={selectedSkillEntries}
+                    selectedTechStackEntries={selectedTechStackEntries}
+                    onToggleAll={() =>
+                      toggleSectionAll(section.sectionName, section.items)
+                    }
+                    onToggleItem={toggleSelect}
+                    onSetDescriptionOverride={setDescriptionOverride}
+                    onToggleSkillCategory={toggleSkillCategory}
+                    onToggleSkillEntry={toggleSkillEntry}
+                    onToggleTechStackCategory={toggleTechStackCategory}
+                    onToggleTechStackEntry={toggleTechStackEntry}
+                  />
+                ),
+              )}
             </Col>
             <Col xl={3}>
               <ExportSummary
                 counts={summaryCounts}
                 onGenerate={() => handleGenerateCV("pdf")}
+                templateId={templateId}
+                onTemplateChange={setTemplateId}
               />
             </Col>
           </Row>

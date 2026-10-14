@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import Badge from "react-bootstrap/Badge";
 import Button from "@/components/ui/button";
 import Card from "react-bootstrap/Card";
@@ -30,6 +30,9 @@ type SelectedSkillEntries = Record<string, Set<string>>;
 type SelectedTechStackEntries = Record<string, Set<string>>;
 
 type Props = {
+  bodyHeader?: ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   sectionName: string;
   items: Record<string, any>[];
   selectedItems: Set<string | number>;
@@ -77,6 +80,9 @@ const sectionIcons = {
 } as const;
 
 const CvGeneratorSectionCard = ({
+  bodyHeader,
+  open: controlledOpen,
+  onOpenChange,
   sectionName,
   items,
   selectedItems,
@@ -91,7 +97,13 @@ const CvGeneratorSectionCard = ({
   onToggleTechStackCategory,
   onToggleTechStackEntry,
 }: Props) => {
-  const [open, setOpen] = useState(sectionName === "work_experience");
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen ?? internalOpen;
+  const toggleOpen = () => {
+    const nextOpen = !open;
+    setInternalOpen(nextOpen);
+    onOpenChange?.(nextOpen);
+  };
   const allSelected =
     items.length > 0 && items.every((item) => selectedItems.has(item.id));
   const isSkillsSection = sectionName === SKILLS_SECTION_NAME;
@@ -104,7 +116,7 @@ const CvGeneratorSectionCard = ({
         as="button"
         type="button"
         className="cv-generator-section-header"
-        onClick={() => setOpen((value) => !value)}
+        onClick={toggleOpen}
         aria-expanded={open}
       >
         {(() => {
@@ -131,6 +143,7 @@ const CvGeneratorSectionCard = ({
       </Card.Header>
       {open ? (
         <Card.Body className="cv-generator-section-body app-card-body">
+          {bodyHeader}
           <div className="cv-generator-section-toolbar">
             <span>
               Choose the entries to include in the generated document.
@@ -170,45 +183,58 @@ const CvGeneratorSectionCard = ({
                         onToggleSkillCategory(itemId, allSkillNames, isChecked)
                       }
                       label={
-                        <div>
-                          <div className="fw-semibold">{categoryName}</div>
-                          <div className="small text-body-secondary">
-                            {selectedSkillNames.length} of{" "}
-                            {allSkillNames.length} selected
+                        <div className="cv-generator-skill-heading">
+                          <div className="cv-generator-item-title">
+                            {categoryName}
+                          </div>
+                          <div className="cv-generator-item-subtitle">
+                            {allSkillNames.length}{" "}
+                            {allSkillNames.length === 1 ? "skill" : "skills"}
                           </div>
                         </div>
                       }
                     >
                       {allSkillNames.length > 0 ? (
-                        <div className="cv-generator-pill-list">
-                          {allSkillNames.map((skillName) => {
-                            const skillChecked =
-                              isChecked &&
-                              selectedSkillNames.includes(skillName);
+                        <>
+                          <div className="cv-generator-options-heading">
+                            <span>Skills</span>
+                            <small>
+                              {selectedSkillNames.length} of{" "}
+                              {allSkillNames.length} included
+                            </small>
+                          </div>
+                          <div className="cv-generator-pill-list">
+                            {allSkillNames.map((skillName) => {
+                              const skillChecked =
+                                isChecked &&
+                                selectedSkillNames.includes(skillName);
 
-                            return (
-                              <Button
-                                key={skillName}
-                                type="button"
-                                size="sm"
-                                variant={
-                                  skillChecked ? "primary" : "outline-secondary"
-                                }
-                                className="cv-generator-pill"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  onToggleSkillEntry(
-                                    itemId,
-                                    skillName,
-                                    selectedSkillNames,
-                                  );
-                                }}
-                              >
-                                {skillName}
-                              </Button>
-                            );
-                          })}
-                        </div>
+                              return (
+                                <Button
+                                  key={skillName}
+                                  type="button"
+                                  size="sm"
+                                  variant={
+                                    skillChecked
+                                      ? "primary"
+                                      : "outline-secondary"
+                                  }
+                                  className="cv-generator-pill"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    onToggleSkillEntry(
+                                      itemId,
+                                      skillName,
+                                      selectedSkillNames,
+                                    );
+                                  }}
+                                >
+                                  {skillName}
+                                </Button>
+                              );
+                            })}
+                          </div>
+                        </>
                       ) : null}
                     </CvSelectableEntry>
                   </div>
@@ -254,51 +280,52 @@ const CvGeneratorSectionCard = ({
                           <CvGeneratorItemLabel
                             sectionName={sectionName}
                             item={item}
-                            isChecked={isChecked}
                           />
-                          {allTechStackEntries.length > 0 ? (
-                            <div className="small text-body-secondary">
-                              {activeTechStackEntries.length} of{" "}
-                              {allTechStackEntries.length} tech stack entries
-                              selected
-                            </div>
-                          ) : null}
                         </div>
                       }
                     >
                       {allTechStackEntries.length > 0 ? (
-                        <div className="cv-generator-pill-list">
-                          {allTechStackEntries.map((techStackEntry) => {
-                            const techEntryChecked =
-                              isChecked &&
-                              activeTechStackEntries.includes(techStackEntry);
+                        <>
+                          <div className="cv-generator-options-heading">
+                            <span>Technologies</span>
+                            <small>
+                              {activeTechStackEntries.length} of{" "}
+                              {allTechStackEntries.length} included
+                            </small>
+                          </div>
+                          <div className="cv-generator-pill-list">
+                            {allTechStackEntries.map((techStackEntry) => {
+                              const techEntryChecked =
+                                isChecked &&
+                                activeTechStackEntries.includes(techStackEntry);
 
-                            return (
-                              <Button
-                                key={techStackEntry}
-                                type="button"
-                                size="sm"
-                                variant={
-                                  techEntryChecked
-                                    ? "primary"
-                                    : "outline-secondary"
-                                }
-                                className="cv-generator-pill"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  onToggleTechStackEntry(
-                                    sectionName,
-                                    itemId,
-                                    techStackEntry,
-                                    activeTechStackEntries,
-                                  );
-                                }}
-                              >
-                                {techStackEntry}
-                              </Button>
-                            );
-                          })}
-                        </div>
+                              return (
+                                <Button
+                                  key={techStackEntry}
+                                  type="button"
+                                  size="sm"
+                                  variant={
+                                    techEntryChecked
+                                      ? "primary"
+                                      : "outline-secondary"
+                                  }
+                                  className="cv-generator-pill"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    onToggleTechStackEntry(
+                                      sectionName,
+                                      itemId,
+                                      techStackEntry,
+                                      activeTechStackEntries,
+                                    );
+                                  }}
+                                >
+                                  {techStackEntry}
+                                </Button>
+                              );
+                            })}
+                          </div>
+                        </>
                       ) : null}
                     </CvSelectableEntry>
 
@@ -333,7 +360,6 @@ const CvGeneratorSectionCard = ({
                       <CvGeneratorItemLabel
                         sectionName={sectionName}
                         item={item}
-                        isChecked={isChecked}
                       />
                     }
                   />

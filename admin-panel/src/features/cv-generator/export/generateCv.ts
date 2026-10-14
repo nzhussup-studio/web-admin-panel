@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import html2pdf from "html2pdf.js";
-import CVTemplate, { type CvData } from "./CvTemplate";
+import { getCvTemplate, type CvData, type CvTemplateId } from "../templates";
 import {
   buildPreviewWindowHtml,
   buildPrintWindowHtml,
@@ -9,8 +9,9 @@ import {
 const POPUP_BLOCKED_MESSAGE =
   "Preview window was blocked. Please allow pop-ups for this site.";
 
-function renderCvMarkup(data: CvData): string {
-  return renderToStaticMarkup(CVTemplate({ data }));
+function renderCvMarkup(data: CvData, templateId: CvTemplateId): string {
+  const Template = getCvTemplate(templateId).component;
+  return renderToStaticMarkup(Template({ data }));
 }
 
 function openWindowWithHtml(documentHtml: string): Window | null {
@@ -80,16 +81,20 @@ function downloadPdfWithCanvasFallback(cvMarkup: string) {
     });
 }
 
-export function previewCV(data: CvData) {
-  const cvMarkup = renderCvMarkup(data);
+export function previewCV(data: CvData, templateId: CvTemplateId = "modern") {
+  const cvMarkup = renderCvMarkup(data, templateId);
   const popup = openWindowWithHtml(buildPreviewWindowHtml(cvMarkup));
   if (!popup) {
     alert(POPUP_BLOCKED_MESSAGE);
   }
 }
 
-export function generateCV(data: CvData, output = "pdf") {
-  const cvMarkup = renderCvMarkup(data);
+export function generateCV(
+  data: CvData,
+  output = "pdf",
+  templateId: CvTemplateId = "modern",
+) {
+  const cvMarkup = renderCvMarkup(data, templateId);
 
   if (output === "pdf") {
     const popup = openWindowWithHtml(buildPrintWindowHtml(cvMarkup));

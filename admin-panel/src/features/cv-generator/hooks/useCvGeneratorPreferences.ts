@@ -1,22 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useOptionalGlobalAlert } from "@/providers/alerts";
 import {
   loadCvGeneratorPreferences,
   saveCvGeneratorPreferences,
 } from "../preferences";
+import { isCvTemplateId, type CvTemplateId } from "../templates";
+import {
+  parseCustomSkillsText,
+  serializeCustomSkillCategories,
+  type CustomSkillCategory,
+} from "../components/cvGeneratorUtils";
 
 export type BasicInfo = Record<string, string>;
 export type DescriptionOverrides = Record<string, string>;
 export type SelectedItems = Record<string, Set<string | number>>;
 export type SelectedSkillEntries = Record<string, Set<string>>;
 export type SelectedTechStackEntries = Record<string, Set<string>>;
+export type { CustomSkillCategory } from "../components/cvGeneratorUtils";
+export type SkillCategoryMode = "default" | "custom";
 
 type SerializablePreferences = {
+  templateId?: unknown;
   basicInfo?: Record<string, unknown>;
   selectedItems?: Record<string, (string | number)[]>;
   descriptionOverrides?: DescriptionOverrides;
   selectedSkillEntries?: Record<string, string[]>;
   selectedTechStackEntries?: Record<string, string[]>;
+  customSkillCategories?: CustomSkillCategory[];
+  customSkillsText?: unknown;
+  skillCategoryMode?: unknown;
 };
 
 const STORAGE_KEY = "cvGeneratorSelectedItems";
@@ -29,6 +41,7 @@ const defaultBasicInfo: BasicInfo = {
   linkedin: "https://www.linkedin.com/in/nurzhanat-zhussup/",
   github: "https://github.com/nzhussup",
   image_url: "",
+  headline: "Backend & Platform Software Engineer",
   about:
     "A passionate software engineer with a focus on backend and infrastructure.",
 };
@@ -60,6 +73,11 @@ export function useCvGeneratorPreferences() {
   const { triggerAlert } = useOptionalGlobalAlert();
   const [initialPreferences] = useState(readLocalPreferences);
   const [isSyncingPreferences, setIsSyncingPreferences] = useState(false);
+  const [templateId, setTemplateId] = useState<CvTemplateId>(() =>
+    isCvTemplateId(initialPreferences.templateId)
+      ? initialPreferences.templateId
+      : "modern",
+  );
   const [basicInfo, setBasicInfo] = useState<BasicInfo>({
     ...defaultBasicInfo,
     ...(initialPreferences.basicInfo as BasicInfo | undefined),
@@ -79,32 +97,63 @@ export function useCvGeneratorPreferences() {
     useState<SelectedTechStackEntries>(() =>
       toSetMap(initialPreferences.selectedTechStackEntries),
     );
+  const [customSkillsText, setCustomSkillsText] = useState(() =>
+    typeof initialPreferences.customSkillsText === "string"
+      ? initialPreferences.customSkillsText
+      : serializeCustomSkillCategories(
+          initialPreferences.customSkillCategories ?? [],
+        ),
+  );
+  const customSkillCategories = useMemo(
+    () => parseCustomSkillsText(customSkillsText),
+    [customSkillsText],
+  );
+  const [skillCategoryMode, setSkillCategoryMode] = useState<SkillCategoryMode>(
+    () =>
+      initialPreferences.skillCategoryMode === "custom" ||
+      (initialPreferences.skillCategoryMode == null &&
+        Boolean(initialPreferences.customSkillCategories?.length))
+        ? "custom"
+        : "default",
+  );
 
   const serialize = () => ({
+    templateId,
     basicInfo,
     selectedItems: toArrayMap(selectedItems),
     descriptionOverrides,
     selectedSkillEntries: toArrayMap(selectedSkillEntries),
     selectedTechStackEntries: toArrayMap(selectedTechStackEntries),
+    customSkillCategories,
+    customSkillsText,
+    skillCategoryMode,
   });
 
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
+        templateId,
         basicInfo,
         selectedItems: toArrayMap(selectedItems),
         descriptionOverrides,
         selectedSkillEntries: toArrayMap(selectedSkillEntries),
         selectedTechStackEntries: toArrayMap(selectedTechStackEntries),
+        customSkillCategories,
+        customSkillsText,
+        skillCategoryMode,
       }),
     );
   }, [
     basicInfo,
+    templateId,
     descriptionOverrides,
     selectedItems,
     selectedSkillEntries,
     selectedTechStackEntries,
+    customSkillCategories,
+    customSkillsText,
+    skillCategoryMode,
   ]);
 
   const syncToBackend = async () => {
@@ -135,10 +184,25 @@ export function useCvGeneratorPreferences() {
         ),
       );
       setBasicInfo((current) => ({ ...current, ...loadedBasicInfo }));
+      setTemplateId(
+        isCvTemplateId(loaded.templateId) ? loaded.templateId : "modern",
+      );
       setSelectedItems(toSetMap(loaded.selectedItems));
       setDescriptionOverrides(loaded.descriptionOverrides ?? {});
       setSelectedSkillEntries(toSetMap(loaded.selectedSkillEntries));
       setSelectedTechStackEntries(toSetMap(loaded.selectedTechStackEntries));
+      setCustomSkillsText(
+        typeof loaded.customSkillsText === "string"
+          ? loaded.customSkillsText
+          : serializeCustomSkillCategories(loaded.customSkillCategories ?? []),
+      );
+      setSkillCategoryMode(
+        loaded.skillCategoryMode === "custom" ||
+          (loaded.skillCategoryMode == null &&
+            Boolean(loaded.customSkillCategories?.length))
+          ? "custom"
+          : "default",
+      );
       triggerAlert("Preferences synced from backend.", "success");
     } catch {
       triggerAlert("Failed to sync preferences from backend.", "danger");
@@ -148,6 +212,8 @@ export function useCvGeneratorPreferences() {
   };
 
   return {
+    templateId,
+    setTemplateId,
     basicInfo,
     setBasicInfo,
     descriptionOverrides,
@@ -158,6 +224,11 @@ export function useCvGeneratorPreferences() {
     setSelectedSkillEntries,
     selectedTechStackEntries,
     setSelectedTechStackEntries,
+    customSkillCategories,
+    customSkillsText,
+    setCustomSkillsText,
+    skillCategoryMode,
+    setSkillCategoryMode,
     isSyncingPreferences,
     syncToBackend,
     syncFromBackend,
