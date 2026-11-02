@@ -34,7 +34,8 @@ export const useOverviewQueries = () =>
       },
       {
         queryKey: queryKeys.cv.workExperience,
-        queryFn: () => WorkExperienceControllerService.listAdminWorkExperiences(),
+        queryFn: () =>
+          WorkExperienceControllerService.listAdminWorkExperiences(),
       },
       {
         queryKey: queryKeys.cv.education,
@@ -50,7 +51,8 @@ export const useOverviewQueries = () =>
       },
       {
         queryKey: queryKeys.albums.list("all"),
-        queryFn: async () => (await AlbumService.getV1AdminAlbums("all")).data ?? [],
+        queryFn: async () =>
+          (await AlbumService.getV1AdminAlbums("all")).data ?? [],
       },
       {
         queryKey: ["configuration", "llm"],

@@ -6,7 +6,12 @@ import { FormDrawer } from "@/components/ui/form-drawer";
 import type { base_service_Skill } from "@/api";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CvSectionNav } from "../components";
-import { createAdminSkills, deleteAdminSkills, listAdminSkillss, updateAdminSkills } from "../api";
+import {
+  createAdminSkills,
+  deleteAdminSkills,
+  listAdminSkillss,
+  updateAdminSkills,
+} from "../api";
 import { DataTable, DataTableMobileCard } from "@/components/ui/data-table";
 import { OverflowMenu } from "@/components/ui/overflow-menu";
 import {

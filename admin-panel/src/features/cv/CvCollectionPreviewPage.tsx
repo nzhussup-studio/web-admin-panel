@@ -20,7 +20,9 @@ function CvCollectionPreviewPage({ kind }: { kind: PreviewKind }) {
     queryKey: isWorkExperience
       ? queryKeys.cv.workExperience
       : queryKeys.cv.education,
-    queryFn: isWorkExperience ? listAdminWorkExperiences : listAdminEducationRecords,
+    queryFn: isWorkExperience
+      ? listAdminWorkExperiences
+      : listAdminEducationRecords,
   });
   const entries = [...(query.data ?? [])].sort(
     (a, b) => Number(a.displayOrder) - Number(b.displayOrder),

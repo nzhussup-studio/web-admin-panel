@@ -18,13 +18,20 @@ const loadAdminPreview = async (url?: string) => {
   if (!url) return url;
   const match = url.match(/\/v1\/albums\/([^/]+)\/images\/([^/?#]+)/);
   if (!match) return url;
-  return loadAdminImage(decodeURIComponent(match[1]), decodeURIComponent(match[2]));
+  return loadAdminImage(
+    decodeURIComponent(match[1]),
+    decodeURIComponent(match[2]),
+  );
 };
 
-const withAuthenticatedImages = async <T extends {
-  id?: string;
-  images?: Array<{ id?: string; url?: string }>;
-}>(album: T | null): Promise<T | null> => {
+const withAuthenticatedImages = async <
+  T extends {
+    id?: string;
+    images?: Array<{ id?: string; url?: string }>;
+  },
+>(
+  album: T | null,
+): Promise<T | null> => {
   if (!album?.id || !album.images) return album;
   const images = await Promise.all(
     album.images.map(async (image) => ({

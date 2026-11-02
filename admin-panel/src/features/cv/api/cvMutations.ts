@@ -9,16 +9,25 @@ import {
   type base_service_WorkExperience,
 } from "@/api";
 
-export const createAdminWorkExperiences = (value: base_service_WorkExperience) =>
-  WorkExperienceControllerService.createAdminWorkExperiences(value);
-export const updateAdminWorkExperiences = (value: base_service_WorkExperience) =>
-  WorkExperienceControllerService.updateAdminWorkExperiences(Number(value.id), value);
+export const createAdminWorkExperiences = (
+  value: base_service_WorkExperience,
+) => WorkExperienceControllerService.createAdminWorkExperiences(value);
+export const updateAdminWorkExperiences = (
+  value: base_service_WorkExperience,
+) =>
+  WorkExperienceControllerService.updateAdminWorkExperiences(
+    Number(value.id),
+    value,
+  );
 export const deleteAdminWorkExperiences = (id: number) =>
   WorkExperienceControllerService.deleteAdminWorkExperiences(id);
 export const createAdminEducationRecords = (value: base_service_Education) =>
   EducationControllerService.createAdminEducationRecords(value);
 export const updateAdminEducationRecords = (value: base_service_Education) =>
-  EducationControllerService.updateAdminEducationRecords(Number(value.id), value);
+  EducationControllerService.updateAdminEducationRecords(
+    Number(value.id),
+    value,
+  );
 export const deleteAdminEducationRecords = (id: number) =>
   EducationControllerService.deleteAdminEducationRecords(id);
 export const createAdminSkills = (value: base_service_Skill) =>
