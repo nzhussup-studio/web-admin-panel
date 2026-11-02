@@ -8,28 +8,49 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class SkillControllerService {
     /**
-     * @returns any OK
-     * @throws ApiError
-     */
-    public static listSkill(): CancelablePromise<Array<Record<string, any>>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/v1/base/skill',
-        });
-    }
-    /**
+     * @param id
      * @param requestBody
      * @returns base_service_Skill OK
      * @throws ApiError
      */
-    public static updateSkill(
+    public static updateAdminSkills(
+        id: number,
         requestBody: base_service_Skill,
     ): CancelablePromise<base_service_Skill> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/v1/base/skill',
+            url: '/v1/admin/skills/{id}',
+            path: {
+                'id': id,
+            },
             body: requestBody,
             mediaType: 'application/json',
+        });
+    }
+    /**
+     * @param id
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static deleteAdminSkills(
+        id: number,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/v1/admin/skills/{id}',
+            path: {
+                'id': id,
+            },
+        });
+    }
+    /**
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static listAdminSkills(): CancelablePromise<Array<Record<string, any>>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/v1/admin/skills',
         });
     }
     /**
@@ -37,27 +58,12 @@ export class SkillControllerService {
      * @returns base_service_Skill OK
      * @throws ApiError
      */
-    public static createSkill(
+    public static createAdminSkills(
         requestBody: base_service_Skill,
     ): CancelablePromise<base_service_Skill> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/v1/base/skill',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-    /**
-     * @param requestBody
-     * @returns any OK
-     * @throws ApiError
-     */
-    public static deleteSkill(
-        requestBody: base_service_Skill,
-    ): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/v1/base/skill',
+            url: '/v1/admin/skills',
             body: requestBody,
             mediaType: 'application/json',
         });

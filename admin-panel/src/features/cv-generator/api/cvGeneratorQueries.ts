@@ -9,11 +9,11 @@ import {
 export async function getCvGeneratorSourceData() {
   const [workExperience, education, skills, projects, certificates] =
     await Promise.all([
-      WorkExperienceControllerService.listWorkExperience(),
-      EducationControllerService.listEducation(),
-      SkillControllerService.listSkill(),
-      ProjectControllerService.listProject(),
-      CertificateControllerService.listCertificate(),
+      WorkExperienceControllerService.listAdminWorkExperiences(),
+      EducationControllerService.listAdminEducationRecords(),
+      SkillControllerService.listAdminSkills(),
+      ProjectControllerService.listAdminProjects(),
+      CertificateControllerService.listAdminCertificates(),
     ]);
   return { workExperience, education, skills, projects, certificates };
 }

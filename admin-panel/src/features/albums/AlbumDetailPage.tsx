@@ -35,6 +35,7 @@ import {
 } from "./api";
 import {
   getAlbumImageUrl,
+  getPublicAlbumImageUrl,
   normalizeAlbumPreview,
   type AlbumPreviewView,
 } from "./albumData";
@@ -278,6 +279,11 @@ const AlbumDetailPage = () => {
         <div key={image.id} className="col">
           <ImageMenu
             imageUrl={getAlbumImageUrl(image?.url)}
+            copyUrl={
+              album.type === "public" || album.type === "semi-public"
+                ? getPublicAlbumImageUrl(album.id, image.id)
+                : undefined
+            }
             imageId={image.id}
             alt={image?.id}
             onOpen={() => setSelectedImageIndex(index)}

@@ -10,10 +10,10 @@ export class CacheControllerService {
      * @returns string OK
      * @throws ApiError
      */
-    public static createCache(): CancelablePromise<string> {
+    public static createAdminCache(): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/v1/base/cache/clearGlobalCache',
+            url: '/v1/admin/cache/invalidate',
         });
     }
 }

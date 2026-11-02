@@ -1,6 +1,6 @@
-export { listProjects } from "./projectQueries";
+export { listAdminProjectss } from "./projectQueries";
 export {
-  createProject,
-  updateProject,
-  deleteProject,
+  createAdminProjects,
+  updateAdminProjects,
+  deleteAdminProjects,
 } from "./projectMutations";

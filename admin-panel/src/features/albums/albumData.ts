@@ -24,3 +24,12 @@ export const getAlbumImageUrl = (imageUrl?: string) => {
 
   return `${API_BASE.replace(/\/+$/, "")}/${value.replace(/^\/+/, "")}`;
 };
+
+export const getPublicAlbumImageUrl = (
+  albumId?: string,
+  imageId?: string,
+) => {
+  if (!albumId || !imageId) return "";
+
+  return `${API_BASE.replace(/\/+$/, "")}/v1/albums/${encodeURIComponent(albumId)}/images/${encodeURIComponent(imageId)}`;
+};

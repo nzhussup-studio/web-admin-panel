@@ -2,7 +2,7 @@ import { AccountService, CacheControllerService, CacheService } from "@/api";
 
 export const clearAccountCaches = () =>
   Promise.all([
-    CacheControllerService.createCache(),
-    CacheService.deleteV1AlbumCache(),
+    CacheControllerService.createAdminCache(),
+    CacheService.deleteV1AdminAlbumsCache(),
   ]);
-export const deleteAccount = () => AccountService.deleteV1Account();
+export const deleteAccount = () => AccountService.deleteV1MeAccount();

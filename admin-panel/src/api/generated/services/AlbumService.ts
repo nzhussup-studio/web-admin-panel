@@ -16,14 +16,14 @@ export class AlbumService {
      * @returns any OK
      * @throws ApiError
      */
-    public static getV1Album(
+    public static getV1AdminAlbums(
         type: 'public' | 'semi-public' | 'private' | 'all' = 'public',
     ): CancelablePromise<(image_service_model_SuccessResponse & {
         data?: Array<image_service_model_AlbumPreview>;
     })> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/v1/album',
+            url: '/v1/admin/albums',
             query: {
                 'type': type,
             },
@@ -42,14 +42,14 @@ export class AlbumService {
      * @returns any Created
      * @throws ApiError
      */
-    public static postV1Album(
+    public static postV1AdminAlbums(
         requestBody: image_service_model_AlbumPreview,
     ): CancelablePromise<(image_service_model_SuccessResponse & {
         data?: image_service_model_AlbumPreview;
     })> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/v1/album',
+            url: '/v1/admin/albums',
             body: requestBody,
             mediaType: 'application/json',
             errors: {
@@ -67,12 +67,12 @@ export class AlbumService {
      * @returns image_service_model_SuccessResponse Album deleted successfully
      * @throws ApiError
      */
-    public static deleteV1Album(
+    public static deleteV1AdminAlbums(
         id: string,
     ): CancelablePromise<image_service_model_SuccessResponse> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/v1/album/{id}',
+            url: '/v1/admin/albums/{id}',
             path: {
                 'id': id,
             },
@@ -90,14 +90,14 @@ export class AlbumService {
      * @returns any OK
      * @throws ApiError
      */
-    public static getV1Album1(
+    public static getV1AdminAlbums1(
         id: string,
     ): CancelablePromise<(image_service_model_SuccessResponse & {
         data?: image_service_model_Album;
     })> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/v1/album/{id}',
+            url: '/v1/admin/albums/{id}',
             path: {
                 'id': id,
             },
@@ -118,7 +118,7 @@ export class AlbumService {
      * @returns any OK
      * @throws ApiError
      */
-    public static putV1Album(
+    public static putV1AdminAlbums(
         id: string,
         requestBody: image_service_model_AlbumPreview,
     ): CancelablePromise<(image_service_model_SuccessResponse & {
@@ -126,7 +126,7 @@ export class AlbumService {
     })> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/v1/album/{id}',
+            url: '/v1/admin/albums/{id}',
             path: {
                 'id': id,
             },

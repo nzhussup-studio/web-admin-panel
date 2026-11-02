@@ -11,10 +11,10 @@ import { CvSectionNav } from "../components";
 import { OverflowMenu } from "@/components/ui/overflow-menu";
 import { DataTable, DataTableMobileCard } from "@/components/ui/data-table";
 import {
-  createWorkExperience,
-  deleteWorkExperience,
-  listWorkExperience,
-  updateWorkExperience,
+  createAdminWorkExperiences,
+  deleteAdminWorkExperiences,
+  listAdminWorkExperiences,
+  updateAdminWorkExperiences,
 } from "../api";
 import { ResourceForm } from "@/components/ui/resource-form";
 import { ColorPills } from "@/components/ui/color-pills";
@@ -45,10 +45,10 @@ const WorkExperiencePage = () => {
     number
   >({
     queryKey: queryKeys.cv.workExperience,
-    loadItems: listWorkExperience,
-    createItem: createWorkExperience,
-    updateItem: updateWorkExperience,
-    deleteItem: deleteWorkExperience,
+    loadItems: listAdminWorkExperiences,
+    createItem: createAdminWorkExperiences,
+    updateItem: updateAdminWorkExperiences,
+    deleteItem: deleteAdminWorkExperiences,
     sortItems: (items, isAscending) =>
       items.sort((a, b) =>
         isAscending

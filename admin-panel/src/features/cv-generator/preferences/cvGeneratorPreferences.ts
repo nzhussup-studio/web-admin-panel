@@ -19,10 +19,9 @@ const toPreferencePayload = (
 export const loadCvGeneratorPreferences =
   async (): Promise<CvGeneratorPreferencesPayload | null> => {
     try {
-      const list =
-        await CvGeneratorPreferenceControllerService.listCvGeneratorPreference();
-      const first = Array.isArray(list) ? list[0] : null;
-      return toPreferencePayload(first);
+      const preference =
+        await CvGeneratorPreferenceControllerService.listAdminCvGeneratorPreferences();
+      return toPreferencePayload(preference);
     } catch {
       return null;
     }
@@ -31,22 +30,15 @@ export const loadCvGeneratorPreferences =
 export const saveCvGeneratorPreferences = async (
   payload: CvGeneratorPreferencesPayload,
 ): Promise<void> => {
-  const list =
-    await CvGeneratorPreferenceControllerService.listCvGeneratorPreference();
-  const first = Array.isArray(list) ? list[0] : null;
+  const preference =
+    await CvGeneratorPreferenceControllerService.listAdminCvGeneratorPreferences();
 
   const requestBody: base_service_CvGeneratorPreference = {
-    ...(first?.id ? { id: first.id } : {}),
+    ...(preference?.id ? { id: preference.id } : {}),
     preferencesJson: payload as any,
   };
 
-  if (first?.id) {
-    await CvGeneratorPreferenceControllerService.updateCvGeneratorPreference(
-      requestBody,
-    );
-  } else {
-    await CvGeneratorPreferenceControllerService.createCvGeneratorPreference(
-      requestBody,
-    );
-  }
+  await CvGeneratorPreferenceControllerService.updateAdminCvGeneratorPreferences(
+    requestBody,
+  );
 };

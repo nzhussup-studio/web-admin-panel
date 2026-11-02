@@ -8,28 +8,49 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class WorkExperienceControllerService {
     /**
-     * @returns any OK
-     * @throws ApiError
-     */
-    public static listWorkExperience(): CancelablePromise<Array<Record<string, any>>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/v1/base/work-experience',
-        });
-    }
-    /**
+     * @param id
      * @param requestBody
      * @returns base_service_WorkExperience OK
      * @throws ApiError
      */
-    public static updateWorkExperience(
+    public static updateAdminWorkExperiences(
+        id: number,
         requestBody: base_service_WorkExperience,
     ): CancelablePromise<base_service_WorkExperience> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/v1/base/work-experience',
+            url: '/v1/admin/work-experiences/{id}',
+            path: {
+                'id': id,
+            },
             body: requestBody,
             mediaType: 'application/json',
+        });
+    }
+    /**
+     * @param id
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static deleteAdminWorkExperiences(
+        id: number,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/v1/admin/work-experiences/{id}',
+            path: {
+                'id': id,
+            },
+        });
+    }
+    /**
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static listAdminWorkExperiences(): CancelablePromise<Array<Record<string, any>>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/v1/admin/work-experiences',
         });
     }
     /**
@@ -37,27 +58,12 @@ export class WorkExperienceControllerService {
      * @returns base_service_WorkExperience OK
      * @throws ApiError
      */
-    public static createWorkExperience(
+    public static createAdminWorkExperiences(
         requestBody: base_service_WorkExperience,
     ): CancelablePromise<base_service_WorkExperience> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/v1/base/work-experience',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-    /**
-     * @param requestBody
-     * @returns any OK
-     * @throws ApiError
-     */
-    public static deleteWorkExperience(
-        requestBody: base_service_WorkExperience,
-    ): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/v1/base/work-experience',
+            url: '/v1/admin/work-experiences',
             body: requestBody,
             mediaType: 'application/json',
         });

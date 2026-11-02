@@ -4,7 +4,7 @@ import Container from "react-bootstrap/Container";
 import { AlbumLightboxModal, ImageGrid } from "./components";
 import { PageHeader } from "@/components/layout/page-header";
 import { AsyncState } from "@/components/feedback/error-state";
-import { useAlbum } from "./api";
+import { usePublicAlbum } from "./api";
 import { hasAdminRole, useAuth } from "@/providers/auth";
 
 const PublicAlbumPage = () => {
@@ -13,7 +13,7 @@ const PublicAlbumPage = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
     null,
   );
-  const { album, loading, error } = useAlbum(id);
+  const { album, loading, error } = usePublicAlbum(id);
   const images = album?.images || [];
 
   const openImage = (index: number) => {

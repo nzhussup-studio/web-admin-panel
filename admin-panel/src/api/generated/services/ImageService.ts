@@ -10,6 +10,41 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class ImageService {
     /**
+     * Upload image(s) to an album
+     * Upload one or more image files to the specified album
+     * @param id Album ID
+     * @param formData
+     * @returns any Upload accepted for background processing
+     * @throws ApiError
+     */
+    public static postV1AdminAlbumsImages(
+        id: string,
+        formData: {
+            /**
+             * Image file(s) to upload
+             */
+            file: Array<Blob>;
+        },
+    ): CancelablePromise<(image_service_model_SuccessResponse & {
+        data?: image_service_service_UploadJob;
+    })> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/v1/admin/albums/{id}/images',
+            path: {
+                'id': id,
+            },
+            formData: formData,
+            mediaType: 'multipart/form-data',
+            errors: {
+                400: `Bad Request`,
+                404: `Album Not Found`,
+                409: `Conflict`,
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * Delete an image from an album
      * Deletes an image by ID from the given album
      * @param id Album ID
@@ -17,7 +52,7 @@ export class ImageService {
      * @returns any Image deleted successfully
      * @throws ApiError
      */
-    public static deleteV1Album(
+    public static deleteV1AdminAlbumsImages(
         id: string,
         imageId: string,
     ): CancelablePromise<(image_service_model_SuccessResponse & {
@@ -25,7 +60,7 @@ export class ImageService {
     })> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/v1/album/{id}/{imageID}',
+            url: '/v1/admin/albums/{id}/images/{imageID}',
             path: {
                 'id': id,
                 'imageID': imageId,
@@ -45,13 +80,13 @@ export class ImageService {
      * @returns binary Image file
      * @throws ApiError
      */
-    public static getV1Album(
+    public static getV1AdminAlbumsImages(
         id: string,
         imageId: string,
     ): CancelablePromise<Blob> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/v1/album/{id}/{imageID}',
+            url: '/v1/admin/albums/{id}/images/{imageID}',
             path: {
                 'id': id,
                 'imageID': imageId,
@@ -70,7 +105,7 @@ export class ImageService {
      * @returns any Image renamed successfully
      * @throws ApiError
      */
-    public static patchV1AlbumRename(
+    public static patchV1AdminAlbumsImages(
         id: string,
         imageId: string,
         newName: string,
@@ -79,7 +114,7 @@ export class ImageService {
     })> {
         return __request(OpenAPI, {
             method: 'PATCH',
-            url: '/v1/album/{id}/{imageID}/rename',
+            url: '/v1/admin/albums/{id}/images/{imageID}',
             path: {
                 'id': id,
                 'imageID': imageId,
@@ -96,41 +131,6 @@ export class ImageService {
         });
     }
     /**
-     * Upload image(s) to an album
-     * Upload one or more image files to the specified album
-     * @param id Album ID
-     * @param formData
-     * @returns any Upload accepted for background processing
-     * @throws ApiError
-     */
-    public static postV1AlbumUpload(
-        id: string,
-        formData: {
-            /**
-             * Image file(s) to upload
-             */
-            file: Array<Blob>;
-        },
-    ): CancelablePromise<(image_service_model_SuccessResponse & {
-        data?: image_service_service_UploadJob;
-    })> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/v1/album/{id}/upload',
-            path: {
-                'id': id,
-            },
-            formData: formData,
-            mediaType: 'multipart/form-data',
-            errors: {
-                400: `Bad Request`,
-                404: `Album Not Found`,
-                409: `Conflict`,
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
      * Get upload job status
      * Returns progress and final result for a background image upload
      * @param id Album ID
@@ -138,7 +138,7 @@ export class ImageService {
      * @returns any OK
      * @throws ApiError
      */
-    public static getV1AlbumUpload(
+    public static getV1AdminAlbumsUploads(
         id: string,
         jobId: string,
     ): CancelablePromise<(image_service_model_SuccessResponse & {
@@ -146,7 +146,7 @@ export class ImageService {
     })> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/v1/album/{id}/upload/{jobID}',
+            url: '/v1/admin/albums/{id}/uploads/{jobID}',
             path: {
                 'id': id,
                 'jobID': jobId,

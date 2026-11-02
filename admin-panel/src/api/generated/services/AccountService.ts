@@ -12,10 +12,10 @@ export class AccountService {
      * @returns void
      * @throws ApiError
      */
-    public static deleteV1Account(): CancelablePromise<void> {
+    public static deleteV1MeAccount(): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/v1/account',
+            url: '/v1/me/account',
             errors: {
                 401: `Unauthorized`,
                 403: `Forbidden`,

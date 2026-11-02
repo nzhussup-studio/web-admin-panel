@@ -8,10 +8,10 @@ import type { base_service_Education } from "@/api";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CvSectionNav } from "../components";
 import {
-  createEducation,
-  deleteEducation,
-  listEducation,
-  updateEducation,
+  createAdminEducationRecords,
+  deleteAdminEducationRecords,
+  listAdminEducationRecords,
+  updateAdminEducationRecords,
 } from "../api";
 import { DataTable, DataTableMobileCard } from "@/components/ui/data-table";
 import { OverflowMenu } from "@/components/ui/overflow-menu";
@@ -75,10 +75,10 @@ const EducationPage = () => {
   } = useResourceEditor<base_service_Education, base_service_Education, number>(
     {
       queryKey: queryKeys.cv.education,
-      loadItems: listEducation,
-      createItem: createEducation,
-      updateItem: updateEducation,
-      deleteItem: deleteEducation,
+      loadItems: listAdminEducationRecords,
+      createItem: createAdminEducationRecords,
+      updateItem: updateAdminEducationRecords,
+      deleteItem: deleteAdminEducationRecords,
       sortItems: (items, isAscending) =>
         items.sort((a, b) =>
           isAscending

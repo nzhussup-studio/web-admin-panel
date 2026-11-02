@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { API_BASE } from "@/api";
-import { getAlbumImageUrl, normalizeAlbumPreview } from "./albumData";
+import {
+  getAlbumImageUrl,
+  getPublicAlbumImageUrl,
+  normalizeAlbumPreview,
+} from "./albumData";
 
 describe("albumData", () => {
   it("maps API names to view names", () => {
@@ -27,9 +31,16 @@ describe("albumData", () => {
   });
 
   it("joins relative paths to the API base without duplicate slashes", () => {
-    expect(getAlbumImageUrl("/v1/album/photo.png")).toBe(
-      `${API_BASE.replace(/\/+$/, "")}/v1/album/photo.png`,
+    expect(getAlbumImageUrl("/v1/albums/photo.png")).toBe(
+      `${API_BASE.replace(/\/+$/, "")}/v1/albums/photo.png`,
     );
     expect(getAlbumImageUrl("  ")).toBe("");
+  });
+
+  it("builds a permanent public API image URL", () => {
+    expect(getPublicAlbumImageUrl("album/id", "image name.jpg")).toBe(
+      `${API_BASE.replace(/\/+$/, "")}/v1/albums/album%2Fid/images/image%20name.jpg`,
+    );
+    expect(getPublicAlbumImageUrl("album", undefined)).toBe("");
   });
 });

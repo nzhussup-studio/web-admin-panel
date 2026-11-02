@@ -1,3 +1,3 @@
 import { ProjectControllerService } from "@/api";
 
-export const listProjects = () => ProjectControllerService.listProject();
+export const listAdminProjectss = () => ProjectControllerService.listAdminProjects();

@@ -4,10 +4,10 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { FormDrawer } from "@/components/ui/form-drawer";
 import { ResourceForm } from "@/components/ui/resource-form";
 import {
-  createProject,
-  deleteProject,
-  listProjects,
-  updateProject,
+  createAdminProjects,
+  deleteAdminProjects,
+  listAdminProjectss,
+  updateAdminProjects,
 } from "./api";
 import { ProjectList } from "./components";
 import {
@@ -23,10 +23,10 @@ const ProjectsPage = () => {
     number
   >({
     queryKey: queryKeys.projects,
-    loadItems: listProjects,
-    createItem: createProject,
-    updateItem: updateProject,
-    deleteItem: deleteProject,
+    loadItems: listAdminProjectss,
+    createItem: createAdminProjects,
+    updateItem: updateAdminProjects,
+    deleteItem: deleteAdminProjects,
     sortItems: sortProjects,
     toPayload: toProjectPayload,
   });

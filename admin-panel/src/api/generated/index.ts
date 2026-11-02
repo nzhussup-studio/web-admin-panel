@@ -36,10 +36,11 @@ export { CertificateControllerService } from './services/CertificateControllerSe
 export { ConfigurationService } from './services/ConfigurationService';
 export { CvGeneratorPreferenceControllerService } from './services/CvGeneratorPreferenceControllerService';
 export { EducationControllerService } from './services/EducationControllerService';
-export { HealthService } from './services/HealthService';
-export { HealthControllerService } from './services/HealthControllerService';
 export { ImageService } from './services/ImageService';
 export { ProjectControllerService } from './services/ProjectControllerService';
+export { PublicAlbumService } from './services/PublicAlbumService';
+export { PublicContentControllerService } from './services/PublicContentControllerService';
+export { PublicImageService } from './services/PublicImageService';
 export { SkillControllerService } from './services/SkillControllerService';
 export { SummarizerService } from './services/SummarizerService';
 export { WorkExperienceControllerService } from './services/WorkExperienceControllerService';

@@ -11,7 +11,6 @@ import {
   Images,
   KeyRound,
   Settings,
-  UserRound,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { useOverviewQueries } from "./api";
@@ -51,36 +50,29 @@ const OverviewPage = () => {
       label: "Base service",
       icon: Settings,
       tone: "blue",
-      isSuccess: results[6].isSuccess,
-      isError: results[6].isError,
+      isSuccess: results.slice(0, 5).every((result) => result.isSuccess),
+      isError: results.slice(0, 5).some((result) => result.isError),
     },
     {
       label: "Image service",
       icon: Image,
       tone: "green",
-      isSuccess: results[7].isSuccess,
-      isError: results[7].isError,
+      isSuccess: results[5].isSuccess,
+      isError: results[5].isError,
     },
     {
       label: "LLM service",
       icon: Brain,
       tone: "purple",
-      isSuccess: results[8].isSuccess,
-      isError: results[8].isError,
-    },
-    {
-      label: "Account service",
-      icon: UserRound,
-      tone: "gold",
-      isSuccess: results[9].isSuccess,
-      isError: results[9].isError,
+      isSuccess: results[6].isSuccess,
+      isError: results[6].isError,
     },
     {
       label: "Keycloak",
       icon: KeyRound,
       tone: "red",
-      isSuccess: results[10].isSuccess,
-      isError: results[10].isError,
+      isSuccess: results[7].isSuccess,
+      isError: results[7].isError,
     },
   ];
 

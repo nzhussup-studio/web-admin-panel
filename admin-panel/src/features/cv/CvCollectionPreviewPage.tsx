@@ -4,7 +4,7 @@ import { queryKeys } from "@/api";
 import { ColorPills } from "@/components/ui/color-pills";
 import { PreviewPage, type PreviewGroup } from "@/components/ui/preview-page";
 import { MarkdownContent } from "@/components/ui/markdown-field";
-import { listEducation, listWorkExperience } from "./api";
+import { listAdminEducationRecords, listAdminWorkExperiences } from "./api";
 
 type PreviewKind = "work-experience" | "education";
 
@@ -20,7 +20,7 @@ function CvCollectionPreviewPage({ kind }: { kind: PreviewKind }) {
     queryKey: isWorkExperience
       ? queryKeys.cv.workExperience
       : queryKeys.cv.education,
-    queryFn: isWorkExperience ? listWorkExperience : listEducation,
+    queryFn: isWorkExperience ? listAdminWorkExperiences : listAdminEducationRecords,
   });
   const entries = [...(query.data ?? [])].sort(
     (a, b) => Number(a.displayOrder) - Number(b.displayOrder),

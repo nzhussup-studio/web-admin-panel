@@ -5,9 +5,9 @@ import {
   WorkExperienceControllerService,
 } from "@/api";
 
-export const listWorkExperience = () =>
-  WorkExperienceControllerService.listWorkExperience();
-export const listEducation = () => EducationControllerService.listEducation();
-export const listSkills = () => SkillControllerService.listSkill();
+export const listAdminWorkExperiences = () =>
+  WorkExperienceControllerService.listAdminWorkExperiences();
+export const listAdminEducationRecords = () => EducationControllerService.listAdminEducationRecords();
+export const listAdminSkillss = () => SkillControllerService.listAdminSkills();
 export const listCertifications = () =>
-  CertificateControllerService.listCertificate();
+  CertificateControllerService.listAdminCertificates();

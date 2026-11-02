@@ -14,12 +14,12 @@ export class SummarizerService {
      * @returns llm_service_dto_APIResponse Generated professional summary
      * @throws ApiError
      */
-    public static getV1LlmSummarize(
+    public static postV1LlmSummaries(
         lang?: string,
     ): CancelablePromise<llm_service_dto_APIResponse> {
         return __request(OpenAPI, {
-            method: 'GET',
-            url: '/v1/llm/summarize',
+            method: 'POST',
+            url: '/v1/llm/summaries',
             query: {
                 'lang': lang,
             },

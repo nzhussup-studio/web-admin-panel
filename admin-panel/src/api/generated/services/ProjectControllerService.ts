@@ -8,28 +8,49 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class ProjectControllerService {
     /**
-     * @returns any OK
-     * @throws ApiError
-     */
-    public static listProject(): CancelablePromise<Array<Record<string, any>>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/v1/base/project',
-        });
-    }
-    /**
+     * @param id
      * @param requestBody
      * @returns base_service_Project OK
      * @throws ApiError
      */
-    public static updateProject(
+    public static updateAdminProjects(
+        id: number,
         requestBody: base_service_Project,
     ): CancelablePromise<base_service_Project> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/v1/base/project',
+            url: '/v1/admin/projects/{id}',
+            path: {
+                'id': id,
+            },
             body: requestBody,
             mediaType: 'application/json',
+        });
+    }
+    /**
+     * @param id
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static deleteAdminProjects(
+        id: number,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/v1/admin/projects/{id}',
+            path: {
+                'id': id,
+            },
+        });
+    }
+    /**
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static listAdminProjects(): CancelablePromise<Array<Record<string, any>>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/v1/admin/projects',
         });
     }
     /**
@@ -37,27 +58,12 @@ export class ProjectControllerService {
      * @returns base_service_Project OK
      * @throws ApiError
      */
-    public static createProject(
+    public static createAdminProjects(
         requestBody: base_service_Project,
     ): CancelablePromise<base_service_Project> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/v1/base/project',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-    /**
-     * @param requestBody
-     * @returns any OK
-     * @throws ApiError
-     */
-    public static deleteProject(
-        requestBody: base_service_Project,
-    ): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/v1/base/project',
+            url: '/v1/admin/projects',
             body: requestBody,
             mediaType: 'application/json',
         });

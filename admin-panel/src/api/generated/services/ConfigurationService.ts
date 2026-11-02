@@ -14,10 +14,10 @@ export class ConfigurationService {
      * @returns llm_service_dto_ConfigurationResponse Current configuration
      * @throws ApiError
      */
-    public static getV1LlmConfiguration(): CancelablePromise<llm_service_dto_ConfigurationResponse> {
+    public static getV1AdminLlmConfiguration(): CancelablePromise<llm_service_dto_ConfigurationResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/v1/llm/configuration',
+            url: '/v1/admin/llm/configuration',
         });
     }
     /**
@@ -27,12 +27,12 @@ export class ConfigurationService {
      * @returns llm_service_dto_ConfigurationResponse Updated configuration
      * @throws ApiError
      */
-    public static putV1LlmConfiguration(
+    public static putV1AdminLlmConfiguration(
         requestBody: llm_service_dto_ConfigurationRequest,
     ): CancelablePromise<llm_service_dto_ConfigurationResponse> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/v1/llm/configuration',
+            url: '/v1/admin/llm/configuration',
             body: requestBody,
             mediaType: 'application/json',
             errors: {

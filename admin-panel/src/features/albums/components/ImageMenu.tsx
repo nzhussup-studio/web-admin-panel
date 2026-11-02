@@ -5,6 +5,7 @@ import { useGlobalAlert } from "@/providers/alerts";
 
 interface ImageMenuProps {
   imageUrl: string;
+  copyUrl?: string;
   imageId?: string;
   alt?: string;
   onOpen?: () => void;
@@ -14,6 +15,7 @@ interface ImageMenuProps {
 
 const ImageMenu = ({
   imageUrl,
+  copyUrl: publicImageUrl,
   imageId: providedImageId,
   alt,
   onOpen,
@@ -24,8 +26,10 @@ const ImageMenu = ({
   const imageId = providedImageId || imageUrl.split("/").pop() || "Image";
 
   const copyUrl = async () => {
+    if (!publicImageUrl) return;
+
     try {
-      await navigator.clipboard.writeText(imageUrl);
+      await navigator.clipboard.writeText(publicImageUrl);
       triggerAlert("Image URL copied", "success");
     } catch {
       triggerAlert("Failed to copy image URL", "danger");
@@ -62,9 +66,11 @@ const ImageMenu = ({
             <Ellipsis size={17} />
           </Dropdown.Toggle>
           <Dropdown.Menu>
-            <Dropdown.Item onClick={() => void copyUrl()}>
-              <Copy size={16} /> Copy URL
-            </Dropdown.Item>
+            {publicImageUrl ? (
+              <Dropdown.Item onClick={() => void copyUrl()}>
+                <Copy size={16} /> Copy public URL
+              </Dropdown.Item>
+            ) : null}
             {onEdit ? (
               <Dropdown.Item onClick={onEdit}>
                 <Pencil size={16} /> Rename

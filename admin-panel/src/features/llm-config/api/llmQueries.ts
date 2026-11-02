@@ -1,6 +1,6 @@
 import { ConfigurationService, SummarizerService } from "@/api";
 
 export const getLlmConfiguration = () =>
-  ConfigurationService.getV1LlmConfiguration();
+  ConfigurationService.getV1AdminLlmConfiguration();
 export const generateSummary = (language: string) =>
-  SummarizerService.getV1LlmSummarize(language);
+  SummarizerService.postV1LlmSummaries(language);

@@ -2,9 +2,8 @@ import { useQueries } from "@tanstack/react-query";
 import {
   AlbumService,
   CertificateControllerService,
+  ConfigurationService,
   EducationControllerService,
-  HealthControllerService,
-  HealthService,
   ProjectControllerService,
   SkillControllerService,
   WorkExperienceControllerService,
@@ -31,43 +30,31 @@ export const useOverviewQueries = () =>
     queries: [
       {
         queryKey: queryKeys.projects,
-        queryFn: () => ProjectControllerService.listProject(),
+        queryFn: () => ProjectControllerService.listAdminProjects(),
       },
       {
         queryKey: queryKeys.cv.workExperience,
-        queryFn: () => WorkExperienceControllerService.listWorkExperience(),
+        queryFn: () => WorkExperienceControllerService.listAdminWorkExperiences(),
       },
       {
         queryKey: queryKeys.cv.education,
-        queryFn: () => EducationControllerService.listEducation(),
+        queryFn: () => EducationControllerService.listAdminEducationRecords(),
       },
       {
         queryKey: queryKeys.cv.skills,
-        queryFn: () => SkillControllerService.listSkill(),
+        queryFn: () => SkillControllerService.listAdminSkills(),
       },
       {
         queryKey: queryKeys.cv.certifications,
-        queryFn: () => CertificateControllerService.listCertificate(),
+        queryFn: () => CertificateControllerService.listAdminCertificates(),
       },
       {
         queryKey: queryKeys.albums.list("all"),
-        queryFn: async () => (await AlbumService.getV1Album("all")).data ?? [],
+        queryFn: async () => (await AlbumService.getV1AdminAlbums("all")).data ?? [],
       },
       {
-        queryKey: ["health", "base"],
-        queryFn: () => HealthControllerService.baseServiceHealth(),
-      },
-      {
-        queryKey: ["health", "images"],
-        queryFn: () => HealthService.getV1AlbumHealth(),
-      },
-      {
-        queryKey: ["health", "llm"],
-        queryFn: () => HealthService.getV1LlmHealth(),
-      },
-      {
-        queryKey: ["health", "account"],
-        queryFn: () => HealthService.getV1AccountHealth(),
+        queryKey: ["configuration", "llm"],
+        queryFn: () => ConfigurationService.getV1AdminLlmConfiguration(),
       },
       {
         queryKey: ["health", "keycloak"],

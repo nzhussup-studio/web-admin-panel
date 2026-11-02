@@ -8,13 +8,13 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class CvGeneratorPreferenceControllerService {
     /**
-     * @returns any OK
+     * @returns base_service_CvGeneratorPreference OK
      * @throws ApiError
      */
-    public static listCvGeneratorPreference(): CancelablePromise<Array<Record<string, any>>> {
+    public static listAdminCvGeneratorPreferences(): CancelablePromise<base_service_CvGeneratorPreference> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/v1/base/cv-generator-preference',
+            url: '/v1/admin/cv-generator-preferences',
         });
     }
     /**
@@ -22,42 +22,12 @@ export class CvGeneratorPreferenceControllerService {
      * @returns base_service_CvGeneratorPreference OK
      * @throws ApiError
      */
-    public static updateCvGeneratorPreference(
+    public static updateAdminCvGeneratorPreferences(
         requestBody: base_service_CvGeneratorPreference,
     ): CancelablePromise<base_service_CvGeneratorPreference> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/v1/base/cv-generator-preference',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-    /**
-     * @param requestBody
-     * @returns base_service_CvGeneratorPreference OK
-     * @throws ApiError
-     */
-    public static createCvGeneratorPreference(
-        requestBody: base_service_CvGeneratorPreference,
-    ): CancelablePromise<base_service_CvGeneratorPreference> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/v1/base/cv-generator-preference',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-    /**
-     * @param requestBody
-     * @returns any OK
-     * @throws ApiError
-     */
-    public static deleteCvGeneratorPreference(
-        requestBody: base_service_CvGeneratorPreference,
-    ): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/v1/base/cv-generator-preference',
+            url: '/v1/admin/cv-generator-preferences',
             body: requestBody,
             mediaType: 'application/json',
         });

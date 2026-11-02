@@ -6,7 +6,7 @@ import { FormDrawer } from "@/components/ui/form-drawer";
 import type { base_service_Skill } from "@/api";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CvSectionNav } from "../components";
-import { createSkill, deleteSkill, listSkills, updateSkill } from "../api";
+import { createAdminSkills, deleteAdminSkills, listAdminSkillss, updateAdminSkills } from "../api";
 import { DataTable, DataTableMobileCard } from "@/components/ui/data-table";
 import { OverflowMenu } from "@/components/ui/overflow-menu";
 import {
@@ -46,10 +46,10 @@ const SkillsPage = () => {
     handleDelete,
   } = useResourceEditor<base_service_Skill, base_service_Skill, number>({
     queryKey: queryKeys.cv.skills,
-    loadItems: listSkills,
-    createItem: createSkill,
-    updateItem: updateSkill,
-    deleteItem: deleteSkill,
+    loadItems: listAdminSkillss,
+    createItem: createAdminSkills,
+    updateItem: updateAdminSkills,
+    deleteItem: deleteAdminSkills,
     sortItems: (items, isAscending) =>
       items.sort((a, b) =>
         isAscending

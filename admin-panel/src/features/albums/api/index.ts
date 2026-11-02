@@ -1,4 +1,10 @@
-export { getAlbum, listAlbums, useAlbum } from "./albumQueries";
+export {
+  getAlbum,
+  getPublicAlbum,
+  listAlbums,
+  useAlbum,
+  usePublicAlbum,
+} from "./albumQueries";
 export {
   createAlbum,
   deleteAlbum,

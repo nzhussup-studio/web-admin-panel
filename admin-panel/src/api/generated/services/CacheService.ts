@@ -13,10 +13,10 @@ export class CacheService {
      * @returns image_service_model_SuccessResponse Cache cleared successfully
      * @throws ApiError
      */
-    public static deleteV1AlbumCache(): CancelablePromise<image_service_model_SuccessResponse> {
+    public static deleteV1AdminAlbumsCache(): CancelablePromise<image_service_model_SuccessResponse> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/v1/album/cache',
+            url: '/v1/admin/albums/cache',
             errors: {
                 500: `Internal Server Error`,
             },
