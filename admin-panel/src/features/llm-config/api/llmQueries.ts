@@ -22,7 +22,7 @@ export const generateSummary = async (language: string) => {
   }
 
 	if (response.status === "generating") {
-		throw new Error("Summary generation is taking longer than expected. Please retry.");
+		throw new Error("This is taking a little longer than usual. Please try again in a moment.");
 	}
   if (response.status !== "completed" || !response.summary) {
     throw new Error("Summary generation did not complete");

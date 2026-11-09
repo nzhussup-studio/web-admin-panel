@@ -64,6 +64,7 @@ const LlmConfigPage = () => {
   });
   const summaryMutation = useMutation({
     mutationFn: generateSummary,
+    retry: false,
     onSuccess: (response) => setSummary(response.summary ?? ""),
     onError: (error) =>
       triggerAlert(
