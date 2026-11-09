@@ -13,17 +13,19 @@ export const generateSummary = async (language: string) => {
   let response = await SummarizerService.postV1LlmSummariesGenerations({
     language: selectedLanguage,
   });
-	const deadline = Date.now() + MAX_FRONTEND_WAIT_MS;
+  const deadline = Date.now() + MAX_FRONTEND_WAIT_MS;
 
-	while (response.status === "generating" && Date.now() < deadline) {
-		const remaining = deadline - Date.now();
-		await wait(Math.min(response.poll_after_ms ?? 1500, remaining));
+  while (response.status === "generating" && Date.now() < deadline) {
+    const remaining = deadline - Date.now();
+    await wait(Math.min(response.poll_after_ms ?? 1500, remaining));
     response = await SummarizerService.getV1LlmSummaries(selectedLanguage);
   }
 
-	if (response.status === "generating") {
-		throw new Error("This is taking a little longer than usual. Please try again in a moment.");
-	}
+  if (response.status === "generating") {
+    throw new Error(
+      "This is taking a little longer than usual. Please try again in a moment.",
+    );
+  }
   if (response.status !== "completed" || !response.summary) {
     throw new Error("Summary generation did not complete");
   }
