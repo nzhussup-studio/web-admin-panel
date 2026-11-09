@@ -45,9 +45,6 @@ const LlmConfigPage = () => {
       system_prompt_en: configuration.data.system_prompt_en ?? "",
       system_prompt_de: configuration.data.system_prompt_de ?? "",
       system_prompt_kk: configuration.data.system_prompt_kk ?? "",
-      enable_parallel_generation: Boolean(
-        configuration.data.enable_parallel_generation,
-      ),
     });
   }, [configuration.data]);
 
@@ -67,7 +64,7 @@ const LlmConfigPage = () => {
   });
   const summaryMutation = useMutation({
     mutationFn: generateSummary,
-    onSuccess: (response) => setSummary(response.message ?? ""),
+    onSuccess: (response) => setSummary(response.summary ?? ""),
     onError: (error) =>
       triggerAlert(
         getApiErrorMessage(error, "Failed to generate summary"),

@@ -46,19 +46,6 @@ export function ModelSettingsForm({
               disabled={disabled}
             />
           </Form.Group>
-          <Form.Check
-            className="mb-4"
-            type="switch"
-            id="parallel-generation"
-            label="Enable parallel generation"
-            checked={Boolean(value.enable_parallel_generation)}
-            onChange={(event) =>
-              onChange({
-                ...value,
-                enable_parallel_generation: event.target.checked,
-              })
-            }
-          />
           <Nav
             variant="tabs"
             activeKey={activePrompt}

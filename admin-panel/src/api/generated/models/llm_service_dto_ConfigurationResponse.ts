@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type llm_service_dto_ConfigurationResponse = {
-    enable_parallel_generation?: boolean;
     model?: string;
     status?: number;
     system_prompt_de?: string;

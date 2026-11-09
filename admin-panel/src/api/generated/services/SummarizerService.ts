@@ -2,30 +2,53 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { llm_service_dto_APIResponse } from '../models/llm_service_dto_APIResponse';
+import type { llm_service_dto_GenerationRequest } from '../models/llm_service_dto_GenerationRequest';
+import type { llm_service_dto_SummaryResponse } from '../models/llm_service_dto_SummaryResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class SummarizerService {
     /**
-     * Generate professional profile summary
-     * Retrieves structured personal data (e.g., work experience, education), generates a professional summary using a large language model (LLM), and returns it in the requested language.
-     * @param lang
-     * @returns llm_service_dto_APIResponse Generated professional summary
+     * Get summary or generation status
+     * @param language Language
+     * @returns llm_service_dto_SummaryResponse Generated summary
      * @throws ApiError
      */
-    public static postV1LlmSummaries(
-        lang?: string,
-    ): CancelablePromise<llm_service_dto_APIResponse> {
+    public static getV1LlmSummaries(
+        language: 'en' | 'kk' | 'de',
+    ): CancelablePromise<llm_service_dto_SummaryResponse> {
         return __request(OpenAPI, {
-            method: 'POST',
-            url: '/v1/llm/summaries',
-            query: {
-                'lang': lang,
+            method: 'GET',
+            url: '/v1/llm/summaries/{language}',
+            path: {
+                'language': language,
             },
             errors: {
-                400: `Invalid query parameters`,
-                500: `Internal server error with error details`,
+                400: `Invalid language`,
+                404: `No summary or active generation`,
+                500: `Internal server error`,
+                503: `Generation failed`,
+            },
+        });
+    }
+    /**
+     * Start or join summary generation
+     * Returns a current cached summary or starts missing and stale language summaries in parallel.
+     * @param requestBody Requested language
+     * @returns llm_service_dto_SummaryResponse Current summary
+     * @throws ApiError
+     */
+    public static postV1LlmSummariesGenerations(
+        requestBody: llm_service_dto_GenerationRequest,
+    ): CancelablePromise<llm_service_dto_SummaryResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/v1/llm/summaries/generations',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Invalid request`,
+                500: `Internal server error`,
             },
         });
     }

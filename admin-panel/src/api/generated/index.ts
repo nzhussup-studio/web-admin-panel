@@ -27,6 +27,8 @@ export type { image_service_service_UploadJob } from './models/image_service_ser
 export type { llm_service_dto_APIResponse } from './models/llm_service_dto_APIResponse';
 export type { llm_service_dto_ConfigurationRequest } from './models/llm_service_dto_ConfigurationRequest';
 export type { llm_service_dto_ConfigurationResponse } from './models/llm_service_dto_ConfigurationResponse';
+export type { llm_service_dto_GenerationRequest } from './models/llm_service_dto_GenerationRequest';
+export type { llm_service_dto_SummaryResponse } from './models/llm_service_dto_SummaryResponse';
 
 export { AccountService } from './services/AccountService';
 export { AlbumService } from './services/AlbumService';

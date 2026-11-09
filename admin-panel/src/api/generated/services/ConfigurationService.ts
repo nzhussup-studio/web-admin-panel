@@ -10,7 +10,7 @@ import { request as __request } from '../core/request';
 export class ConfigurationService {
     /**
      * Get current LLM configuration
-     * Returns active runtime LLM settings such as model, prompts, and parallel generation flag.
+     * Returns the active model and language prompts.
      * @returns llm_service_dto_ConfigurationResponse Current configuration
      * @throws ApiError
      */
@@ -22,7 +22,7 @@ export class ConfigurationService {
     }
     /**
      * Update LLM configuration
-     * Updates runtime LLM settings such as model, prompts, and parallel generation flag.
+     * Updates the active model and language prompts.
      * @param requestBody Configuration overrides
      * @returns llm_service_dto_ConfigurationResponse Updated configuration
      * @throws ApiError
