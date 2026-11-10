@@ -214,12 +214,6 @@ const AlbumDetailPage = () => {
         onInvalidFiles={() =>
           triggerAlert("Only image files can be uploaded", "warning")
         }
-        onPreviewError={() =>
-          triggerAlert(
-            "One or more HEIC previews could not be generated",
-            "warning",
-          )
-        }
       />
     </FormDrawer>
   );
