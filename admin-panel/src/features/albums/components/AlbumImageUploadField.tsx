@@ -2,36 +2,37 @@ import type { ChangeEvent } from "react";
 import Button from "@/components/ui/button";
 import Form from "react-bootstrap/Form";
 import { ImagePlus, X } from "lucide-react";
+import { createImagePreview, isHeic, type ImagePreview } from "./imagePreview";
 
-export type ImagePreview = {
-  file: File;
-  preview: string;
-};
+export type { ImagePreview } from "./imagePreview";
 
 interface AlbumImageUploadFieldProps {
   value: ImagePreview[];
   onChange: (images: ImagePreview[]) => void;
   onInvalidFiles: () => void;
+  onPreviewError: () => void;
 }
-
-const readImage = (file: File) =>
-  new Promise<ImagePreview>((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () =>
-      resolve({ file, preview: String(reader.result || "") });
-    reader.readAsDataURL(file);
-  });
 
 export function AlbumImageUploadField({
   value,
   onChange,
   onInvalidFiles,
+  onPreviewError,
 }: AlbumImageUploadFieldProps) {
   const addFiles = async (files: File[]) => {
-    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+    const imageFiles = files.filter(
+      (file) => file.type.startsWith("image/") || isHeic(file),
+    );
     if (imageFiles.length !== files.length) onInvalidFiles();
     if (imageFiles.length === 0) return;
-    onChange([...value, ...(await Promise.all(imageFiles.map(readImage)))]);
+    const results = await Promise.allSettled(
+      imageFiles.map(createImagePreview),
+    );
+    const previews = results.flatMap((result) =>
+      result.status === "fulfilled" ? [result.value] : [],
+    );
+    if (previews.length !== results.length) onPreviewError();
+    if (previews.length > 0) onChange([...value, ...previews]);
   };
 
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
@@ -54,7 +55,7 @@ export function AlbumImageUploadField({
           <Form.Control
             className="visually-hidden"
             type="file"
-            accept="image/*"
+            accept="image/*,.heic,.heif"
             multiple
             onChange={handleInput}
             aria-label="Choose images"
