@@ -6,10 +6,17 @@ import {
   queryKeys,
   type image_service_model_AlbumPreview,
 } from "@/api";
+import { createRequestPacer } from "./requestPacer";
+
+// Authenticated album images are fetched as blobs because <img> cannot attach
+// the bearer token. Pace starts to 10/second so album refreshes stay below the
+// gateway's 20/second authenticated limit while status polling is still active.
+const scheduleAdminImageRequest = createRequestPacer(100);
 
 const loadAdminImage = async (albumId: string, imageId: string) => {
-  const blob = await getAuthenticatedBlob(
-    `/v1/admin/albums/${encodeURIComponent(albumId)}/images/${encodeURIComponent(imageId)}`,
+  const path = `/v1/admin/albums/${encodeURIComponent(albumId)}/images/${encodeURIComponent(imageId)}`;
+  const blob = await scheduleAdminImageRequest(() =>
+    getAuthenticatedBlob(path),
   );
   return URL.createObjectURL(blob);
 };
