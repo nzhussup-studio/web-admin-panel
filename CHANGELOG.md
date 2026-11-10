@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v4.0.0...v4.1.0) (2026-11-10)
+
+
+### Features
+
+* add description option in projects ([cdf3c1f](https://github.com/nzhussup/admin-panel-personal-website/commit/cdf3c1ff2e3092d7fbc080fc809c885ef93af855))
+* adjust health endpoints ([ff980e6](https://github.com/nzhussup/admin-panel-personal-website/commit/ff980e62a5a0ea0941c228130af46c0ae1ee9b8b))
+* improve tests ([90e69a0](https://github.com/nzhussup/admin-panel-personal-website/commit/90e69a0d6836fa6633bbb9e582953434cf6945e4))
+* rework cv generator and add new template ([9fb9fc0](https://github.com/nzhussup/admin-panel-personal-website/commit/9fb9fc083e28956629df5720d0b67626d31ce370))
+
+
+### Bug Fixes
+
+* cap llm queries at lower timeout ([2575986](https://github.com/nzhussup/admin-panel-personal-website/commit/25759869b10191a22b242a4d8f5cec0957e7daa8))
+* disable llm query retries and add localization for timeout error ([1462bf4](https://github.com/nzhussup/admin-panel-personal-website/commit/1462bf4dd4282fc543fb46b263195b1f7a4a456e))
+* disable llm query retries and add localization for timeout error ([c4da18b](https://github.com/nzhussup/admin-panel-personal-website/commit/c4da18b458b234a1ab0e3707ed81445a99b890db))
+* mobile css ([e9e18c1](https://github.com/nzhussup/admin-panel-personal-website/commit/e9e18c16a4559f7a23538862a8e73b0ed0319f4b))
+
 ## [4.0.0](https://github.com/nzhussup/admin-panel-personal-website/compare/v3.8.0...v4.0.0) (2026-10-08)
 
 
